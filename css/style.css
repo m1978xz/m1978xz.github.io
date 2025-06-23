@@ -2009,3 +2009,7 @@ html[data-dark=true] img {
 .article-tag-list {
   padding-left: 0rem;
 }
+
+#footer .copyright-symbol {
+  color: #ff69B4;
+}
