@@ -2013,3 +2013,8 @@ html[data-dark=true] img {
 #footer .copyright-symbol {
   color: #ff69B4;
 }
+
+/* 博客标题颜色 */
+.site-title, .blog-title, .header-title, h1.logo, #logo {
+  color: #1E90FF !important;
+}
