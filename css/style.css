@@ -2019,9 +2019,18 @@ html[data-dark=true] img {
   color: #1E90FF !important;
 }
 
-/* 主标题副标题间距加大 */
+@media (min-width: 992px) {
+  #sidebar {
+    display: none !important;
+  }
+  .content {
+    width: 100% !important;
+    float: none !important;
+    margin: 0 auto !important;
+  }
+}
 .site-name {
-  margin-bottom: 20px !important;
+  margin-bottom: 25px !important;
 }
 
 .site-description {
