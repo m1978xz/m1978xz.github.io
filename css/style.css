@@ -2019,13 +2019,13 @@ html[data-dark=true] img {
   color: #1E90FF !important;
 }
 
-/* 主标题与副标题加大间距 */
-.header-wrapper .title {
-  margin-bottom: 15px !important;
+/* 主标题副标题间距加大 */
+.site-name {
+  margin-bottom: 20px !important;
 }
 
-.header-wrapper .subtitle {
+.site-description {
   margin-top: 0 !important;
-  margin-bottom: 30px !important;
-  font-size: 19px !important;
+  margin-bottom: 40px !important;
+  font-size: 20px !important;
 }
