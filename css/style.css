@@ -2018,3 +2018,16 @@ html[data-dark=true] img {
 .site-title, .blog-title, .header-title, h1.logo, #logo {
   color: #1E90FF !important;
 }
+
+/* 调整博客标题间距 + 放大副标题 */
+/* 主标题与副标题之间加大间距 */
+.site-branding .site-title {
+  margin-bottom: 12px !important; /* 数值越大间隔越大，默认一般2~5px，你可以改15/20px */
+}
+
+/* 副标题放大2个字号 + 可微调颜色/粗细 */
+.site-branding .site-description {
+  font-size: 1.2em !important; /* 比原来大2号字号 */
+  /* 如果你想更大：1.3em、1.4em 都行 */
+  opacity: 0.8 !important; /* 让副标题柔和一点（可选） */
+}
