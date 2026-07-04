@@ -646,20 +646,6 @@ function renderList(filteredNotes, searchTerm) {
         timeSpan.style.cssText = 'font-size:12px;color:#8e8e93;font-weight:400;white-space:nowrap;';
         timeSpan.textContent = formatTimestamp(n.lastModified);
         titleDiv.appendChild(timeSpan);
-        if (n.tags && n.tags.length > 0) {
-            var tagsDiv = document.createElement('div');
-            tagsDiv.style.cssText = 'margin-top:4px;';
-            n.tags.forEach(function(tid) {
-                var t = tags.find(function(tt) { return tt.id === tid; });
-                if (t) {
-                    var badge = document.createElement('span');
-                    badge.className = 'tag-badge';
-                    badge.textContent = t.name;
-                    tagsDiv.appendChild(badge);
-                }
-            });
-            titleDiv.appendChild(tagsDiv);
-        }
         var contentDiv = document.createElement("div");
         contentDiv.classList.add("note-content");
         var contentTextDiv = document.createElement("div");
@@ -714,6 +700,20 @@ function renderList(filteredNotes, searchTerm) {
         contentDiv.appendChild(actionButtonsDiv);
         titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id, searchTerm); };
         li.appendChild(titleDiv);
+        if (n.tags && n.tags.length > 0) {
+            var tagsDiv = document.createElement('div');
+            tagsDiv.style.cssText = 'margin-top:4px;margin-bottom:4px;';
+            n.tags.forEach(function(tid) {
+                var t = tags.find(function(tt) { return tt.id === tid; });
+                if (t) {
+                    var badge = document.createElement('span');
+                    badge.className = 'tag-badge';
+                    badge.textContent = t.name;
+                    tagsDiv.appendChild(badge);
+                }
+            });
+            li.appendChild(tagsDiv);
+        }
         li.appendChild(contentDiv);
         noteList.appendChild(li);
     });
