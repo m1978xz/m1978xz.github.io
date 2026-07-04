@@ -431,9 +431,15 @@ nextPageBtn.onclick = function() {
     if (currentPage < totalPages) goToPage(currentPage + 1);
 };
 
-document.querySelector("#fmtBold").onclick = function() { storyDiv.focus(); document.execCommand('bold'); };
+document.querySelector("#fmtBold").onclick = function() { storyDiv.focus(); if (savedRange) { var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); savedRange = null; } document.execCommand('bold'); };
+document.querySelector("#fmtSize").onmousedown = function() { saveSelection(); };
+document.querySelector("#fmtSize").ontouchstart = function() { saveSelection(); };
 document.querySelector("#fmtSize").onchange = function() {
-    if (this.value) { storyDiv.focus(); document.execCommand('fontSize', false, this.value); }
+    if (this.value) {
+        storyDiv.focus();
+        if (savedRange) { var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); savedRange = null; }
+        document.execCommand('fontSize', false, this.value);
+    }
     this.value = '';
 };
 var colorPickerMode = 'foreColor';
