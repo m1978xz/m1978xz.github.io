@@ -134,6 +134,26 @@ body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
 .empty-trash-btn:hover { background: #d62d20; }
 .restore-btn { background: #ff9500; color: white; }
 .restore-btn:hover { background: #e08600; }
+
+/* Tags */
+.tag-badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:10px; margin:2px 3px 2px 0; background:#e8e8ed; color:#555; cursor:default; }
+body.dark-mode .tag-badge { background:#3a3a3c; color:#aaa; }
+.tag-picker-popup { position:fixed; background:#fff; border:1px solid #e8e8ed; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15); padding:14px; z-index:2000; min-width:260px; }
+body.dark-mode .tag-picker-popup { background:#2c2c2e; border-color:#48484a; }
+.tag-picker-popup .tag-option { display:inline-block; padding:4px 12px; border-radius:12px; margin:3px; font-size:12px; cursor:pointer; border:1px solid #d1d1d6; background:#f8f8fa; transition:all 0.15s; }
+.tag-picker-popup .tag-option:hover { border-color:#007aff; }
+.tag-picker-popup .tag-option.selected { background:#007aff; color:#fff; border-color:#007aff; }
+body.dark-mode .tag-picker-popup .tag-option { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+body.dark-mode .tag-picker-popup .tag-option.selected { background:#007aff; }
+.tag-picker-popup .tag-new-row { display:flex; gap:6px; margin-top:10px; }
+.tag-picker-popup .tag-new-row input { flex:1; padding:8px; border:1px solid #e8e8ed; border-radius:8px; font-size:13px; outline:none; }
+body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+#tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
+#tagManagementList { list-style:none; padding:0; margin-top:15px; }
+#tagManagementList li { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0f0f0; }
+#tagManagementList li:last-child { border-bottom:none; }
+body.dark-mode #tagManagementContainer { background:#2c2c2e; border-color:#48484a; }
+body.dark-mode #tagManagementList li { border-bottom-color:#48484a; }
 </style>
 </head>
 <body>
@@ -153,6 +173,7 @@ body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
             <select id="folderFilter"><option value="">所有笔记</option><option value="unfiled">无文件夹</option></select>
             <button id="showFolderListBtn">文件夹列表</button>
             <button id="showTrashBtn" style="background:#ff3b30;color:white;">回收站</button>
+            <button id="showTagsBtn" style="background:#5e5ce6;color:white;">标签管理</button>
             <button id="exportAllMdBtn" style="background:#6f42c1;color:white;">导出全部为MD</button>
             <button id="exportDataBtn">导出数据(JSON)</button>
             <button id="importDataBtn">导入数据(JSON)</button>
@@ -185,8 +206,20 @@ body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
     </select>
     <button id="fmtColorBtn">文字色</button>
     <button id="fmtBgColorBtn">背景色</button>
+    <select id="fmtHeading">
+      <option value="">标题</option>
+      <option value="h1">标题 1</option>
+      <option value="h2">标题 2</option>
+      <option value="h3">标题 3</option>
+      <option value="h4">标题 4</option>
+      <option value="h5">标题 5</option>
+      <option value="h6">标题 6</option>
+      <option value="p">正文</option>
+    </select>
+    <button id="fmtLink" title="插入链接">🔗</button>
     <button id="fmtBullet" title="项目符号">• 列表</button>
     <button id="fmtNumber" title="编号列表">1. 列表</button>
+    <button id="fmtTagBtn" title="标签" style="background:#5e5ce6;color:white;"># 标签</button>
     <span class="auto-save-indicator" id="autoSaveIndicator">已保存</span>
   </div>
   <div id="story" contenteditable="true"></div>
@@ -204,6 +237,15 @@ body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
   <button class="picker-none-btn" id="colorPickerNoneBtn">不填充</button>
 </div>
 
+<div id="tagPickerPopup" class="tag-picker-popup" style="display:none;">
+  <div class="picker-title">选择标签</div>
+  <div id="tagPickerList"></div>
+  <div class="tag-new-row">
+    <input type="text" id="tagPickerNewInput" placeholder="新建标签...">
+    <button id="tagPickerNewBtn" style="background:#007aff;color:white;white-space:nowrap;">添加</button>
+  </div>
+</div>
+
 <div id="folderListContainer" style="display: none;">
     <h2 style="font-size:18px;font-weight:700;margin-top:0;">文件夹管理</h2>
     <ul id="folderManagementList"></ul>
@@ -215,6 +257,12 @@ body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
     <ul id="trashList"></ul>
     <button class="empty-trash-btn" id="emptyTrashBtn">清空回收站</button>
     <button id="backFromTrashBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+</div>
+
+<div id="tagManagementContainer">
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">标签管理</h2>
+    <ul id="tagManagementList"></ul>
+    <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
 </div>
 
 <input type="file" id="importFileInput" accept=".json" style="display:none;">
@@ -239,26 +287,31 @@ function formatTimestamp(timestamp) {
 var notes = [];
 var folders = [];
 var trash = [];
+var tags = [];
 
 function saveData() {
     localStorage.setItem('simpleNotesAppData_notes', JSON.stringify(notes));
     localStorage.setItem('simpleNotesAppData_folders', JSON.stringify(folders));
     localStorage.setItem('simpleNotesAppData_trash', JSON.stringify(trash));
+    localStorage.setItem('simpleNotesAppData_tags', JSON.stringify(tags));
 }
 
 function loadData() {
     var savedNotes = localStorage.getItem('simpleNotesAppData_notes');
     var savedFolders = localStorage.getItem('simpleNotesAppData_folders');
     var savedTrash = localStorage.getItem('simpleNotesAppData_trash');
+    var savedTags = localStorage.getItem('simpleNotesAppData_tags');
     if (savedNotes && savedFolders) {
         notes = JSON.parse(savedNotes);
         folders = JSON.parse(savedFolders);
         trash = savedTrash ? JSON.parse(savedTrash) : [];
+        tags = savedTags ? JSON.parse(savedTags) : [];
         if (!folders.some(function(f) { return f.id === 'unfiled'; })) {
             folders.unshift({ id: 'unfiled', name: '无文件夹' });
         }
         notes.forEach(function(n) {
             if (!n.lastModified) { n.lastModified = Date.now(); }
+            if (!n.tags) { n.tags = []; }
         });
         return true;
     }
@@ -269,6 +322,7 @@ if (!loadData()) {
     folders = [{ id: 'unfiled', name: '无文件夹' }];
     notes = [];
     trash = [];
+    tags = [];
     saveData();
 }
 
@@ -337,7 +391,12 @@ function highlightTextInHtml(html, searchTerm) {
     return result;
 }
 
+function addLinkTarget(html) {
+    return html.replace(/<a\s+/gi, '<a target="_blank" rel="noopener" ');
+}
+
 function renderContentWithLines(content, searchTerm) {
+    content = addLinkTarget(content);
     var hasSearch = searchTerm && searchTerm.length > 0;
     var normalized = content.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n');
     var html = '';
@@ -437,6 +496,20 @@ function renderList(filteredNotes, searchTerm) {
         timeSpan.style.cssText = 'font-size:12px;color:#8e8e93;font-weight:400;white-space:nowrap;';
         timeSpan.textContent = formatTimestamp(n.lastModified);
         titleDiv.appendChild(timeSpan);
+        if (n.tags && n.tags.length > 0) {
+            var tagsDiv = document.createElement('div');
+            tagsDiv.style.cssText = 'margin-top:4px;';
+            n.tags.forEach(function(tid) {
+                var t = tags.find(function(tt) { return tt.id === tid; });
+                if (t) {
+                    var badge = document.createElement('span');
+                    badge.className = 'tag-badge';
+                    badge.textContent = t.name;
+                    tagsDiv.appendChild(badge);
+                }
+            });
+            titleDiv.appendChild(tagsDiv);
+        }
         var contentDiv = document.createElement("div");
         contentDiv.classList.add("note-content");
         var contentTextDiv = document.createElement("div");
@@ -601,14 +674,18 @@ function showColorPicker(mode, btn) {
 }
 
 document.querySelector("#fmtColorBtn").onmousedown = function() { saveSelection(); };
-document.querySelector("#fmtColorBtn").onclick = function() { showColorPicker('foreColor', this); };
+document.querySelector("#fmtColorBtn").onclick = function() { document.querySelector("#tagPickerPopup").style.display = 'none'; showColorPicker('foreColor', this); };
 document.querySelector("#fmtBgColorBtn").onmousedown = function() { saveSelection(); };
-document.querySelector("#fmtBgColorBtn").onclick = function() { showColorPicker('backColor', this); };
+document.querySelector("#fmtBgColorBtn").onclick = function() { document.querySelector("#tagPickerPopup").style.display = 'none'; showColorPicker('backColor', this); };
 
 document.addEventListener("click", function(event) {
     var popup = document.querySelector("#colorPickerPopup");
     if (popup.style.display === 'block' && !popup.contains(event.target) && event.target.id !== 'fmtColorBtn' && event.target.id !== 'fmtBgColorBtn') {
         popup.style.display = 'none';
+    }
+    var tPopup = document.querySelector("#tagPickerPopup");
+    if (tPopup.style.display === 'block' && !tPopup.contains(event.target) && event.target.id !== 'fmtTagBtn') {
+        tPopup.style.display = 'none';
     }
 });
 
@@ -617,6 +694,122 @@ document.querySelector("#fmtUndo").onclick = function() { storyDiv.focus(); docu
 document.querySelector("#fmtRedo").onclick = function() { storyDiv.focus(); document.execCommand('redo'); };
 document.querySelector("#fmtBullet").onclick = function() { storyDiv.focus(); document.execCommand('insertUnorderedList'); };
 document.querySelector("#fmtNumber").onclick = function() { storyDiv.focus(); document.execCommand('insertOrderedList'); };
+
+/* --- Heading --- */
+document.querySelector("#fmtHeading").onchange = function() {
+    if (this.value) { storyDiv.focus(); document.execCommand('formatBlock', false, '<' + this.value + '>'); }
+    this.value = '';
+};
+
+/* --- Link --- */
+document.querySelector("#fmtLink").onclick = function() {
+    var sel = window.getSelection();
+    if (!sel.toString().trim()) { alert('请先选中要添加链接的文字。'); return; }
+    var url = prompt('输入链接地址（URL）：', 'https://');
+    if (url && url.trim()) {
+        storyDiv.focus();
+        document.execCommand('createLink', false, url.trim());
+        var links = storyDiv.querySelectorAll('a');
+        if (links.length) links[links.length - 1].setAttribute('target', '_blank');
+    }
+};
+
+/* --- Tags --- */
+function renderTagPicker() {
+    var list = document.querySelector("#tagPickerList");
+    list.innerHTML = '';
+    tags.forEach(function(t) {
+        var el = document.createElement('span');
+        el.className = 'tag-option';
+        el.textContent = t.name;
+        if (editing) {
+            var note = notes.find(function(n) { return n.id === editing; });
+            if (note && note.tags && note.tags.indexOf(t.id) >= 0) el.classList.add('selected');
+        }
+        el.onclick = function() {
+            if (!editing) { alert('请先保存笔记再添加标签。'); return; }
+            var idx = -1;
+            notes.forEach(function(n, i) { if (n.id === editing) idx = i; });
+            if (idx >= 0) {
+                if (!notes[idx].tags) notes[idx].tags = [];
+                var pos = notes[idx].tags.indexOf(t.id);
+                if (pos >= 0) { notes[idx].tags.splice(pos, 1); } else { notes[idx].tags.push(t.id); }
+                saveData();
+                renderTagPicker();
+            }
+        };
+        list.appendChild(el);
+    });
+}
+
+document.querySelector("#fmtTagBtn").onclick = function() {
+    renderTagPicker();
+    var popup = document.querySelector("#tagPickerPopup");
+    var rect = this.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+};
+
+document.querySelector("#tagPickerNewBtn").onclick = function() {
+    var name = document.querySelector("#tagPickerNewInput").value.trim();
+    if (!name) return;
+    if (tags.some(function(t) { return t.name === name; })) { alert('标签已存在。'); return; }
+    tags.push({ id: generateUniqueId(), name: name });
+    document.querySelector("#tagPickerNewInput").value = '';
+    saveData();
+    renderTagPicker();
+};
+
+document.querySelector("#tagPickerNewInput").onkeydown = function(e) {
+    if (e.key === 'Enter') document.querySelector("#tagPickerNewBtn").click();
+};
+
+function renderTagManagementList() {
+    var list = document.querySelector("#tagManagementList");
+    list.innerHTML = '';
+    if (tags.length === 0) {
+        var li = document.createElement('li'); li.textContent = '暂无标签。'; list.appendChild(li); return;
+    }
+    tags.forEach(function(t) {
+        var li = document.createElement('li');
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = t.name;
+        li.appendChild(nameSpan);
+        var delBtn = document.createElement('button');
+        delBtn.textContent = '删除';
+        delBtn.className = 'delete-btn';
+        delBtn.onclick = function() {
+            if (confirm('删除标签 "' + t.name + '"？所有笔记中该标签将被移除。')) {
+                tags = tags.filter(function(x) { return x.id !== t.id; });
+                notes.forEach(function(n) { if (n.tags) n.tags = n.tags.filter(function(tid) { return tid !== t.id; }); });
+                saveData();
+                renderTagManagementList();
+            }
+        };
+        li.appendChild(delBtn);
+        list.appendChild(li);
+    });
+}
+
+document.querySelector("#showTagsBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'block';
+    renderTagManagementList();
+};
+
+document.querySelector("#backFromTagsBtn").onclick = function() {
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    noteList.style.display = 'block';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
 
 /* --- Auto-save --- */
 var autoSaveTimer = null;
@@ -813,6 +1006,8 @@ publishBtn.onclick = function() {
     actionMenu.style.display = 'none';
     folderListContainer.style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
 };
@@ -827,6 +1022,8 @@ newBtn.onclick = function() {
     actionMenu.style.display = 'none';
     folderListContainer.style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
     mainSearchBar.style.display = 'none';
     noteList.style.display = 'none';
 };
@@ -853,6 +1050,8 @@ folderFilter.onchange = function(e) {
     actionMenu.style.display = 'none';
     folderListContainer.style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
     editor.style.display = 'none';
@@ -973,6 +1172,8 @@ showFolderListBtn.onclick = function() {
 backToNotesBtn.onclick = function() {
     folderListContainer.style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
     currentPage = 1;
@@ -984,6 +1185,8 @@ function showHomePage() {
     editor.style.display = 'none';
     folderListContainer.style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
     mainSearchBar.style.display = 'block';
     mainSearchBar.value = '';
     currentViewingFolderId = null;
@@ -1015,7 +1218,7 @@ document.querySelector("#exportAllMdBtn").onclick = function() {
 
 document.querySelector("#exportDataBtn").onclick = function() {
     if (notes.length === 0) { alert("没有数据可以导出。"); return; }
-    var data = { notes: notes, folders: folders, trash: trash };
+    var data = { notes: notes, folders: folders, trash: trash, tags: tags };
     var json = JSON.stringify(data, null, 2);
     var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
     var url = URL.createObjectURL(blob);
@@ -1035,10 +1238,11 @@ importFileInput.onchange = function(e) {
         try {
             var data = JSON.parse(ev.target.result);
             if (!data.notes || !data.folders) { alert("JSON格式不对，缺少 notes 或 folders 字段。"); return; }
-            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹' + (data.trash ? '，' + data.trash.length + ' 条回收站记录' : '') + '，是否覆盖当前数据？')) return;
+            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹' + (data.trash ? '，' + data.trash.length + ' 条回收站记录' : '') + (data.tags ? '，' + data.tags.length + ' 个标签' : '') + '，是否覆盖当前数据？')) return;
             notes = data.notes;
             folders = data.folders;
             trash = data.trash || [];
+            tags = data.tags || [];
             if (!folders.some(function(f) { return f.id === 'unfiled'; })) { folders.unshift({ id: 'unfiled', name: '无文件夹' }); }
             saveData();
             currentPage = 1;
