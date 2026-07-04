@@ -250,7 +250,8 @@ function stripHtml(html) {
 }
 
 function cleanContent(content) {
-    var text = /<[^>]+>/.test(content) ? stripHtml(content) : content.replace(/\\n/g, '\n');
+    var text = content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+    if (!/<[^>]+>/.test(content)) { text = content.replace(/\\n/g, '\n'); }
     return text.trimEnd();
 }
 
@@ -265,7 +266,7 @@ function highlightText(text, searchTerm) {
 }
 
 function renderContentWithLines(content, searchTerm) {
-    var plainText = stripHtml(content).replace(/\\n/g, '\n');
+    var plainText = content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/\\n/g, '\n');
     var lines = plainText.split('\n');
     var hasSearch = searchTerm && searchTerm.length > 0;
     var html = '';
@@ -297,7 +298,9 @@ function renderContentWithLines(content, searchTerm) {
         var displayLine = hasSearch ? highlightText(line, searchTerm) : line;
         if (displayLine === '') { displayLine = '&nbsp;'; }
         html += '<div class="content-line">';
-        html += '<span class="line-number">' + lineNum + '</span>';
+        if (hasSearch) {
+            html += '<span class="line-number">' + lineNum + '</span>';
+        }
         html += '<span>' + displayLine + '</span>';
         html += '</div>';
     });
@@ -552,7 +555,7 @@ folderFilter.onchange = function(e) {
 mainSearchBar.oninput = function() {
     var searchTerm = mainSearchBar.value.toLowerCase();
     var allNotesInCurrentView = notes.filter(function(n) { return currentViewingFolderId === null || currentViewingFolderId === '' || n.folderId === currentViewingFolderId; });
-    var filteredNotes = allNotesInCurrentView.filter(function(n) { return n.title.toLowerCase().includes(searchTerm) || stripHtml(n.content).toLowerCase().includes(searchTerm); });
+    var filteredNotes = allNotesInCurrentView.filter(function(n) { return n.title.toLowerCase().includes(searchTerm) || n.content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').toLowerCase().includes(searchTerm); });
     currentPage = 1;
     renderList(filteredNotes, searchTerm);
     if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
