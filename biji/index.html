@@ -92,12 +92,55 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
 
 /* Note timestamp */
 .note-timestamp { font-size: 12px; color: #8e8e93; margin-top: 12px; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 8px; }
+.note-wordcount { font-size: 11px; color: #8e8e93; margin-top: 2px; text-align: right; }
+.auto-save-indicator { font-size: 11px; color: #34c759; margin-left: 8px; display: none; }
+
+/* Dark mode */
+body.dark-mode { background: #1c1c1e; color: #f5f5f7; }
+body.dark-mode #noteList li { background: #2c2c2e; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+body.dark-mode .note-content { background: #3a3a3c; border-color: #48484a; }
+body.dark-mode #editor { background: #2c2c2e; }
+body.dark-mode #editorToolbar { background: #3a3a3c; border-color: #48484a; }
+body.dark-mode #editorToolbar button, body.dark-mode #editorToolbar select { background: #48484a; border-color: #555; color: #f5f5f7; }
+body.dark-mode #mainSearchBar { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #story { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #actionMenu { background: #2c2c2e; border-color: #48484a; }
+body.dark-mode #actionMenu button, body.dark-mode #actionMenu input, body.dark-mode #actionMenu select { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #actionMenu button:hover { background: #48484a; }
+body.dark-mode #folderListContainer { background: #2c2c2e; border-color: #48484a; }
+body.dark-mode .color-picker-popup { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode .color-picker-popup .picker-none-btn { background: #3a3a3c; color: #aaa; border-color: #555; }
+body.dark-mode .search-stats { background: #1a2a40; border-color: #2a4a6a; color: #5ac8fa; }
+body.dark-mode #editor input#title { background: transparent; color: #f5f5f7; border-bottom-color: #48484a; }
+body.dark-mode #pagination button { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode .note-timestamp { color: #8e8e93; border-top-color: #48484a; }
+body.dark-mode #folderManagementList li { border-bottom-color: #48484a; }
+body.dark-mode .line-number { color: #555; border-right-color: #48484a; }
+body.dark-mode #trashContainer { background: #2c2c2e; border-color: #48484a; }
+body.dark-mode #trashList li { border-bottom-color: #48484a; color: #f5f5f7; }
+body.dark-mode #colorPickerPopup .picker-hue-bar { border-color: #48484a; }
+body.dark-mode #darkModeToggle { color: #ffd60a; }
+body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
+
+#darkModeToggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 2px 6px; border-radius: 6px; line-height: 1; margin-right: 6px; }
+#darkModeToggle:hover { background: #e8e8ed; }
+
+/* Trash */
+#trashContainer { margin-top: 20px; border: 1px solid #e8e8ed; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: none; }
+#trashList { list-style: none; padding: 0; margin-top: 15px; }
+#trashList li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+#trashList li:last-child { border-bottom: none; }
+.empty-trash-btn { background: #ff3b30; color: white; }
+.empty-trash-btn:hover { background: #d62d20; }
+.restore-btn { background: #ff9500; color: white; }
+.restore-btn:hover { background: #e08600; }
 </style>
 </head>
 <body>
 
 <div class="header-section">
     <h1>简洁笔记本</h1>
+    <button id="darkModeToggle">🌙</button>
     <div style="position: relative;">
         <button id="menuToggleButton"></button>
         <div id="actionMenu" style="display: none;">
@@ -109,6 +152,7 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
             </div>
             <select id="folderFilter"><option value="">所有笔记</option><option value="unfiled">无文件夹</option></select>
             <button id="showFolderListBtn">文件夹列表</button>
+            <button id="showTrashBtn" style="background:#ff3b30;color:white;">回收站</button>
             <button id="exportAllMdBtn" style="background:#6f42c1;color:white;">导出全部为MD</button>
             <button id="exportDataBtn">导出数据(JSON)</button>
             <button id="importDataBtn">导入数据(JSON)</button>
@@ -129,6 +173,8 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
 <div id="editor" style="display: none;">
   <p><input id="title" placeholder="标题"></p>
   <div id="editorToolbar">
+    <button id="fmtUndo" title="撤销">↩</button>
+    <button id="fmtRedo" title="重做">↪</button>
     <button id="fmtBold" title="加粗"><b>B</b></button>
     <select id="fmtSize">
       <option value="">大小</option>
@@ -139,6 +185,9 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
     </select>
     <button id="fmtColorBtn">文字色</button>
     <button id="fmtBgColorBtn">背景色</button>
+    <button id="fmtBullet" title="项目符号">• 列表</button>
+    <button id="fmtNumber" title="编号列表">1. 列表</button>
+    <span class="auto-save-indicator" id="autoSaveIndicator">已保存</span>
   </div>
   <div id="story" contenteditable="true"></div>
   <p style="margin-top:10px;">
@@ -161,6 +210,13 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
     <button id="backToNotesBtn">返回笔记列表</button>
 </div>
 
+<div id="trashContainer">
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">回收站</h2>
+    <ul id="trashList"></ul>
+    <button class="empty-trash-btn" id="emptyTrashBtn">清空回收站</button>
+    <button id="backFromTrashBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+</div>
+
 <input type="file" id="importFileInput" accept=".json" style="display:none;">
 
 <script>
@@ -178,17 +234,26 @@ function formatTimestamp(timestamp) {
     return year + '年' + month + '月' + day + '日' + hours + '时' + minutes + '分';
 }
 
+
+
+var notes = [];
+var folders = [];
+var trash = [];
+
 function saveData() {
     localStorage.setItem('simpleNotesAppData_notes', JSON.stringify(notes));
     localStorage.setItem('simpleNotesAppData_folders', JSON.stringify(folders));
+    localStorage.setItem('simpleNotesAppData_trash', JSON.stringify(trash));
 }
 
 function loadData() {
     var savedNotes = localStorage.getItem('simpleNotesAppData_notes');
     var savedFolders = localStorage.getItem('simpleNotesAppData_folders');
+    var savedTrash = localStorage.getItem('simpleNotesAppData_trash');
     if (savedNotes && savedFolders) {
         notes = JSON.parse(savedNotes);
         folders = JSON.parse(savedFolders);
+        trash = savedTrash ? JSON.parse(savedTrash) : [];
         if (!folders.some(function(f) { return f.id === 'unfiled'; })) {
             folders.unshift({ id: 'unfiled', name: '无文件夹' });
         }
@@ -200,12 +265,10 @@ function loadData() {
     return false;
 }
 
-var notes = [];
-var folders = [];
-
 if (!loadData()) {
     folders = [{ id: 'unfiled', name: '无文件夹' }];
     notes = [];
+    trash = [];
     saveData();
 }
 
@@ -377,6 +440,13 @@ function renderList(filteredNotes, searchTerm) {
         timestampDiv.classList.add("note-timestamp");
         timestampDiv.textContent = '最后编辑: ' + formatTimestamp(n.lastModified);
         contentDiv.appendChild(timestampDiv);
+        var wcDiv = document.createElement("div");
+        wcDiv.className = 'note-wordcount';
+        var text = n.content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var charCount = text.length;
+        var lineCount = text ? (text.split('\n').length) : 0;
+        wcDiv.textContent = charCount + ' 字 · ' + lineCount + ' 行';
+        contentDiv.appendChild(wcDiv);
         var actionButtonsDiv = document.createElement("div");
         actionButtonsDiv.classList.add("action-buttons");
         var exportNoteTxtBtn = document.createElement("button");
@@ -536,6 +606,145 @@ document.addEventListener("click", function(event) {
     }
 });
 
+/* --- Undo / Redo / Lists --- */
+document.querySelector("#fmtUndo").onclick = function() { storyDiv.focus(); document.execCommand('undo'); };
+document.querySelector("#fmtRedo").onclick = function() { storyDiv.focus(); document.execCommand('redo'); };
+document.querySelector("#fmtBullet").onclick = function() { storyDiv.focus(); document.execCommand('insertUnorderedList'); };
+document.querySelector("#fmtNumber").onclick = function() { storyDiv.focus(); document.execCommand('insertOrderedList'); };
+
+/* --- Auto-save --- */
+var autoSaveTimer = null;
+function triggerAutoSave() {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(function() {
+        if (editor.style.display === 'block') {
+            var t = titleInput.value.trim();
+            var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
+            var folderId = noteFolderSelect.value;
+            var now = Date.now();
+            if (t) {
+                if (editing) {
+                    notes = notes.map(function(n) { return n.id === editing ? { ...n, title: t, content: c, folderId: folderId, lastModified: now } : n; });
+                } else {
+                    editing = generateUniqueId();
+                    notes.push({ id: editing, folderId: folderId, title: t, content: c, lastModified: now });
+                }
+                saveData();
+            }
+            var indicator = document.querySelector("#autoSaveIndicator");
+            indicator.style.display = 'inline';
+            setTimeout(function() { indicator.style.display = 'none'; }, 2000);
+        }
+    }, 1500);
+}
+storyDiv.addEventListener('input', triggerAutoSave);
+titleInput.addEventListener('input', triggerAutoSave);
+
+/* --- Keyboard shortcuts --- */
+document.addEventListener('keydown', function(e) {
+    if (editor.style.display !== 'block') return;
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (autoSaveTimer) clearTimeout(autoSaveTimer); triggerAutoSave(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); storyDiv.focus(); document.execCommand('undo'); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); storyDiv.focus(); document.execCommand('redo'); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); storyDiv.focus(); document.execCommand('bold'); }
+});
+
+/* --- Dark mode --- */
+var darkMode = localStorage.getItem('simpleNotesAppData_darkMode') === 'true';
+if (darkMode) { document.body.classList.add('dark-mode'); document.querySelector("#darkModeToggle").textContent = '☀️'; }
+document.querySelector("#darkModeToggle").onclick = function() {
+    darkMode = !darkMode;
+    document.body.classList.toggle('dark-mode', darkMode);
+    this.textContent = darkMode ? '☀️' : '🌙';
+    localStorage.setItem('simpleNotesAppData_darkMode', darkMode);
+};
+
+/* --- Word count --- */
+function updateWordCount(noteId, contentDiv) {
+    var wc = contentDiv.querySelector('.note-wordcount');
+    if (!wc) {
+        wc = document.createElement('div');
+        wc.className = 'note-wordcount';
+        contentDiv.appendChild(wc);
+    }
+    var note = notes.find(function(n) { return n.id === noteId; });
+    if (note) {
+        var text = note.content.replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var charCount = text.length;
+        var lineCount = (text.match(/\n/g) || []).length + 1;
+        wc.textContent = charCount + ' 字 · ' + lineCount + ' 行';
+    }
+}
+
+/* --- Trash --- */
+function renderTrashList() {
+    var list = document.querySelector("#trashList");
+    list.innerHTML = '';
+    if (trash.length === 0) {
+        var li = document.createElement('li');
+        li.textContent = '回收站为空。';
+        list.appendChild(li);
+        return;
+    }
+    trash.forEach(function(note) {
+        var li = document.createElement('li');
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = note.title + ' (' + formatTimestamp(note.lastModified) + ')';
+        li.appendChild(nameSpan);
+        var btnDiv = document.createElement('div');
+        var restoreBtn = document.createElement('button');
+        restoreBtn.textContent = '恢复';
+        restoreBtn.className = 'restore-btn';
+        restoreBtn.onclick = function() {
+            notes.push(note);
+            trash = trash.filter(function(t) { return t.id !== note.id; });
+            saveData();
+            renderTrashList();
+        };
+        btnDiv.appendChild(restoreBtn);
+        var delBtn = document.createElement('button');
+        delBtn.textContent = '永久删除';
+        delBtn.className = 'delete-btn';
+        delBtn.onclick = function() {
+            if (confirm('永久删除 "' + note.title + '"？不可恢复。')) {
+                trash = trash.filter(function(t) { return t.id !== note.id; });
+                saveData();
+                renderTrashList();
+            }
+        };
+        btnDiv.appendChild(delBtn);
+        li.appendChild(btnDiv);
+        list.appendChild(li);
+    });
+}
+
+document.querySelector("#emptyTrashBtn").onclick = function() {
+    if (trash.length === 0) { alert('回收站已为空。'); return; }
+    if (confirm('确定清空回收站？所有笔记将被永久删除。')) {
+        trash = [];
+        saveData();
+        renderTrashList();
+    }
+};
+
+document.querySelector("#showTrashBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'block';
+    renderTrashList();
+};
+
+document.querySelector("#backFromTrashBtn").onclick = function() {
+    document.querySelector("#trashContainer").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    noteList.style.display = 'block';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
 function toggleContent(id, contentDivToShow) {
     if (currentOpenNoteContentDiv && currentOpenNoteContentDiv !== contentDivToShow) {
         currentOpenNoteContentDiv.style.display = 'none';
@@ -564,8 +773,13 @@ function editNote(id) {
 }
 
 function deleteNote(id) {
-    if (confirm("确定要删除这篇笔记吗？")) {
-        notes = notes.filter(function(n) { return n.id !== id; });
+    if (confirm("确定要删除这篇笔记吗？可前往回收站恢复。")) {
+        var idx = -1;
+        notes.forEach(function(n, i) { if (n.id === id) idx = i; });
+        if (idx >= 0) {
+            trash.push(notes[idx]);
+            notes.splice(idx, 1);
+        }
         if (currentOpenNoteContentDiv && currentOpenNoteContentDiv.closest('li').dataset.id === id) { currentOpenNoteContentDiv = null; }
         saveData();
         renderList(notes, mainSearchBar.value.toLowerCase());
@@ -592,6 +806,7 @@ publishBtn.onclick = function() {
     renderList(notes, mainSearchBar.value.toLowerCase());
     actionMenu.style.display = 'none';
     folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
 };
@@ -605,6 +820,7 @@ newBtn.onclick = function() {
     if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
     actionMenu.style.display = 'none';
     folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
     mainSearchBar.style.display = 'none';
     noteList.style.display = 'none';
 };
@@ -630,6 +846,7 @@ folderFilter.onchange = function(e) {
     if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
     actionMenu.style.display = 'none';
     folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
     editor.style.display = 'none';
@@ -749,6 +966,7 @@ showFolderListBtn.onclick = function() {
 
 backToNotesBtn.onclick = function() {
     folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
     currentPage = 1;
@@ -759,6 +977,7 @@ function showHomePage() {
     actionMenu.style.display = 'none';
     editor.style.display = 'none';
     folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
     mainSearchBar.style.display = 'block';
     mainSearchBar.value = '';
     currentViewingFolderId = null;
@@ -790,7 +1009,7 @@ document.querySelector("#exportAllMdBtn").onclick = function() {
 
 document.querySelector("#exportDataBtn").onclick = function() {
     if (notes.length === 0) { alert("没有数据可以导出。"); return; }
-    var data = { notes: notes, folders: folders };
+    var data = { notes: notes, folders: folders, trash: trash };
     var json = JSON.stringify(data, null, 2);
     var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
     var url = URL.createObjectURL(blob);
@@ -810,9 +1029,10 @@ importFileInput.onchange = function(e) {
         try {
             var data = JSON.parse(ev.target.result);
             if (!data.notes || !data.folders) { alert("JSON格式不对，缺少 notes 或 folders 字段。"); return; }
-            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹，是否覆盖当前数据？')) return;
+            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹' + (data.trash ? '，' + data.trash.length + ' 条回收站记录' : '') + '，是否覆盖当前数据？')) return;
             notes = data.notes;
             folders = data.folders;
+            trash = data.trash || [];
             if (!folders.some(function(f) { return f.id === 'unfiled'; })) { folders.unshift({ id: 'unfiled', name: '无文件夹' }); }
             saveData();
             currentPage = 1;
