@@ -1234,27 +1234,24 @@ function renderAnchorMgmtList() {
     list.innerHTML = '';
     var found = {};
     notes.forEach(function(n) {
-        var regex = /data-anchor-id="([^"]*)"/g;
+        var regex = /data-anchor-id=["']([^"']*)["']/g;
         var m;
         while ((m = regex.exec(n.content)) !== null) {
             var anchorId = m[1];
             var key = n.id + '::' + anchorId;
             if (found[key]) continue;
             found[key] = true;
-            var folderName = '无文件夹';
-            var f = folders.find(function(fold) { return fold.id === n.folderId; });
-            if (f) folderName = f.name;
+            var noteTitle = n.title || '(无标题)';
             var backlinks = [];
             notes.forEach(function(n2) {
-                if (n2.content && n2.content.indexOf('data-note-anchor="' + n.id + '::' + anchorId + '"') >= 0) {
-                    var f2 = folders.find(function(fold) { return fold.id === n2.folderId; });
-                    backlinks.push(f2 ? f2.name : '无文件夹');
+                if (n2.content && n2.content.indexOf(n.id + '::' + anchorId) >= 0) {
+                    backlinks.push(n2.title || '(无标题)');
                 }
             });
             var li = document.createElement('li');
             var label = anchorId.replace('anc_', '');
             var backStr = backlinks.length > 0 ? '<span style="color:#8e8e93;">被跳转:</span> ' + backlinks.join(', ') : '<span style="color:#c7c7cc;">无跳转</span>';
-            li.innerHTML = '<span class="note-anchor-marker" style="opacity:0.6;font-size:14px;">⚓' + label + '</span> <span style="color:#8e8e93;">所在:</span> ' + folderName + ' ' + backStr;
+            li.innerHTML = '<span class="note-anchor-marker" style="opacity:0.6;font-size:14px;">⚓' + label + '</span> <span style="color:#8e8e93;">所在:</span> ' + noteTitle + ' ' + backStr;
             list.appendChild(li);
         }
     });
