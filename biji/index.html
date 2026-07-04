@@ -345,6 +345,11 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
 
 <div id="tagManagementContainer">
     <h2 style="font-size:18px;font-weight:700;margin-top:0;">标签管理</h2>
+    <div class="tag-new-row" style="margin-bottom:12px;">
+      <input type="text" id="tagMgmtNewInput" placeholder="新建标签...">
+      <span class="new-tag-colors" id="tagMgmtNewColors"></span>
+      <button id="tagMgmtNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">新建</button>
+    </div>
     <ul id="tagManagementList"></ul>
     <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
 </div>
@@ -1126,6 +1131,8 @@ document.querySelector("#showTagsBtn").onclick = function() {
     document.querySelector("#trashContainer").style.display = 'none';
     document.querySelector("#settingsContainer").style.display = 'none';
     document.querySelector("#tagManagementContainer").style.display = 'block';
+    tagSelectedColor = TAG_COLORS[0];
+    renderTagMgmtNewColors();
     renderTagManagementList();
 };
 
@@ -1135,6 +1142,32 @@ document.querySelector("#backFromTagsBtn").onclick = function() {
     noteList.style.display = 'block';
     currentPage = 1;
     renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+function renderTagMgmtNewColors() {
+    var row = document.querySelector("#tagMgmtNewColors");
+    row.innerHTML = '';
+    TAG_COLORS.forEach(function(c) {
+        var dot = document.createElement('span');
+        dot.className = 'tag-color-dot' + (c === tagSelectedColor ? ' active' : '');
+        dot.style.background = c;
+        dot.onclick = function() { tagSelectedColor = c; renderTagMgmtNewColors(); };
+        row.appendChild(dot);
+    });
+}
+
+document.querySelector("#tagMgmtNewBtn").onclick = function() {
+    var name = document.querySelector("#tagMgmtNewInput").value.trim();
+    if (!name) return;
+    if (tags.some(function(t) { return t.name === name; })) { alert('标签已存在。'); return; }
+    tags.push({ id: generateUniqueId(), name: name, color: tagSelectedColor });
+    document.querySelector("#tagMgmtNewInput").value = '';
+    saveData();
+    renderTagManagementList();
+};
+
+document.querySelector("#tagMgmtNewInput").onkeydown = function(e) {
+    if (e.key === 'Enter') document.querySelector("#tagMgmtNewBtn").click();
 };
 
 /* --- Password --- */
