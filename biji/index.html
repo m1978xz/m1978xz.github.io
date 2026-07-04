@@ -155,8 +155,8 @@ body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border
 .tag-picker-popup .tag-color-dot.active { border-color:#1d1d1f; box-shadow:0 0 0 1.5px #fff; }
 body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
 #tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
-.note-anchor-marker { display:inline; font-size:11px; opacity:0.45; cursor:default; padding:0 1px; user-select:none; }
-body.dark-mode .note-anchor-marker { opacity:0.35; }
+.note-anchor-marker { display:inline; font-size:11px; opacity:0.5; cursor:pointer; padding:0 2px; user-select:none; }
+body.dark-mode .note-anchor-marker { opacity:0.4; }
 .note-anchor-link { color:#007aff; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #007aff; }
 body.dark-mode .note-anchor-link { color:#5e9eff; border-bottom-color:#5e9eff; }
 #anchorPickerPopup .picker-note-group { font-size:12px; font-weight:600; color:#8e8e93; margin:8px 0 4px 4px; }
@@ -325,6 +325,11 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
   <div class="tag-new-row">
     <input type="text" id="anchorPickerSearch" placeholder="搜索笔记或锚点...">
   </div>
+</div>
+
+<div id="anchorInfoPopup" class="tag-picker-popup" style="display:none;">
+  <div class="picker-title" id="anchorInfoTitle">锚点信息</div>
+  <div id="anchorInfoList"></div>
 </div>
 
 <div id="folderListContainer" style="display: none;">
@@ -564,7 +569,7 @@ function addLinkTarget(html) {
 function normalizeContentForDisplay(html) {
     var s = html;
     var anchors = [], alinks = [];
-    s = s.replace(/<span[^>]*data-anchor-id="[^"]*"[^>]*><\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
+    s = s.replace(/<span[^>]*data-anchor-id="[^"]*"[^>]*>.*?<\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
     s = s.replace(/<a[^>]*data-note-anchor="[^"]*"[^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
     s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
     s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
@@ -907,11 +912,12 @@ document.querySelector("#fmtAnchor").onclick = function() {
     var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', '');
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
-    if (storyDiv.innerHTML.indexOf('data-anchor-id="' + id + '"') >= 0) {
+    var allContent = notes.map(function(n) { return n.content; }).join(' ');
+    if (allContent.indexOf('data-anchor-id="' + id + '"') >= 0) {
         alert('锚点 "' + name.trim() + '" 已存在。'); return;
     }
     storyDiv.focus();
-    document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker">⚓</span>');
+    document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker">⚓' + name.trim() + '</span>');
 };
 
 document.querySelector("#fmtAnchorLink").onclick = function() {
@@ -1515,6 +1521,53 @@ document.querySelector("#viewerContent").addEventListener('click', function(e) {
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
+        return;
+    }
+    var marker = e.target.closest('[data-anchor-id]');
+    if (marker) {
+        var anchorId = marker.getAttribute('data-anchor-id');
+        var currentNoteId = currentViewerNoteId;
+        var backlinks = [];
+        notes.forEach(function(n) {
+            if (n.id !== currentNoteId && n.content && n.content.indexOf('data-note-anchor="' + currentNoteId + '::' + anchorId + '"') >= 0) {
+                backlinks.push({ id: n.id, title: n.title });
+            }
+        });
+        var popup = document.querySelector("#anchorInfoPopup");
+        var title = document.querySelector("#anchorInfoTitle");
+        var list = document.querySelector("#anchorInfoList");
+        title.textContent = '锚点: ' + anchorId.replace('anc_', '');
+        list.innerHTML = '';
+        if (backlinks.length === 0) {
+            list.innerHTML = '<div style="padding:10px;color:#8e8e93;font-size:13px;">暂无其他笔记跳转到此锚点。</div>';
+        } else {
+            backlinks.forEach(function(b) {
+                var item = document.createElement('div');
+                item.className = 'picker-anchor-item';
+                item.textContent = '📄 ' + b.title;
+                item.onclick = function() {
+                    popup.style.display = 'none';
+                    openNoteViewer(b.id, '');
+                    setTimeout(function() {
+                        var el = document.querySelector('#viewerContent [data-note-anchor="' + currentNoteId + '::' + anchorId + '"]');
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                };
+                list.appendChild(item);
+            });
+        }
+        var rect = marker.getBoundingClientRect();
+        popup.style.left = Math.max(4, rect.left) + 'px';
+        popup.style.top = (rect.bottom + 4) + 'px';
+        popup.style.display = 'block';
+        return;
+    }
+});
+
+document.addEventListener('click', function(e) {
+    var popup = document.querySelector("#anchorInfoPopup");
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && !e.target.closest('[data-anchor-id]')) {
+        popup.style.display = 'none';
     }
 });
 
