@@ -180,6 +180,34 @@ body.dark-mode #settingsContainer input { background:#3a3a3c; border-color:#4848
 .sync-indicator.syncing { color:#ff9500; }
 .sync-indicator.done { color:#34c759; }
 .sync-indicator.error { color:#ff3b30; }
+
+/* Note viewer fullscreen */
+#noteViewer { position:fixed; top:0; left:0; right:0; bottom:0; background:#fff; z-index:5000; display:none; flex-direction:column; }
+body.dark-mode #noteViewer { background:#1c1c1e; }
+.viewer-header { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #e8e8ed; flex-shrink:0; position:relative; }
+body.dark-mode .viewer-header { border-bottom-color:#48484a; }
+.viewer-header .viewer-menu-btn { background:none; border:none; font-size:22px; cursor:pointer; padding:4px 8px; border-radius:6px; margin:0; line-height:1; }
+.viewer-header .viewer-menu-btn:hover { background:#f0f0f5; }
+body.dark-mode .viewer-header .viewer-menu-btn:hover { background:#3a3a3c; }
+.viewer-header .viewer-menu { position:absolute; top:calc(100% + 4px); left:16px; background:#fff; border:1px solid #e8e8ed; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); padding:8px; z-index:5001; display:none; flex-direction:column; gap:4px; min-width:140px; }
+body.dark-mode .viewer-header .viewer-menu { background:#2c2c2e; border-color:#48484a; }
+.viewer-header .viewer-menu button { width:100%; padding:8px 14px; border:none; border-radius:6px; font-size:13px; cursor:pointer; text-align:left; background:none; margin:0; }
+.viewer-header .viewer-menu button:hover { background:#f0f0f5; }
+body.dark-mode .viewer-header .viewer-menu button:hover { background:#3a3a3c; }
+.viewer-header .viewer-font-controls { display:flex; align-items:center; gap:4px; margin-left:auto; margin-right:12px; }
+.viewer-header .viewer-font-controls button { padding:4px 10px; border:1px solid #e8e8ed; border-radius:6px; background:#fff; cursor:pointer; font-size:15px; font-weight:600; margin:0; line-height:1.4; }
+body.dark-mode .viewer-header .viewer-font-controls button { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.viewer-header .viewer-font-controls .font-size-label { font-size:13px; min-width:28px; text-align:center; color:#8e8e93; }
+.viewer-header .viewer-close-btn { background:none; border:none; font-size:24px; cursor:pointer; padding:4px 8px; border-radius:6px; margin:0; line-height:1; color:#8e8e93; }
+.viewer-header .viewer-close-btn:hover { background:#f0f0f5; color:#1d1d1f; }
+body.dark-mode .viewer-header .viewer-close-btn:hover { background:#3a3a3c; color:#f5f5f7; }
+.viewer-body { flex:1; overflow-y:auto; padding:24px 20px; }
+.viewer-body .viewer-title { font-size:22px; font-weight:700; margin:0 0 16px; line-height:1.3; }
+.viewer-body .viewer-content { font-size:16px; line-height:1.8; }
+.viewer-body .viewer-content .content-lines { font-family:inherit; font-size:inherit; line-height:inherit; }
+.viewer-body .viewer-content .content-line { padding:0; }
+.viewer-footer { padding:12px 20px; border-top:1px solid #e8e8ed; display:flex; justify-content:space-between; font-size:12px; color:#8e8e93; flex-shrink:0; }
+body.dark-mode .viewer-footer { border-top-color:#48484a; }
 </style>
 </head>
 <body>
@@ -291,6 +319,32 @@ body.dark-mode #settingsContainer input { background:#3a3a3c; border-color:#4848
     <h2 style="font-size:18px;font-weight:700;margin-top:0;">标签管理</h2>
     <ul id="tagManagementList"></ul>
     <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+</div>
+
+<div id="noteViewer">
+  <div class="viewer-header">
+    <button class="viewer-menu-btn" id="viewerMenuBtn">☰</button>
+    <div class="viewer-menu" id="viewerMenu">
+      <button id="viewerEditBtn">✏️ 编辑</button>
+      <button id="viewerExportTxtBtn">📄 导出TXT</button>
+      <button id="viewerExportMdBtn">📝 导出MD</button>
+      <button id="viewerDeleteBtn">🗑️ 删除</button>
+    </div>
+    <div class="viewer-font-controls">
+      <button id="viewerFontDec">A−</button>
+      <span class="font-size-label" id="viewerFontLabel">16</span>
+      <button id="viewerFontInc">A+</button>
+    </div>
+    <button class="viewer-close-btn" id="viewerCloseBtn">✕</button>
+  </div>
+  <div class="viewer-body">
+    <div class="viewer-title" id="viewerTitle"></div>
+    <div class="viewer-content" id="viewerContent"></div>
+  </div>
+  <div class="viewer-footer">
+    <span id="viewerWordCount"></span>
+    <span id="viewerTimestamp"></span>
+  </div>
 </div>
 
 <div id="lockScreen">
@@ -617,7 +671,7 @@ function renderList(filteredNotes, searchTerm) {
         };
         actionButtonsDiv.appendChild(deleteBtn);
         contentDiv.appendChild(actionButtonsDiv);
-        titleDiv.onclick = function(event) { event.stopPropagation(); toggleContent(n.id, contentDiv); };
+        titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id); };
         li.appendChild(titleDiv);
         li.appendChild(contentDiv);
         noteList.appendChild(li);
@@ -1177,6 +1231,41 @@ document.querySelector("#backFromTrashBtn").onclick = function() {
     currentPage = 1;
     renderList(notes, mainSearchBar.value.toLowerCase());
 };
+
+var viewerFontSize = parseInt(localStorage.getItem('simpleNotesAppData_viewerFontSize') || '16');
+
+function openNoteViewer(id) {
+    var note = notes.find(function(n) { return n.id === id; });
+    if (!note) return;
+    currentViewerNoteId = id;
+    document.querySelector("#viewerTitle").textContent = note.title;
+    var contentWithLinks = addLinkTarget(note.content);
+    document.querySelector("#viewerContent").innerHTML = '<div class="content-lines">' + contentWithLinks.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n').split('\n').map(function(line) { return '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>'; }).join('') + '</div>';
+    var text = note.content.replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+    document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
+    document.querySelector("#viewerTimestamp").textContent = '最后编辑: ' + formatTimestamp(note.lastModified);
+    document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px';
+    document.querySelector("#viewerFontLabel").textContent = viewerFontSize;
+    document.querySelector("#viewerMenu").style.display = 'none';
+    document.querySelector("#noteViewer").style.display = 'flex';
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+}
+
+function closeNoteViewer() {
+    document.querySelector("#noteViewer").style.display = 'none';
+}
+
+var currentViewerNoteId = null;
+
+document.querySelector("#viewerCloseBtn").onclick = closeNoteViewer;
+document.querySelector("#viewerFontInc").onclick = function() { if (viewerFontSize < 32) { viewerFontSize += 2; localStorage.setItem('simpleNotesAppData_viewerFontSize', viewerFontSize); document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px'; document.querySelector("#viewerFontLabel").textContent = viewerFontSize; } };
+document.querySelector("#viewerFontDec").onclick = function() { if (viewerFontSize > 10) { viewerFontSize -= 2; localStorage.setItem('simpleNotesAppData_viewerFontSize', viewerFontSize); document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px'; document.querySelector("#viewerFontLabel").textContent = viewerFontSize; } };
+document.querySelector("#viewerMenuBtn").onclick = function() { var m = document.querySelector("#viewerMenu"); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; };
+document.addEventListener("click", function(e) { var m = document.querySelector("#viewerMenu"); if (m.style.display === 'flex' && !m.contains(e.target) && e.target.id !== 'viewerMenuBtn') { m.style.display = 'none'; } });
+document.querySelector("#viewerEditBtn").onclick = function() { closeNoteViewer(); if (currentViewerNoteId) editNote(currentViewerNoteId); };
+document.querySelector("#viewerExportTxtBtn").onclick = function() { if (currentViewerNoteId) { exportNoteToTxt(currentViewerNoteId); document.querySelector("#viewerMenu").style.display = 'none'; } };
+document.querySelector("#viewerExportMdBtn").onclick = function() { if (currentViewerNoteId) { exportNoteToMd(currentViewerNoteId); document.querySelector("#viewerMenu").style.display = 'none'; } };
+document.querySelector("#viewerDeleteBtn").onclick = function() { if (currentViewerNoteId) { document.querySelector("#viewerMenu").style.display = 'none'; closeNoteViewer(); deleteNote(currentViewerNoteId); } };
 
 function toggleContent(id, contentDivToShow) {
     if (currentOpenNoteContentDiv && currentOpenNoteContentDiv !== contentDivToShow) {
