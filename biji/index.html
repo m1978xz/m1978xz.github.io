@@ -504,7 +504,6 @@ var newBtn = document.querySelector("#actionMenu #newBtn");
 var newFolderNameInput = document.querySelector("#actionMenu #newFolderNameInput");
 var newFolderBtn = document.querySelector("#actionMenu #newFolderBtn");
 var folderFilter = document.querySelector("#actionMenu #folderFilter");
-var showFolderListBtn = document.querySelector("#actionMenu #showFolderListBtn");
 var mainSearchBar = document.querySelector("#mainSearchBar");
 var noteList = document.querySelector("#noteList");
 var noteFolderSelect = document.querySelector("#noteFolderSelect");
@@ -1734,16 +1733,6 @@ function deleteFolder(folderId) {
         alert('文件夹 "' + folderToDelete.name + '" 已删除，相关笔记已移至"无文件夹"。');
     }
 }
-
-showFolderListBtn.onclick = function() {
-    actionMenu.style.display = 'none';
-    editor.style.display = 'none';
-    mainSearchBar.style.display = 'none';
-    noteList.style.display = 'none';
-    folderListContainer.style.display = 'block';
-    document.querySelector("#settingsContainer").style.display = 'none';
-    renderFolderManagementList();
-};
 
 backToNotesBtn.onclick = function() {
     folderListContainer.style.display = 'none';
