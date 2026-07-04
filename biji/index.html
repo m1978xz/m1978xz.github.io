@@ -305,7 +305,6 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
             <button id="exportAllMdBtn" style="background:#6f42c1;color:white;">导出全部为MD</button>
             <button id="exportDataBtn">导出数据(JSON)</button>
             <button id="importDataBtn">导入数据(JSON)</button>
-            <button id="syncNowBtn">☁️ 同步到GitHub</button>
             <button id="showSettingsBtn">⚙️ 设置</button>
         </div>
     </div>
@@ -1431,12 +1430,6 @@ function loadFromGitHub() {
     });
 }
 
-/* --- Manual sync button --- */
-document.querySelector("#syncNowBtn").onclick = function() {
-    actionMenu.style.display = 'none';
-    if (!gitSettings.token) { alert('请先在设置中配置 GitHub Token。'); return; }
-    triggerGitSync();
-};
 
 /* --- Settings UI --- */
 document.querySelector("#showSettingsBtn").onclick = function() {
