@@ -65,7 +65,8 @@ button { padding: 8px 18px; margin: 4px 0; cursor: pointer; border: none; border
 /* Color picker popup */
 .color-picker-popup { position: fixed; background: #fff; border: 1px solid #e8e8ed; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 14px; z-index: 2000; min-width: 220px; }
 .color-picker-popup .picker-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #1d1d1f; }
-.color-picker-popup input[type="color"] { width: 100%; height: 36px; border: 1px solid #e8e8ed; border-radius: 8px; cursor: pointer; padding: 2px; background: #fff; margin-bottom: 8px; }
+.color-picker-popup .picker-hue-bar { width: 100%; height: 28px; border-radius: 8px; cursor: pointer; margin-bottom: 8px; border: 1px solid #e8e8ed; background: linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%)); position: relative; }
+.color-picker-popup .picker-hue-bar .hue-indicator { position: absolute; top: -2px; bottom: -2px; width: 4px; border-radius: 2px; background: #1d1d1f; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); pointer-events: none; }
 .color-picker-popup .picker-swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .color-picker-popup .picker-swatches .swatch { display: inline-block; width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
 .color-picker-popup .picker-swatches .swatch:hover { transform: scale(1.2); border-color: #007aff; }
@@ -149,7 +150,7 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
 
 <div id="colorPickerPopup" class="color-picker-popup" style="display:none;">
   <div class="picker-title" id="colorPickerTitle">选择颜色</div>
-  <input type="color" id="colorPickerWheel" value="#ff0000">
+  <div class="picker-hue-bar" id="colorPickerHueBar"><div class="hue-indicator" id="hueIndicator" style="left:0;"></div></div>
   <div class="picker-swatches" id="colorPickerSwatches"></div>
   <button class="picker-none-btn" id="colorPickerNoneBtn">不填充</button>
 </div>
@@ -463,8 +464,31 @@ function initColorPickerSwatches() {
 }
 initColorPickerSwatches();
 
-document.querySelector("#colorPickerWheel").onchange = function() {
-    applyColor(this.value);
+function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    var c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2, r, g, b;
+    if (h < 60) { r = c; g = x; b = 0; } else if (h < 120) { r = x; g = c; b = 0; } else if (h < 180) { r = 0; g = c; b = x; } else if (h < 240) { r = 0; g = x; b = c; } else if (h < 300) { r = x; g = 0; b = c; } else { r = c; g = 0; b = x; }
+    return '#' + [r, g, b].map(function(v) { return Math.round((v + m) * 255).toString(16).padStart(2, '0'); }).join('');
+}
+
+function hueFromX(hueBar, x) {
+    var rect = hueBar.getBoundingClientRect();
+    var pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    return Math.round(pct * 360);
+}
+
+function onHueBarMouseDown(e) {
+    var hueBar = document.querySelector("#colorPickerHueBar");
+    var indicator = document.querySelector("#hueIndicator");
+    var rect = hueBar.getBoundingClientRect();
+    var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    indicator.style.left = (pct * 100) + '%';
+    var hue = hueFromX(hueBar, e.clientX);
+    applyColor(hslToHex(hue, 100, 50));
+}
+
+document.querySelector("#colorPickerHueBar").onmousedown = function(e) {
+    onHueBarMouseDown(e);
 };
 
 document.querySelector("#colorPickerNoneBtn").onclick = function() {
