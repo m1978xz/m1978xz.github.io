@@ -23,14 +23,16 @@
       "folderId": "unfiled",
       "title": "m1",
       "content": "<span data-anchor-id=\"anc_m1\" class=\"note-anchor-marker\">⚓m1</span>",
-      "lastModified": 1783153679633
+      "lastModified": 1783153679633,
+      "tags": []
     },
     {
       "id": "id_1783153689276_545cd5eqy",
       "folderId": "unfiled",
       "title": "tm2",
       "content": "<a href=\"#\" class=\"note-anchor-link\" data-note-anchor=\"id_1783153668503_qlkdj47us::anc_m1\">跳转至m1</a>",
-      "lastModified": 1783153692160
+      "lastModified": 1783153692160,
+      "tags": []
     }
   ],
   "folders": [
