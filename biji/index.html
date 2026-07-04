@@ -155,9 +155,8 @@ body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border
 .tag-picker-popup .tag-color-dot.active { border-color:#1d1d1f; box-shadow:0 0 0 1.5px #fff; }
 body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
 #tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
-.note-anchor-marker { display:inline-block; font-size:0; line-height:0; margin:0 2px; cursor:default; vertical-align:middle; }
-.note-anchor-marker::before { content:'⚓'; font-size:11px; opacity:0.4; }
-body.dark-mode .note-anchor-marker::before { opacity:0.3; }
+.note-anchor-marker { display:inline; font-size:11px; opacity:0.45; cursor:default; padding:0 1px; user-select:none; }
+body.dark-mode .note-anchor-marker { opacity:0.35; }
 .note-anchor-link { color:#007aff; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #007aff; }
 body.dark-mode .note-anchor-link { color:#5e9eff; border-bottom-color:#5e9eff; }
 #anchorPickerPopup .picker-note-group { font-size:12px; font-weight:600; color:#8e8e93; margin:8px 0 4px 4px; }
@@ -909,8 +908,11 @@ document.querySelector("#fmtAnchor").onclick = function() {
     var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', '');
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
+    if (storyDiv.innerHTML.indexOf('data-anchor-id="' + id + '"') >= 0) {
+        alert('锚点 "' + name.trim() + '" 已存在。'); return;
+    }
     storyDiv.focus();
-    document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker"></span>');
+    document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker">⚓</span>');
 };
 
 document.querySelector("#fmtAnchorLink").onclick = function() {
