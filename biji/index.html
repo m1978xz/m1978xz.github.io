@@ -643,7 +643,7 @@ function normalizeContentForDisplay(html) {
     s = s.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(m, inner) {
         var items = [];
         inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(lm, lc) { items.push(lc.trim()); return lm; });
-        return items.map(function(t) { return '  • ' + t; }).join('\n');
+        return items.map(function(t) { return '  \u2022 ' + t; }).join('\n');
     });
     s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
     s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
