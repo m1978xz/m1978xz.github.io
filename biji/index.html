@@ -633,8 +633,8 @@ function addLinkTarget(html) {
 function normalizeContentForDisplay(html) {
     var s = html;
     var anchors = [], alinks = [];
-    s = s.replace(/<span[^>]*data-anchor-id="[^"]*"[^>]*>.*?<\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
-    s = s.replace(/<a[^>]*data-note-anchor="[^"]*"[^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
+    s = s.replace(/<span[^>]*data-anchor-id=["'][^"']*["'][^>]*>.*?<\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
+    s = s.replace(/<a[^>]*data-note-anchor=["'][^"']*["'][^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
     s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
     s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
     s = s.replace(/<\/p>/gi, '\n');
@@ -983,7 +983,7 @@ document.querySelector("#fmtLink").onclick = function() {
 document.querySelector("#fmtAnchor").onclick = function() {
     var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
     var existingNums = [];
-    var numRegex = /data-anchor-id="anc_m(\d+)"/g;
+    var numRegex = /data-anchor-id=["']anc_m(\d+)["']/g;
     var match;
     while ((match = numRegex.exec(allContent)) !== null) { existingNums.push(parseInt(match[1], 10)); }
     var nextNum = existingNums.length > 0 ? Math.max.apply(null, existingNums) + 1 : 1;
@@ -991,7 +991,7 @@ document.querySelector("#fmtAnchor").onclick = function() {
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
     var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
-    if (allContent.indexOf('data-anchor-id="' + id + '"') >= 0) {
+    if (allContent.indexOf('anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_')) >= 0) {
         alert('锚点 "' + name.trim() + '" 已存在。'); return;
     }
     storyDiv.focus();
@@ -1010,7 +1010,7 @@ document.querySelector("#fmtAnchorLink").onclick = function() {
     searchInput.value = '';
     var allAnchors = [];
     notes.forEach(function(n) {
-        var regex = /data-anchor-id="([^"]*)"/gi;
+        var regex = /data-anchor-id=["']([^"']*)["']/gi;
         var m;
         while ((m = regex.exec(n.content)) !== null) {
             allAnchors.push({ noteId: n.id, noteTitle: n.title, anchorId: m[1] });
@@ -1687,8 +1687,12 @@ document.querySelector("#viewerContent").addEventListener('click', function(e) {
             var noteId = parts[0], anchorId = parts[1];
             openNoteViewer(noteId, '');
             setTimeout(function() {
-                var el = document.querySelector('#viewerContent [data-anchor-id="' + anchorId + '"]');
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                var els = document.querySelectorAll('#viewerContent [data-anchor-id]');
+                for (var i = 0; i < els.length; i++) {
+                    if (els[i].getAttribute('data-anchor-id') === anchorId) {
+                        els[i].scrollIntoView({ behavior: 'smooth', block: 'center' }); break;
+                    }
+                }
             }, 100);
         }
         return;
@@ -1700,7 +1704,7 @@ function handleAnchorMarkerClick(marker) {
     var currentNoteId = currentViewerNoteId;
     var backlinks = [];
     notes.forEach(function(n) {
-        if (n.id !== currentNoteId && n.content && n.content.indexOf('data-note-anchor="' + currentNoteId + '::' + anchorId + '"') >= 0) {
+        if (n.id !== currentNoteId && n.content && n.content.indexOf(currentNoteId + '::' + anchorId) >= 0) {
             backlinks.push({ id: n.id, title: n.title });
         }
     });
@@ -1720,8 +1724,12 @@ function handleAnchorMarkerClick(marker) {
                 popup.style.display = 'none';
                 openNoteViewer(b.id, '');
                 setTimeout(function() {
-                    var el = document.querySelector('#viewerContent [data-note-anchor="' + currentNoteId + '::' + anchorId + '"]');
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    var els = document.querySelectorAll('#viewerContent [data-note-anchor]');
+                    for (var i = 0; i < els.length; i++) {
+                        if (els[i].getAttribute('data-note-anchor') === currentNoteId + '::' + anchorId) {
+                            els[i].scrollIntoView({ behavior: 'smooth', block: 'center' }); break;
+                        }
+                    }
                 }, 100);
             };
             list.appendChild(item);
