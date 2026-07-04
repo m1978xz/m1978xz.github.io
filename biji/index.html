@@ -155,6 +155,16 @@ body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border
 .tag-picker-popup .tag-color-dot.active { border-color:#1d1d1f; box-shadow:0 0 0 1.5px #fff; }
 body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
 #tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
+.note-anchor-marker { display:inline-block; font-size:0; line-height:0; margin:0 2px; cursor:default; vertical-align:middle; }
+.note-anchor-marker::before { content:'⚓'; font-size:11px; opacity:0.4; }
+body.dark-mode .note-anchor-marker::before { opacity:0.3; }
+.note-anchor-link { color:#007aff; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #007aff; }
+body.dark-mode .note-anchor-link { color:#5e9eff; border-bottom-color:#5e9eff; }
+#anchorPickerPopup .picker-note-group { font-size:12px; font-weight:600; color:#8e8e93; margin:8px 0 4px 4px; }
+#anchorPickerPopup .picker-anchor-item { display:block; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:#1d1d1f; transition:background 0.15s; }
+#anchorPickerPopup .picker-anchor-item:hover { background:#f0f0f5; }
+body.dark-mode #anchorPickerPopup .picker-anchor-item { color:#f5f5f7; }
+body.dark-mode #anchorPickerPopup .picker-anchor-item:hover { background:#3a3a3c; }
 #tagManagementList { list-style:none; padding:0; margin-top:15px; }
 #tagManagementList li { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0f0f0; }
 #tagManagementList li:last-child { border-bottom:none; }
@@ -278,7 +288,9 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
       <option value="h6">标题 6</option>
       <option value="p">正文</option>
     </select>
-    <button id="fmtLink" title="插入链接">🔗</button>
+    <button id="fmtLink" title="插入链接">🔗 链接</button>
+    <button id="fmtAnchor" title="插入锚点">⚓ 锚点</button>
+    <button id="fmtAnchorLink" title="插入跳转到锚点的链接">↗ 跳转</button>
     <button id="fmtBullet" title="项目符号">• 列表</button>
     <button id="fmtNumber" title="编号列表">1. 列表</button>
     <button id="fmtTagBtn" title="标签" style="background:#5e5ce6;color:white;"># 标签</button>
@@ -308,6 +320,14 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
     <button id="tagPickerNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">添加</button>
   </div>
 </div>
+</div>
+
+<div id="anchorPickerPopup" class="tag-picker-popup" style="display:none;">
+  <div class="picker-title">选择要跳转到的锚点</div>
+  <div id="anchorPickerList"></div>
+  <div class="tag-new-row">
+    <input type="text" id="anchorPickerSearch" placeholder="搜索笔记或锚点...">
+  </div>
 </div>
 
 <div id="folderListContainer" style="display: none;">
@@ -534,11 +554,17 @@ function highlightTextInHtml(html, searchTerm) {
 }
 
 function addLinkTarget(html) {
-    return html.replace(/<a\s+/gi, '<a target="_blank" rel="noopener" ');
+    return html.replace(/<a\s+([^>]*?)>/gi, function(m, attrs) {
+        if (/data-note-anchor/i.test(attrs) || /target\s*=/i.test(attrs)) return m;
+        return '<a target="_blank" rel="noopener" ' + attrs + '>';
+    });
 }
 
 function normalizeContentForDisplay(html) {
     var s = html;
+    var anchors = [], alinks = [];
+    s = s.replace(/<span[^>]*data-anchor-id="[^"]*"[^>]*><\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
+    s = s.replace(/<a[^>]*data-note-anchor="[^"]*"[^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
     s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
     s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
     s = s.replace(/<\/p>/gi, '\n');
@@ -551,6 +577,8 @@ function normalizeContentForDisplay(html) {
     s = s.replace(/<li[^>]*>/gi, '');
     s = s.replace(/<br\s*\/?>/gi, '\n');
     s = s.replace(/\\n/g, '\n');
+    anchors.forEach(function(a, i) { s = s.replace('%%AM' + i + '%%', a); });
+    alinks.forEach(function(a, i) { s = s.replace('%%AL' + i + '%%', a); });
     return s;
 }
 
@@ -872,6 +900,78 @@ document.querySelector("#fmtLink").onclick = function() {
         if (links.length) links[links.length - 1].setAttribute('target', '_blank');
     }
 };
+
+/* --- Anchors --- */
+document.querySelector("#fmtAnchor").onclick = function() {
+    var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', '');
+    if (!name || !name.trim()) return;
+    var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
+    storyDiv.focus();
+    document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker"></span>');
+};
+
+document.querySelector("#fmtAnchorLink").onclick = function() {
+    var sel = window.getSelection();
+    var text = sel.toString().trim();
+    var popup = document.querySelector("#anchorPickerPopup");
+    var list = document.querySelector("#anchorPickerList");
+    var searchInput = document.querySelector("#anchorPickerSearch");
+    list.innerHTML = '';
+    searchInput.value = '';
+    var allAnchors = [];
+    notes.forEach(function(n) {
+        var regex = /data-anchor-id="([^"]*)"/gi;
+        var m;
+        while ((m = regex.exec(n.content)) !== null) {
+            allAnchors.push({ noteId: n.id, noteTitle: n.title, anchorId: m[1] });
+        }
+    });
+    if (allAnchors.length === 0) {
+        list.innerHTML = '<div style="padding:10px;color:#8e8e93;font-size:13px;">暂无锚点，请先在笔记中插入锚点。</div>';
+    } else {
+        var lastNote = null;
+        allAnchors.forEach(function(a) {
+            if (lastNote !== a.noteId) {
+                var header = document.createElement('div');
+                header.className = 'picker-note-group';
+                header.textContent = a.noteTitle;
+                list.appendChild(header);
+                lastNote = a.noteId;
+            }
+            var item = document.createElement('div');
+            item.className = 'picker-anchor-item';
+            item.textContent = '⚓ ' + a.anchorId;
+            item.dataset.noteId = a.noteId;
+            item.dataset.anchorId = a.anchorId;
+            item.onclick = function() {
+                var linkText = text || a.anchorId;
+                storyDiv.focus();
+                document.execCommand('insertHTML', false, '<a href="#" class="note-anchor-link" data-note-anchor="' + a.noteId + '::' + a.anchorId + '">' + linkText + '</a>');
+                popup.style.display = 'none';
+            };
+            list.appendChild(item);
+        });
+    }
+    var rect = this.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+    searchInput.focus();
+};
+
+document.querySelector("#anchorPickerSearch").oninput = function() {
+    var q = this.value.toLowerCase();
+    document.querySelectorAll("#anchorPickerList .picker-note-group, #anchorPickerList .picker-anchor-item").forEach(function(el) {
+        el.style.display = el.textContent.toLowerCase().indexOf(q) >= 0 ? '' : 'none';
+    });
+};
+
+document.addEventListener('click', function(e) {
+    var popup = document.querySelector("#anchorPickerPopup");
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && e.target.id !== 'fmtAnchorLink') {
+        popup.style.display = 'none';
+    }
+});
 
 /* --- Tags --- */
 var TAG_COLORS = ['#e8e8ed','#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#5e5ce6','#af52de','#ff2d55'];
@@ -1388,6 +1488,23 @@ document.querySelector("#viewerEditBtn").onclick = function() { closeNoteViewer(
 document.querySelector("#viewerExportTxtBtn").onclick = function() { if (currentViewerNoteId) { exportNoteToTxt(currentViewerNoteId); document.querySelector("#viewerMenu").style.display = 'none'; } };
 document.querySelector("#viewerExportMdBtn").onclick = function() { if (currentViewerNoteId) { exportNoteToMd(currentViewerNoteId); document.querySelector("#viewerMenu").style.display = 'none'; } };
 document.querySelector("#viewerDeleteBtn").onclick = function() { if (currentViewerNoteId) { document.querySelector("#viewerMenu").style.display = 'none'; closeNoteViewer(); deleteNote(currentViewerNoteId); } };
+
+document.querySelector("#viewerContent").addEventListener('click', function(e) {
+    var link = e.target.closest('[data-note-anchor]');
+    if (link) {
+        e.preventDefault();
+        var target = link.getAttribute('data-note-anchor');
+        var parts = target.split('::');
+        if (parts.length === 2) {
+            var noteId = parts[0], anchorId = parts[1];
+            openNoteViewer(noteId, '');
+            setTimeout(function() {
+                var el = document.querySelector('#viewerContent [data-anchor-id="' + anchorId + '"]');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    }
+});
 
 function toggleContent(id, contentDivToShow) {
     if (currentOpenNoteContentDiv && currentOpenNoteContentDiv !== contentDivToShow) {
