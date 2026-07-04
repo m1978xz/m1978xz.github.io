@@ -154,6 +154,32 @@ body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border
 #tagManagementList li:last-child { border-bottom:none; }
 body.dark-mode #tagManagementContainer { background:#2c2c2e; border-color:#48484a; }
 body.dark-mode #tagManagementList li { border-bottom-color:#48484a; }
+
+/* Lock screen */
+#lockScreen { position:fixed; top:0; left:0; right:0; bottom:0; background:#f5f5f7; z-index:9999; display:flex; align-items:center; justify-content:center; }
+body.dark-mode #lockScreen { background:#1c1c1e; }
+#lockScreen .lock-card { background:#fff; padding:32px; border-radius:16px; box-shadow:0 4px 24px rgba(0,0,0,0.1); text-align:center; max-width:340px; width:90%; }
+body.dark-mode #lockScreen .lock-card { background:#2c2c2e; }
+#lockScreen .lock-title { font-size:20px; font-weight:700; margin-bottom:20px; }
+#lockScreen input[type="password"] { width:100%; padding:12px; border:2px solid #e8e8ed; border-radius:10px; font-size:16px; outline:none; text-align:center; margin-bottom:12px; }
+#lockScreen input[type="password"]:focus { border-color:#007aff; }
+body.dark-mode #lockScreen input[type="password"] { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
+#lockScreen .lock-error { color:#ff3b30; font-size:13px; margin-bottom:8px; display:none; }
+#lockScreen button { width:100%; padding:12px; border-radius:10px; font-size:16px; font-weight:600; }
+
+/* Settings */
+#settingsContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
+#settingsContainer h2 { font-size:18px; font-weight:700; margin:0 0 16px; }
+#settingsContainer label { display:block; font-size:13px; font-weight:500; color:#555; margin-top:12px; margin-bottom:4px; }
+#settingsContainer input[type="text"], #settingsContainer input[type="password"] { width:100%; padding:10px; border:1px solid #e8e8ed; border-radius:8px; font-size:14px; outline:none; }
+#settingsContainer input:focus { border-color:#007aff; }
+body.dark-mode #settingsContainer { background:#2c2c2e; border-color:#48484a; }
+body.dark-mode #settingsContainer label { color:#aaa; }
+body.dark-mode #settingsContainer input { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
+.sync-indicator { font-size:12px; color:#8e8e93; margin-left:6px; }
+.sync-indicator.syncing { color:#ff9500; }
+.sync-indicator.done { color:#34c759; }
+.sync-indicator.error { color:#ff3b30; }
 </style>
 </head>
 <body>
@@ -177,6 +203,8 @@ body.dark-mode #tagManagementList li { border-bottom-color:#48484a; }
             <button id="exportAllMdBtn" style="background:#6f42c1;color:white;">导出全部为MD</button>
             <button id="exportDataBtn">导出数据(JSON)</button>
             <button id="importDataBtn">导入数据(JSON)</button>
+            <button id="syncNowBtn">☁️ 同步到GitHub</button>
+            <button id="showSettingsBtn">⚙️ 设置</button>
         </div>
     </div>
 </div>
@@ -263,6 +291,33 @@ body.dark-mode #tagManagementList li { border-bottom-color:#48484a; }
     <h2 style="font-size:18px;font-weight:700;margin-top:0;">标签管理</h2>
     <ul id="tagManagementList"></ul>
     <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+</div>
+
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-title">🔒 笔记已锁定</div>
+    <input type="password" id="lockPasswordInput" placeholder="请输入密码" autocomplete="off">
+    <div class="lock-error" id="lockError">密码错误，请重试</div>
+    <button id="lockUnlockBtn" style="background:#007aff;color:white;">解锁</button>
+  </div>
+</div>
+
+<div id="settingsContainer">
+  <h2>⚙️ 设置</h2>
+  <label>密码保护</label>
+  <input type="password" id="settingsPassword" placeholder="留空则不设密码">
+  <label>确认密码</label>
+  <input type="password" id="settingsPasswordConfirm" placeholder="再次输入密码">
+  <button id="settingsSavePasswordBtn" style="background:#ff9500;color:white;margin-bottom:16px;">保存密码</button>
+  <hr style="border:none;border-top:1px solid #e8e8ed;margin:16px 0;">
+  <label>GitHub Token</label>
+  <input type="text" id="settingsGitToken" placeholder="ghp_...">
+  <label>仓库 (owner/repo)</label>
+  <input type="text" id="settingsGitRepo" value="m1978xz/m1978xz.github.io">
+  <label>文件路径</label>
+  <input type="text" id="settingsGitPath" value="biji/notebook-data.json">
+  <button id="settingsSaveGitBtn" style="background:#007aff;color:white;margin-top:8px;">保存设置</button>
+  <span class="sync-indicator" id="syncIndicator"></span>
 </div>
 
 <input type="file" id="importFileInput" accept=".json" style="display:none;">
@@ -799,6 +854,7 @@ document.querySelector("#showTagsBtn").onclick = function() {
     noteList.style.display = 'none';
     folderListContainer.style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
     document.querySelector("#tagManagementContainer").style.display = 'block';
     renderTagManagementList();
 };
@@ -809,6 +865,182 @@ document.querySelector("#backFromTagsBtn").onclick = function() {
     noteList.style.display = 'block';
     currentPage = 1;
     renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+/* --- Password --- */
+var passwordHash = localStorage.getItem('simpleNotesAppData_passwordHash') || '';
+
+function simpleHash(str) {
+    if (!str) return '';
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) { var c = str.charCodeAt(i); hash = ((hash << 5) - hash) + c; hash |= 0; }
+    return hash.toString(36);
+}
+
+function checkPassword() {
+    if (!passwordHash) { document.querySelector("#lockScreen").style.display = 'none'; return; }
+    document.querySelector("#lockScreen").style.display = 'flex';
+}
+
+document.querySelector("#lockUnlockBtn").onclick = function() {
+    var input = document.querySelector("#lockPasswordInput");
+    if (simpleHash(input.value) === passwordHash) {
+        document.querySelector("#lockScreen").style.display = 'none';
+        document.querySelector("#lockError").style.display = 'none';
+        input.value = '';
+    } else {
+        document.querySelector("#lockError").style.display = 'block';
+    }
+};
+document.querySelector("#lockPasswordInput").onkeydown = function(e) {
+    if (e.key === 'Enter') document.querySelector("#lockUnlockBtn").click();
+};
+
+document.querySelector("#settingsSavePasswordBtn").onclick = function() {
+    var p1 = document.querySelector("#settingsPassword").value;
+    var p2 = document.querySelector("#settingsPasswordConfirm").value;
+    if (p1 !== p2) { alert('两次输入的密码不一致。'); return; }
+    if (p1 && p1.length < 3) { alert('密码至少3个字符。'); return; }
+    passwordHash = p1 ? simpleHash(p1) : '';
+    localStorage.setItem('simpleNotesAppData_passwordHash', passwordHash);
+    document.querySelector("#settingsPassword").value = '';
+    document.querySelector("#settingsPasswordConfirm").value = '';
+    alert(p1 ? '密码已设置。' : '密码已清除。');
+    checkPassword();
+};
+
+/* --- GitHub Sync --- */
+var gitSettings = JSON.parse(localStorage.getItem('simpleNotesAppData_gitSettings') || '{"token":"","repo":"m1978xz/m1978xz.github.io","path":"biji/notebook-data.json"}');
+
+function loadGitSettings() {
+    document.querySelector("#settingsGitToken").value = gitSettings.token;
+    document.querySelector("#settingsGitRepo").value = gitSettings.repo;
+    document.querySelector("#settingsGitPath").value = gitSettings.path;
+}
+
+function saveGitSettings() {
+    gitSettings.token = document.querySelector("#settingsGitToken").value.trim();
+    gitSettings.repo = document.querySelector("#settingsGitRepo").value.trim();
+    gitSettings.path = document.querySelector("#settingsGitPath").value.trim();
+    localStorage.setItem('simpleNotesAppData_gitSettings', JSON.stringify(gitSettings));
+}
+
+function setSyncIndicator(msg, cls) {
+    var el = document.querySelector("#syncIndicator");
+    el.textContent = msg;
+    el.className = 'sync-indicator' + (cls ? ' ' + cls : '');
+}
+
+function fetchFromGitHub(callback) {
+    var url = 'https://api.github.com/repos/' + gitSettings.repo + '/contents/' + gitSettings.path;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('Authorization', 'token ' + gitSettings.token);
+    xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var resp = JSON.parse(xhr.responseText);
+            var content = atob(resp.content);
+            try { callback(null, JSON.parse(content), resp.sha); } catch(e) { callback('解析失败'); }
+        } else if (xhr.status === 404) { callback(null, null, null); }
+        else { callback('HTTP ' + xhr.status); }
+    };
+    xhr.onerror = function() { callback('网络错误'); };
+    xhr.send();
+}
+
+function pushToGitHub(data, sha, callback) {
+    var url = 'https://api.github.com/repos/' + gitSettings.repo + '/contents/' + gitSettings.path;
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    var body = { message: 'Sync notebook data ' + new Date().toISOString(), content: content, branch: 'main' };
+    if (sha) body.sha = sha;
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', url, true);
+    xhr.setRequestHeader('Authorization', 'token ' + gitSettings.token);
+    xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+        if (xhr.status === 200 || xhr.status === 201) { callback(null, JSON.parse(xhr.responseText).content.sha); }
+        else { callback('HTTP ' + xhr.status); }
+    };
+    xhr.onerror = function() { callback('网络错误'); };
+    xhr.send(JSON.stringify(body));
+}
+
+var gitSha = null;
+var syncTimer = null;
+
+function triggerGitSync() {
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(function() {
+        var data = { notes: notes, folders: folders, trash: trash, tags: tags, version: 2 };
+        setSyncIndicator('同步中...', 'syncing');
+        pushToGitHub(data, gitSha, function(err, sha) {
+            if (err) { setSyncIndicator('同步失败', 'error'); console.log('Git sync error:', err); return; }
+            gitSha = sha;
+            setSyncIndicator('已同步', 'done');
+            setTimeout(function() { setSyncIndicator('', ''); }, 3000);
+        });
+    }, 3000);
+}
+
+function loadFromGitHub() {
+    setSyncIndicator('加载中...', 'syncing');
+    fetchFromGitHub(function(err, data, sha) {
+        if (err) { setSyncIndicator('加载失败', 'error'); return; }
+        if (!data) { setSyncIndicator('首次使用', ''); return; }
+        gitSha = sha;
+        if (data.notes) {
+            if (data.version >= 2) {
+                notes = data.notes || [];
+                folders = data.folders || [{ id: 'unfiled', name: '无文件夹' }];
+                trash = data.trash || [];
+                tags = data.tags || [];
+            } else {
+                notes = data.notes || [];
+                folders = data.folders || [{ id: 'unfiled', name: '无文件夹' }];
+            }
+            if (!folders.some(function(f) { return f.id === 'unfiled'; })) folders.unshift({ id: 'unfiled', name: '无文件夹' });
+            notes.forEach(function(n) { if (!n.lastModified) n.lastModified = Date.now(); if (!n.tags) n.tags = []; });
+            saveData();
+        }
+        setSyncIndicator('已加载', 'done');
+        setTimeout(function() { setSyncIndicator('', ''); }, 2000);
+    });
+}
+
+/* --- Manual sync button --- */
+document.querySelector("#syncNowBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    if (!gitSettings.token) { alert('请先在设置中配置 GitHub Token。'); return; }
+    triggerGitSync();
+};
+
+/* --- Settings UI --- */
+document.querySelector("#showSettingsBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    loadGitSettings();
+    document.querySelector("#settingsContainer").style.display = 'block';
+};
+
+document.querySelector("#settingsSaveGitBtn").onclick = function() {
+    saveGitSettings();
+    alert('GitHub 设置已保存。');
+    loadFromGitHub();
+};
+
+/* --- Modify saveData to also trigger GitHub sync --- */
+var origSaveData = saveData;
+saveData = function() {
+    origSaveData();
+    triggerGitSync();
 };
 
 /* --- Auto-save --- */
@@ -932,12 +1164,14 @@ document.querySelector("#showTrashBtn").onclick = function() {
     mainSearchBar.style.display = 'none';
     noteList.style.display = 'none';
     folderListContainer.style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
     document.querySelector("#trashContainer").style.display = 'block';
     renderTrashList();
 };
 
 document.querySelector("#backFromTrashBtn").onclick = function() {
     document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
     mainSearchBar.style.display = 'block';
     noteList.style.display = 'block';
     currentPage = 1;
@@ -1166,6 +1400,7 @@ showFolderListBtn.onclick = function() {
     mainSearchBar.style.display = 'none';
     noteList.style.display = 'none';
     folderListContainer.style.display = 'block';
+    document.querySelector("#settingsContainer").style.display = 'none';
     renderFolderManagementList();
 };
 
@@ -1187,6 +1422,7 @@ function showHomePage() {
     document.querySelector("#trashContainer").style.display = 'none';
     document.querySelector("#tagManagementContainer").style.display = 'none';
     document.querySelector("#tagPickerPopup").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
     mainSearchBar.style.display = 'block';
     mainSearchBar.value = '';
     currentViewingFolderId = null;
@@ -1315,6 +1551,8 @@ function exportFolderToTxt(folderId) {
 
 renderFoldersDropdowns();
 showHomePage();
+checkPassword();
+loadFromGitHub();
 </script>
 </body>
 </html>
