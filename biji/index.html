@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>一页笔记本</title>
+<title>涓€椤电瑪璁版湰</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Hiragino Sans GB", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 860px; margin: 0 auto; padding: 24px 20px; background: #f5f5f7; color: #1d1d1f; -webkit-font-smoothing: antialiased; }
@@ -213,129 +213,129 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
 <body>
 
 <div class="header-section">
-    <h1>简洁笔记本</h1>
-    <button id="darkModeToggle">🌙</button>
+    <h1>绠€娲佺瑪璁版湰</h1>
+    <button id="darkModeToggle">馃寵</button>
     <div style="position: relative;">
         <button id="menuToggleButton"></button>
         <div id="actionMenu" style="display: none;">
-            <button id="homeBtn">首页</button>
-            <button id="newBtn">新建笔记</button>
+            <button id="homeBtn">棣栭〉</button>
+            <button id="newBtn">鏂板缓绗旇</button>
             <div class="folder-controls">
-                <input type="text" id="newFolderNameInput" placeholder="新文件夹名称">
-                <button id="newFolderBtn">新建文件夹</button>
+                <input type="text" id="newFolderNameInput" placeholder="鏂版枃浠跺す鍚嶇О">
+                <button id="newFolderBtn">鏂板缓鏂囦欢澶?/button>
             </div>
-            <select id="folderFilter"><option value="">所有笔记</option><option value="unfiled">无文件夹</option></select>
-            <button id="showFolderListBtn">文件夹列表</button>
-            <button id="showTrashBtn" style="background:#ff3b30;color:white;">回收站</button>
-            <button id="showTagsBtn" style="background:#5e5ce6;color:white;">标签管理</button>
-            <button id="exportAllMdBtn" style="background:#6f42c1;color:white;">导出全部为MD</button>
-            <button id="exportDataBtn">导出数据(JSON)</button>
-            <button id="importDataBtn">导入数据(JSON)</button>
-            <button id="syncNowBtn">☁️ 同步到GitHub</button>
-            <button id="showSettingsBtn">⚙️ 设置</button>
+            <select id="folderFilter"><option value="">鎵€鏈夌瑪璁?/option><option value="unfiled">鏃犳枃浠跺す</option></select>
+            <button id="showFolderListBtn">鏂囦欢澶瑰垪琛?/button>
+            <button id="showTrashBtn" style="background:#ff3b30;color:white;">鍥炴敹绔?/button>
+            <button id="showTagsBtn" style="background:#5e5ce6;color:white;">鏍囩绠＄悊</button>
+            <button id="exportAllMdBtn" style="background:#6f42c1;color:white;">瀵煎嚭鍏ㄩ儴涓篗D</button>
+            <button id="exportDataBtn">瀵煎嚭鏁版嵁(JSON)</button>
+            <button id="importDataBtn">瀵煎叆鏁版嵁(JSON)</button>
+            <button id="syncNowBtn">鈽侊笍 鍚屾鍒癎itHub</button>
+            <button id="showSettingsBtn">鈿欙笍 璁剧疆</button>
         </div>
     </div>
 </div>
 
-<input type="text" id="mainSearchBar" placeholder="搜索笔记..." style="display: block;">
+<input type="text" id="mainSearchBar" placeholder="鎼滅储绗旇..." style="display: block;">
 
 <ul id="noteList" style="display: none;"></ul>
 
 <div id="pagination">
-    <button id="prevPageBtn">上一页</button>
+    <button id="prevPageBtn">涓婁竴椤?/button>
     <span class="page-info" id="pageInfo"></span>
-    <button id="nextPageBtn">下一页</button>
+    <button id="nextPageBtn">涓嬩竴椤?/button>
 </div>
 
 <div id="editor" style="display: none;">
-  <p><input id="title" placeholder="标题"></p>
+  <p><input id="title" placeholder="鏍囬"></p>
   <div id="editorToolbar">
-    <button id="fmtUndo" title="撤销">↩</button>
-    <button id="fmtRedo" title="重做">↪</button>
-    <button id="fmtBold" title="加粗"><b>B</b></button>
+    <button id="fmtUndo" title="鎾ら攢">鈫?/button>
+    <button id="fmtRedo" title="閲嶅仛">鈫?/button>
+    <button id="fmtBold" title="鍔犵矖"><b>B</b></button>
     <select id="fmtSize">
-      <option value="">大小</option>
-      <option value="3">小</option>
-      <option value="5">中</option>
-      <option value="6">大</option>
-      <option value="7">超大</option>
+      <option value="">澶у皬</option>
+      <option value="3">灏?/option>
+      <option value="5">涓?/option>
+      <option value="6">澶?/option>
+      <option value="7">瓒呭ぇ</option>
     </select>
-    <button id="fmtColorBtn">文字色</button>
-    <button id="fmtBgColorBtn">背景色</button>
+    <button id="fmtColorBtn">鏂囧瓧鑹?/button>
+    <button id="fmtBgColorBtn">鑳屾櫙鑹?/button>
     <select id="fmtHeading">
-      <option value="">标题</option>
-      <option value="h1">标题 1</option>
-      <option value="h2">标题 2</option>
-      <option value="h3">标题 3</option>
-      <option value="h4">标题 4</option>
-      <option value="h5">标题 5</option>
-      <option value="h6">标题 6</option>
-      <option value="p">正文</option>
+      <option value="">鏍囬</option>
+      <option value="h1">鏍囬 1</option>
+      <option value="h2">鏍囬 2</option>
+      <option value="h3">鏍囬 3</option>
+      <option value="h4">鏍囬 4</option>
+      <option value="h5">鏍囬 5</option>
+      <option value="h6">鏍囬 6</option>
+      <option value="p">姝ｆ枃</option>
     </select>
-    <button id="fmtLink" title="插入链接">🔗</button>
-    <button id="fmtBullet" title="项目符号">• 列表</button>
-    <button id="fmtNumber" title="编号列表">1. 列表</button>
-    <button id="fmtTagBtn" title="标签" style="background:#5e5ce6;color:white;"># 标签</button>
-    <span class="auto-save-indicator" id="autoSaveIndicator">已保存</span>
+    <button id="fmtLink" title="鎻掑叆閾炬帴">馃敆</button>
+    <button id="fmtBullet" title="椤圭洰绗﹀彿">鈥?鍒楄〃</button>
+    <button id="fmtNumber" title="缂栧彿鍒楄〃">1. 鍒楄〃</button>
+    <button id="fmtTagBtn" title="鏍囩" style="background:#5e5ce6;color:white;"># 鏍囩</button>
+    <span class="auto-save-indicator" id="autoSaveIndicator">宸蹭繚瀛?/span>
   </div>
   <div id="story" contenteditable="true"></div>
   <p style="margin-top:10px;">
-    <label for="noteFolderSelect">选择文件夹:</label>
-    <select id="noteFolderSelect"><option value="unfiled">无文件夹</option></select>
+    <label for="noteFolderSelect">閫夋嫨鏂囦欢澶?</label>
+    <select id="noteFolderSelect"><option value="unfiled">鏃犳枃浠跺す</option></select>
   </p>
-  <button id="publishBtn">发布</button>
+  <button id="publishBtn">鍙戝竷</button>
 </div>
 
 <div id="colorPickerPopup" class="color-picker-popup" style="display:none;">
-  <div class="picker-title" id="colorPickerTitle">选择颜色</div>
+  <div class="picker-title" id="colorPickerTitle">閫夋嫨棰滆壊</div>
   <div class="picker-hue-bar" id="colorPickerHueBar"><div class="hue-indicator" id="hueIndicator" style="left:0;"></div></div>
   <div class="picker-swatches" id="colorPickerSwatches"></div>
-  <button class="picker-none-btn" id="colorPickerNoneBtn">不填充</button>
+  <button class="picker-none-btn" id="colorPickerNoneBtn">涓嶅～鍏?/button>
 </div>
 
 <div id="tagPickerPopup" class="tag-picker-popup" style="display:none;">
-  <div class="picker-title">选择标签</div>
+  <div class="picker-title">閫夋嫨鏍囩</div>
   <div id="tagPickerList"></div>
   <div class="tag-new-row">
-    <input type="text" id="tagPickerNewInput" placeholder="新建标签...">
-    <button id="tagPickerNewBtn" style="background:#007aff;color:white;white-space:nowrap;">添加</button>
+    <input type="text" id="tagPickerNewInput" placeholder="鏂板缓鏍囩...">
+    <button id="tagPickerNewBtn" style="background:#007aff;color:white;white-space:nowrap;">娣诲姞</button>
   </div>
 </div>
 
 <div id="folderListContainer" style="display: none;">
-    <h2 style="font-size:18px;font-weight:700;margin-top:0;">文件夹管理</h2>
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">鏂囦欢澶圭鐞?/h2>
     <ul id="folderManagementList"></ul>
-    <button id="backToNotesBtn">返回笔记列表</button>
+    <button id="backToNotesBtn">杩斿洖绗旇鍒楄〃</button>
 </div>
 
 <div id="trashContainer">
-    <h2 style="font-size:18px;font-weight:700;margin-top:0;">回收站</h2>
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">鍥炴敹绔?/h2>
     <ul id="trashList"></ul>
-    <button class="empty-trash-btn" id="emptyTrashBtn">清空回收站</button>
-    <button id="backFromTrashBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+    <button class="empty-trash-btn" id="emptyTrashBtn">娓呯┖鍥炴敹绔?/button>
+    <button id="backFromTrashBtn" style="background:#6c757d;color:white;margin-top:8px;">杩斿洖绗旇鍒楄〃</button>
 </div>
 
 <div id="tagManagementContainer">
-    <h2 style="font-size:18px;font-weight:700;margin-top:0;">标签管理</h2>
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">鏍囩绠＄悊</h2>
     <ul id="tagManagementList"></ul>
-    <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+    <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">杩斿洖绗旇鍒楄〃</button>
 </div>
 
 <div id="noteViewer">
   <div class="viewer-header">
-    <button class="viewer-menu-btn" id="viewerMenuBtn">☰</button>
+    <button class="viewer-menu-btn" id="viewerMenuBtn">鈽?/button>
     <div class="viewer-menu" id="viewerMenu">
-      <button id="viewerEditBtn">✏️ 编辑</button>
-      <button id="viewerExportTxtBtn">📄 导出TXT</button>
-      <button id="viewerExportMdBtn">📝 导出MD</button>
-      <button id="viewerDeleteBtn">🗑️ 删除</button>
+      <button id="viewerEditBtn">鉁忥笍 缂栬緫</button>
+      <button id="viewerExportTxtBtn">馃搫 瀵煎嚭TXT</button>
+      <button id="viewerExportMdBtn">馃摑 瀵煎嚭MD</button>
+      <button id="viewerDeleteBtn">馃棏锔?鍒犻櫎</button>
     </div>
     <div class="viewer-font-controls">
-      <button id="viewerFontDec">A−</button>
+      <button id="viewerFontDec">A鈭?/button>
       <span class="font-size-label" id="viewerFontLabel">16</span>
       <button id="viewerFontInc">A+</button>
     </div>
-    <button class="viewer-close-btn" id="viewerCloseBtn">✕</button>
+    <button class="viewer-close-btn" id="viewerCloseBtn">鉁?/button>
   </div>
   <div class="viewer-body">
     <div class="viewer-title" id="viewerTitle"></div>
@@ -349,28 +349,28 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
 
 <div id="lockScreen">
   <div class="lock-card">
-    <div class="lock-title">🔒 笔记已锁定</div>
-    <input type="password" id="lockPasswordInput" placeholder="请输入密码" autocomplete="off">
-    <div class="lock-error" id="lockError">密码错误，请重试</div>
-    <button id="lockUnlockBtn" style="background:#007aff;color:white;">解锁</button>
+    <div class="lock-title">馃敀 绗旇宸查攣瀹?/div>
+    <input type="password" id="lockPasswordInput" placeholder="璇疯緭鍏ュ瘑鐮? autocomplete="off">
+    <div class="lock-error" id="lockError">瀵嗙爜閿欒锛岃閲嶈瘯</div>
+    <button id="lockUnlockBtn" style="background:#007aff;color:white;">瑙ｉ攣</button>
   </div>
 </div>
 
 <div id="settingsContainer">
-  <h2>⚙️ 设置</h2>
-  <label>密码保护</label>
-  <input type="password" id="settingsPassword" placeholder="留空则不设密码">
-  <label>确认密码</label>
-  <input type="password" id="settingsPasswordConfirm" placeholder="再次输入密码">
-  <button id="settingsSavePasswordBtn" style="background:#ff9500;color:white;margin-bottom:16px;">保存密码</button>
+  <h2>鈿欙笍 璁剧疆</h2>
+  <label>瀵嗙爜淇濇姢</label>
+  <input type="password" id="settingsPassword" placeholder="鐣欑┖鍒欎笉璁惧瘑鐮?>
+  <label>纭瀵嗙爜</label>
+  <input type="password" id="settingsPasswordConfirm" placeholder="鍐嶆杈撳叆瀵嗙爜">
+  <button id="settingsSavePasswordBtn" style="background:#ff9500;color:white;margin-bottom:16px;">淇濆瓨瀵嗙爜</button>
   <hr style="border:none;border-top:1px solid #e8e8ed;margin:16px 0;">
   <label>GitHub Token</label>
   <input type="text" id="settingsGitToken" placeholder="ghp_...">
-  <label>仓库 (owner/repo)</label>
+  <label>浠撳簱 (owner/repo)</label>
   <input type="text" id="settingsGitRepo" value="m1978xz/m1978xz.github.io">
-  <label>文件路径</label>
+  <label>鏂囦欢璺緞</label>
   <input type="text" id="settingsGitPath" value="biji/notebook-data.json">
-  <button id="settingsSaveGitBtn" style="background:#007aff;color:white;margin-top:8px;">保存设置</button>
+  <button id="settingsSaveGitBtn" style="background:#007aff;color:white;margin-top:8px;">淇濆瓨璁剧疆</button>
   <span class="sync-indicator" id="syncIndicator"></span>
 </div>
 
@@ -388,7 +388,7 @@ function formatTimestamp(timestamp) {
     var day = date.getDate().toString().padStart(2, '0');
     var hours = date.getHours().toString().padStart(2, '0');
     var minutes = date.getMinutes().toString().padStart(2, '0');
-    return year + '年' + month + '月' + day + '日' + hours + '时' + minutes + '分';
+    return year + '骞? + month + '鏈? + day + '鏃? + hours + '鏃? + minutes + '鍒?;
 }
 
 
@@ -441,7 +441,7 @@ function loadData() {
         repairAllStrings(trash);
         repairAllStrings(tags);
         if (!folders.some(function(f) { return f.id === 'unfiled'; })) {
-            folders.unshift({ id: 'unfiled', name: '无文件夹' });
+            folders.unshift({ id: 'unfiled', name: '鏃犳枃浠跺す' });
         }
         notes.forEach(function(n) {
             if (!n.lastModified) { n.lastModified = Date.now(); }
@@ -453,7 +453,7 @@ function loadData() {
 }
 
 if (!loadData()) {
-    folders = [{ id: 'unfiled', name: '无文件夹' }];
+    folders = [{ id: 'unfiled', name: '鏃犳枃浠跺す' }];
     notes = [];
     trash = [];
     tags = [];
@@ -563,7 +563,7 @@ function renderContentWithLines(content, searchTerm) {
             if (count > 0) { totalCount += count; matchLines.push(idx + 1); }
         });
         if (totalCount > 0) {
-            html += '<div class="search-stats">🔍 找到 <strong>' + totalCount + '</strong> 处匹配，位于第 <strong>' + matchLines.join('、') + '</strong> 行</div>';
+            html += '<div class="search-stats">馃攳 鎵惧埌 <strong>' + totalCount + '</strong> 澶勫尮閰嶏紝浣嶄簬绗?<strong>' + matchLines.join('銆?) + '</strong> 琛?/div>';
         }
         var displayHtml = highlightTextInHtml(normalized, searchTerm);
         var lines = displayHtml.split('\n');
@@ -589,7 +589,7 @@ function renderFoldersDropdowns() {
     noteFolderSelect.innerHTML = '';
     var allOption = document.createElement("option");
     allOption.value = '';
-    allOption.textContent = '所有笔记';
+    allOption.textContent = '鎵€鏈夌瑪璁?;
     folderFilter.appendChild(allOption);
     folders.forEach(function(f) {
         var option = document.createElement("option");
@@ -627,7 +627,7 @@ function renderList(filteredNotes, searchTerm) {
     }
     if (notesToDisplay.length > PAGE_SIZE) {
         paginationDiv.style.display = 'block';
-        pageInfoSpan.textContent = '第 ' + currentPage + '/' + totalPages + ' 页（共 ' + notesToDisplay.length + ' 条）';
+        pageInfoSpan.textContent = '绗?' + currentPage + '/' + totalPages + ' 椤碉紙鍏?' + notesToDisplay.length + ' 鏉★級';
         prevPageBtn.disabled = currentPage <= 1;
         nextPageBtn.disabled = currentPage >= totalPages;
     } else {
@@ -667,30 +667,30 @@ function renderList(filteredNotes, searchTerm) {
         contentDiv.appendChild(contentTextDiv);
         var timestampDiv = document.createElement("div");
         timestampDiv.classList.add("note-timestamp");
-        timestampDiv.textContent = '最后编辑: ' + formatTimestamp(n.lastModified);
+        timestampDiv.textContent = '鏈€鍚庣紪杈? ' + formatTimestamp(n.lastModified);
         contentDiv.appendChild(timestampDiv);
         var wcDiv = document.createElement("div");
         wcDiv.className = 'note-wordcount';
         var text = normalizeContentForDisplay(n.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
         var charCount = text.length;
         var lineCount = text ? (text.split('\n').length) : 0;
-        wcDiv.textContent = charCount + ' 字 · ' + lineCount + ' 行';
+        wcDiv.textContent = charCount + ' 瀛?路 ' + lineCount + ' 琛?;
         contentDiv.appendChild(wcDiv);
         var actionButtonsDiv = document.createElement("div");
         actionButtonsDiv.classList.add("action-buttons");
         var exportNoteTxtBtn = document.createElement("button");
-        exportNoteTxtBtn.textContent = "导出TXT";
+        exportNoteTxtBtn.textContent = "瀵煎嚭TXT";
         exportNoteTxtBtn.classList.add("export-btn");
         exportNoteTxtBtn.onclick = function(event) { event.stopPropagation(); exportNoteToTxt(n.id); actionMenu.style.display = 'none'; };
         actionButtonsDiv.appendChild(exportNoteTxtBtn);
         var exportNoteMdBtn = document.createElement("button");
-        exportNoteMdBtn.textContent = "导出MD";
+        exportNoteMdBtn.textContent = "瀵煎嚭MD";
         exportNoteMdBtn.classList.add("export-btn");
         exportNoteMdBtn.style.backgroundColor = "#6f42c1";
         exportNoteMdBtn.onclick = function(event) { event.stopPropagation(); exportNoteToMd(n.id); actionMenu.style.display = 'none'; };
         actionButtonsDiv.appendChild(exportNoteMdBtn);
         var editBtn = document.createElement("button");
-        editBtn.textContent = "编辑";
+        editBtn.textContent = "缂栬緫";
         editBtn.classList.add("edit-btn");
         editBtn.onclick = function(event) {
             event.stopPropagation();
@@ -702,7 +702,7 @@ function renderList(filteredNotes, searchTerm) {
         };
         actionButtonsDiv.appendChild(editBtn);
         var deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "删除";
+        deleteBtn.textContent = "鍒犻櫎";
         deleteBtn.classList.add("delete-btn");
         deleteBtn.onclick = function(event) {
             event.stopPropagation();
@@ -712,7 +712,7 @@ function renderList(filteredNotes, searchTerm) {
         };
         actionButtonsDiv.appendChild(deleteBtn);
         contentDiv.appendChild(actionButtonsDiv);
-        titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id); };
+        titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id, searchTerm); };
         li.appendChild(titleDiv);
         li.appendChild(contentDiv);
         noteList.appendChild(li);
@@ -815,7 +815,7 @@ document.querySelector("#colorPickerNoneBtn").onclick = function() {
 
 function showColorPicker(mode, btn) {
     colorPickerMode = mode;
-    document.querySelector("#colorPickerTitle").textContent = mode === 'backColor' ? '选择背景色' : '选择文字色';
+    document.querySelector("#colorPickerTitle").textContent = mode === 'backColor' ? '閫夋嫨鑳屾櫙鑹? : '閫夋嫨鏂囧瓧鑹?;
     var popup = document.querySelector("#colorPickerPopup");
     var rect = btn.getBoundingClientRect();
     popup.style.left = Math.max(4, rect.left) + 'px';
@@ -854,8 +854,8 @@ document.querySelector("#fmtHeading").onchange = function() {
 /* --- Link --- */
 document.querySelector("#fmtLink").onclick = function() {
     var sel = window.getSelection();
-    if (!sel.toString().trim()) { alert('请先选中要添加链接的文字。'); return; }
-    var url = prompt('输入链接地址（URL）：', 'https://');
+    if (!sel.toString().trim()) { alert('璇峰厛閫変腑瑕佹坊鍔犻摼鎺ョ殑鏂囧瓧銆?); return; }
+    var url = prompt('杈撳叆閾炬帴鍦板潃锛圲RL锛夛細', 'https://');
     if (url && url.trim()) {
         storyDiv.focus();
         document.execCommand('createLink', false, url.trim());
@@ -877,13 +877,20 @@ function renderTagPicker() {
             if (note && note.tags && note.tags.indexOf(t.id) >= 0) el.classList.add('selected');
         }
         el.onclick = function() {
-            if (!editing) { alert('请先保存笔记再添加标签。'); return; }
+            if (!editing) { alert('璇峰厛淇濆瓨绗旇鍐嶆坊鍔犳爣绛俱€?); return; }
             var idx = -1;
             notes.forEach(function(n, i) { if (n.id === editing) idx = i; });
             if (idx >= 0) {
                 if (!notes[idx].tags) notes[idx].tags = [];
                 var pos = notes[idx].tags.indexOf(t.id);
-                if (pos >= 0) { notes[idx].tags.splice(pos, 1); } else { notes[idx].tags.push(t.id); }
+                if (pos >= 0) {
+                    notes[idx].tags.splice(pos, 1);
+                } else {
+                    notes[idx].tags.push(t.id);
+                    var text = '# ' + t.name + ' ';
+                    storyDiv.focus();
+                    document.execCommand('insertText', false, text);
+                }
                 saveData();
                 renderTagPicker();
             }
@@ -904,7 +911,7 @@ document.querySelector("#fmtTagBtn").onclick = function() {
 document.querySelector("#tagPickerNewBtn").onclick = function() {
     var name = document.querySelector("#tagPickerNewInput").value.trim();
     if (!name) return;
-    if (tags.some(function(t) { return t.name === name; })) { alert('标签已存在。'); return; }
+    if (tags.some(function(t) { return t.name === name; })) { alert('鏍囩宸插瓨鍦ㄣ€?); return; }
     tags.push({ id: generateUniqueId(), name: name });
     document.querySelector("#tagPickerNewInput").value = '';
     saveData();
@@ -919,7 +926,7 @@ function renderTagManagementList() {
     var list = document.querySelector("#tagManagementList");
     list.innerHTML = '';
     if (tags.length === 0) {
-        var li = document.createElement('li'); li.textContent = '暂无标签。'; list.appendChild(li); return;
+        var li = document.createElement('li'); li.textContent = '鏆傛棤鏍囩銆?; list.appendChild(li); return;
     }
     tags.forEach(function(t) {
         var li = document.createElement('li');
@@ -927,10 +934,10 @@ function renderTagManagementList() {
         nameSpan.textContent = t.name;
         li.appendChild(nameSpan);
         var delBtn = document.createElement('button');
-        delBtn.textContent = '删除';
+        delBtn.textContent = '鍒犻櫎';
         delBtn.className = 'delete-btn';
         delBtn.onclick = function() {
-            if (confirm('删除标签 "' + t.name + '"？所有笔记中该标签将被移除。')) {
+            if (confirm('鍒犻櫎鏍囩 "' + t.name + '"锛熸墍鏈夌瑪璁颁腑璇ユ爣绛惧皢琚Щ闄ゃ€?)) {
                 tags = tags.filter(function(x) { return x.id !== t.id; });
                 notes.forEach(function(n) { if (n.tags) n.tags = n.tags.filter(function(tid) { return tid !== t.id; }); });
                 saveData();
@@ -994,13 +1001,13 @@ document.querySelector("#lockPasswordInput").onkeydown = function(e) {
 document.querySelector("#settingsSavePasswordBtn").onclick = function() {
     var p1 = document.querySelector("#settingsPassword").value;
     var p2 = document.querySelector("#settingsPasswordConfirm").value;
-    if (p1 !== p2) { alert('两次输入的密码不一致。'); return; }
-    if (p1 && p1.length < 3) { alert('密码至少3个字符。'); return; }
+    if (p1 !== p2) { alert('涓ゆ杈撳叆鐨勫瘑鐮佷笉涓€鑷淬€?); return; }
+    if (p1 && p1.length < 3) { alert('瀵嗙爜鑷冲皯3涓瓧绗︺€?); return; }
     passwordHash = p1 ? simpleHash(p1) : '';
     localStorage.setItem('simpleNotesAppData_passwordHash', passwordHash);
     document.querySelector("#settingsPassword").value = '';
     document.querySelector("#settingsPasswordConfirm").value = '';
-    alert(p1 ? '密码已设置。' : '密码已清除。');
+    alert(p1 ? '瀵嗙爜宸茶缃€? : '瀵嗙爜宸叉竻闄ゃ€?);
     checkPassword();
 };
 
@@ -1037,11 +1044,11 @@ function fetchFromGitHub(callback) {
             var resp = JSON.parse(xhr.responseText);
             var contentBytes = atob(resp.content);
             var content = decodeURIComponent(escape(contentBytes));
-            try { callback(null, JSON.parse(content), resp.sha); } catch(e) { callback('解析失败'); }
+            try { callback(null, JSON.parse(content), resp.sha); } catch(e) { callback('瑙ｆ瀽澶辫触'); }
         } else if (xhr.status === 404) { callback(null, null, null); }
         else { callback('HTTP ' + xhr.status); }
     };
-    xhr.onerror = function() { callback('网络错误'); };
+    xhr.onerror = function() { callback('缃戠粶閿欒'); };
     xhr.send();
 }
 
@@ -1059,7 +1066,7 @@ function pushToGitHub(data, sha, callback) {
         if (xhr.status === 200 || xhr.status === 201) { callback(null, JSON.parse(xhr.responseText).content.sha); }
         else { callback('HTTP ' + xhr.status); }
     };
-    xhr.onerror = function() { callback('网络错误'); };
+    xhr.onerror = function() { callback('缃戠粶閿欒'); };
     xhr.send(JSON.stringify(body));
 }
 
@@ -1070,21 +1077,21 @@ function triggerGitSync() {
     if (syncTimer) clearTimeout(syncTimer);
     syncTimer = setTimeout(function() {
         var data = { notes: notes, folders: folders, trash: trash, tags: tags, version: 2 };
-        setSyncIndicator('同步中...', 'syncing');
+        setSyncIndicator('鍚屾涓?..', 'syncing');
         pushToGitHub(data, gitSha, function(err, sha) {
-            if (err) { setSyncIndicator('同步失败', 'error'); console.log('Git sync error:', err); return; }
+            if (err) { setSyncIndicator('鍚屾澶辫触', 'error'); console.log('Git sync error:', err); return; }
             gitSha = sha;
-            setSyncIndicator('已同步', 'done');
+            setSyncIndicator('宸插悓姝?, 'done');
             setTimeout(function() { setSyncIndicator('', ''); }, 3000);
         });
     }, 3000);
 }
 
 function loadFromGitHub() {
-    setSyncIndicator('加载中...', 'syncing');
+    setSyncIndicator('鍔犺浇涓?..', 'syncing');
     fetchFromGitHub(function(err, data, sha) {
-        if (err) { setSyncIndicator('加载失败', 'error'); return; }
-        if (!data) { setSyncIndicator('首次使用', ''); return; }
+        if (err) { setSyncIndicator('鍔犺浇澶辫触', 'error'); return; }
+        if (!data) { setSyncIndicator('棣栨浣跨敤', ''); return; }
         gitSha = sha;
         if (data.notes) {
             repairAllStrings(data.notes);
@@ -1093,20 +1100,20 @@ function loadFromGitHub() {
             repairAllStrings(data.tags || []);
             if (data.version >= 2) {
                 notes = data.notes || [];
-                folders = data.folders || [{ id: 'unfiled', name: '无文件夹' }];
+                folders = data.folders || [{ id: 'unfiled', name: '鏃犳枃浠跺す' }];
                 trash = data.trash || [];
                 tags = data.tags || [];
             } else {
                 notes = data.notes || [];
-                folders = data.folders || [{ id: 'unfiled', name: '无文件夹' }];
+                folders = data.folders || [{ id: 'unfiled', name: '鏃犳枃浠跺す' }];
             }
-            if (!folders.some(function(f) { return f.id === 'unfiled'; })) folders.unshift({ id: 'unfiled', name: '无文件夹' });
+            if (!folders.some(function(f) { return f.id === 'unfiled'; })) folders.unshift({ id: 'unfiled', name: '鏃犳枃浠跺す' });
             notes.forEach(function(n) { if (!n.lastModified) n.lastModified = Date.now(); if (!n.tags) n.tags = []; });
             saveData();
             renderFoldersDropdowns();
             renderList(notes, mainSearchBar.value.toLowerCase());
         }
-        setSyncIndicator('已加载', 'done');
+        setSyncIndicator('宸插姞杞?, 'done');
         setTimeout(function() { setSyncIndicator('', ''); }, 2000);
     });
 }
@@ -1114,7 +1121,7 @@ function loadFromGitHub() {
 /* --- Manual sync button --- */
 document.querySelector("#syncNowBtn").onclick = function() {
     actionMenu.style.display = 'none';
-    if (!gitSettings.token) { alert('请先在设置中配置 GitHub Token。'); return; }
+    if (!gitSettings.token) { alert('璇峰厛鍦ㄨ缃腑閰嶇疆 GitHub Token銆?); return; }
     triggerGitSync();
 };
 
@@ -1134,7 +1141,7 @@ document.querySelector("#showSettingsBtn").onclick = function() {
 
 document.querySelector("#settingsSaveGitBtn").onclick = function() {
     saveGitSettings();
-    alert('GitHub 设置已保存。');
+    alert('GitHub 璁剧疆宸蹭繚瀛樸€?);
     loadFromGitHub();
 };
 
@@ -1184,11 +1191,11 @@ document.addEventListener('keydown', function(e) {
 
 /* --- Dark mode --- */
 var darkMode = localStorage.getItem('simpleNotesAppData_darkMode') === 'true';
-if (darkMode) { document.body.classList.add('dark-mode'); document.querySelector("#darkModeToggle").textContent = '☀️'; }
+if (darkMode) { document.body.classList.add('dark-mode'); document.querySelector("#darkModeToggle").textContent = '鈽€锔?; }
 document.querySelector("#darkModeToggle").onclick = function() {
     darkMode = !darkMode;
     document.body.classList.toggle('dark-mode', darkMode);
-    this.textContent = darkMode ? '☀️' : '🌙';
+    this.textContent = darkMode ? '鈽€锔? : '馃寵';
     localStorage.setItem('simpleNotesAppData_darkMode', darkMode);
 };
 
@@ -1205,7 +1212,7 @@ function updateWordCount(noteId, contentDiv) {
         var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
         var charCount = text.length;
         var lineCount = (text.match(/\n/g) || []).length + 1;
-        wc.textContent = charCount + ' 字 · ' + lineCount + ' 行';
+        wc.textContent = charCount + ' 瀛?路 ' + lineCount + ' 琛?;
     }
 }
 
@@ -1215,7 +1222,7 @@ function renderTrashList() {
     list.innerHTML = '';
     if (trash.length === 0) {
         var li = document.createElement('li');
-        li.textContent = '回收站为空。';
+        li.textContent = '鍥炴敹绔欎负绌恒€?;
         list.appendChild(li);
         return;
     }
@@ -1226,7 +1233,7 @@ function renderTrashList() {
         li.appendChild(nameSpan);
         var btnDiv = document.createElement('div');
         var restoreBtn = document.createElement('button');
-        restoreBtn.textContent = '恢复';
+        restoreBtn.textContent = '鎭㈠';
         restoreBtn.className = 'restore-btn';
         restoreBtn.onclick = function() {
             notes.push(note);
@@ -1236,10 +1243,10 @@ function renderTrashList() {
         };
         btnDiv.appendChild(restoreBtn);
         var delBtn = document.createElement('button');
-        delBtn.textContent = '永久删除';
+        delBtn.textContent = '姘镐箙鍒犻櫎';
         delBtn.className = 'delete-btn';
         delBtn.onclick = function() {
-            if (confirm('永久删除 "' + note.title + '"？不可恢复。')) {
+            if (confirm('姘镐箙鍒犻櫎 "' + note.title + '"锛熶笉鍙仮澶嶃€?)) {
                 trash = trash.filter(function(t) { return t.id !== note.id; });
                 saveData();
                 renderTrashList();
@@ -1252,8 +1259,8 @@ function renderTrashList() {
 }
 
 document.querySelector("#emptyTrashBtn").onclick = function() {
-    if (trash.length === 0) { alert('回收站已为空。'); return; }
-    if (confirm('确定清空回收站？所有笔记将被永久删除。')) {
+    if (trash.length === 0) { alert('鍥炴敹绔欏凡涓虹┖銆?); return; }
+    if (confirm('纭畾娓呯┖鍥炴敹绔欙紵鎵€鏈夌瑪璁板皢琚案涔呭垹闄ゃ€?)) {
         trash = [];
         saveData();
         renderTrashList();
@@ -1282,18 +1289,15 @@ document.querySelector("#backFromTrashBtn").onclick = function() {
 
 var viewerFontSize = parseInt(localStorage.getItem('simpleNotesAppData_viewerFontSize') || '16');
 
-function openNoteViewer(id) {
+function openNoteViewer(id, searchTerm) {
     var note = notes.find(function(n) { return n.id === id; });
     if (!note) return;
     currentViewerNoteId = id;
     document.querySelector("#viewerTitle").textContent = note.title;
-    var contentWithLinks = addLinkTarget(note.content);
-    var normalized = normalizeContentForDisplay(contentWithLinks);
-    var lines = normalized.split('\n');
-    document.querySelector("#viewerContent").innerHTML = '<div class="content-lines">' + lines.map(function(line) { return '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>'; }).join('') + '</div>';
+    document.querySelector("#viewerContent").innerHTML = renderContentWithLines(note.content, searchTerm || '');
     var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
-    document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
-    document.querySelector("#viewerTimestamp").textContent = '最后编辑: ' + formatTimestamp(note.lastModified);
+    document.querySelector("#viewerWordCount").textContent = text.length + ' 瀛?路 ' + (text ? text.split('\n').length : 0) + ' 琛?;
+    document.querySelector("#viewerTimestamp").textContent = '鏈€鍚庣紪杈? ' + formatTimestamp(note.lastModified);
     document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px';
     document.querySelector("#viewerFontLabel").textContent = viewerFontSize;
     document.querySelector("#viewerMenu").style.display = 'none';
@@ -1345,7 +1349,7 @@ function editNote(id) {
 }
 
 function deleteNote(id) {
-    if (confirm("确定要删除这篇笔记吗？可前往回收站恢复。")) {
+    if (confirm("纭畾瑕佸垹闄よ繖绡囩瑪璁板悧锛熷彲鍓嶅線鍥炴敹绔欐仮澶嶃€?)) {
         var idx = -1;
         notes.forEach(function(n, i) { if (n.id === id) idx = i; });
         if (idx >= 0) {
@@ -1363,7 +1367,7 @@ publishBtn.onclick = function() {
     var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
     var folderId = noteFolderSelect.value;
     var now = Date.now();
-    if (!t) { alert("标题不能为空"); return; }
+    if (!t) { alert("鏍囬涓嶈兘涓虹┖"); return; }
     if (editing) {
         notes = notes.map(function(n) { return n.id === editing ? { ...n, title: t, content: c, folderId: folderId, lastModified: now } : n; });
     } else {
@@ -1403,13 +1407,13 @@ newBtn.onclick = function() {
 
 newFolderBtn.onclick = function() {
     var name = newFolderNameInput.value.trim();
-    if (!name) { alert("文件夹名称不能为空"); return; }
-    if (folders.some(function(f) { return f.name === name; })) { alert("文件夹名称已存在，请使用其他名称。"); return; }
+    if (!name) { alert("鏂囦欢澶瑰悕绉颁笉鑳戒负绌?); return; }
+    if (folders.some(function(f) { return f.name === name; })) { alert("鏂囦欢澶瑰悕绉板凡瀛樺湪锛岃浣跨敤鍏朵粬鍚嶇О銆?); return; }
     folders.push({ id: generateUniqueId(), name: name });
     newFolderNameInput.value = '';
     saveData();
     renderFoldersDropdowns();
-    alert('文件夹 "' + name + '" 已创建！');
+    alert('鏂囦欢澶?"' + name + '" 宸插垱寤猴紒');
     actionMenu.style.display = 'none';
     if (folderListContainer.style.display === 'block') { renderFolderManagementList(); }
 };
@@ -1486,7 +1490,7 @@ function renderFolderManagementList() {
     var userFolders = folders.filter(function(f) { return f.id !== 'unfiled'; });
     if (userFolders.length === 0) {
         var msg = document.createElement('li');
-        msg.textContent = '暂无自建文件夹。';
+        msg.textContent = '鏆傛棤鑷缓鏂囦欢澶广€?;
         folderManagementList.appendChild(msg);
         return;
     }
@@ -1497,20 +1501,20 @@ function renderFolderManagementList() {
         nameSpan.textContent = folder.name;
         li.appendChild(nameSpan);
         var exportTxtBtn = document.createElement('button');
-        exportTxtBtn.textContent = '导出TXT';
+        exportTxtBtn.textContent = '瀵煎嚭TXT';
         exportTxtBtn.classList.add('export-btn');
         exportTxtBtn.style.marginRight = '6px';
         exportTxtBtn.onclick = function() { exportFolderToTxt(folder.id); };
         li.appendChild(exportTxtBtn);
         var exportMdBtn = document.createElement('button');
-        exportMdBtn.textContent = '导出MD';
+        exportMdBtn.textContent = '瀵煎嚭MD';
         exportMdBtn.classList.add('export-btn');
         exportMdBtn.style.backgroundColor = '#6f42c1';
         exportMdBtn.style.marginRight = '6px';
         exportMdBtn.onclick = function() { exportFolderToMd(folder.id); };
         li.appendChild(exportMdBtn);
         var deleteFolderBtn = document.createElement('button');
-        deleteFolderBtn.textContent = '删除';
+        deleteFolderBtn.textContent = '鍒犻櫎';
         deleteFolderBtn.classList.add('delete-btn');
         deleteFolderBtn.onclick = function() { deleteFolder(folder.id); };
         li.appendChild(deleteFolderBtn);
@@ -1521,7 +1525,7 @@ function renderFolderManagementList() {
 function deleteFolder(folderId) {
     var folderToDelete = folders.find(function(f) { return f.id === folderId; });
     if (!folderToDelete) return;
-    if (confirm('确定要删除文件夹 "' + folderToDelete.name + '" 吗？该文件夹下的所有笔记将移至"无文件夹"。')) {
+    if (confirm('纭畾瑕佸垹闄ゆ枃浠跺す "' + folderToDelete.name + '" 鍚楋紵璇ユ枃浠跺す涓嬬殑鎵€鏈夌瑪璁板皢绉昏嚦"鏃犳枃浠跺す"銆?)) {
         folders = folders.filter(function(f) { return f.id !== folderId; });
         notes = notes.map(function(n) { return n.folderId === folderId ? { ...n, folderId: 'unfiled' } : n; });
         if (currentViewingFolderId === folderId) { currentViewingFolderId = null; folderFilter.value = ''; }
@@ -1529,7 +1533,7 @@ function deleteFolder(folderId) {
         renderFoldersDropdowns();
         renderFolderManagementList();
         renderList(notes, mainSearchBar.value.toLowerCase());
-        alert('文件夹 "' + folderToDelete.name + '" 已删除，相关笔记已移至"无文件夹"。');
+        alert('鏂囦欢澶?"' + folderToDelete.name + '" 宸插垹闄わ紝鐩稿叧绗旇宸茬Щ鑷?鏃犳枃浠跺す"銆?);
     }
 }
 
@@ -1575,15 +1579,15 @@ function showHomePage() {
 homeBtn.onclick = function() { window.location.href = 'https://191212.xyz/'; };
 
 document.querySelector("#exportAllMdBtn").onclick = function() {
-    if (notes.length === 0) { alert("没有笔记可以导出。"); return; }
-    var fileContent = '# 全部笔记\n\n';
+    if (notes.length === 0) { alert("娌℃湁绗旇鍙互瀵煎嚭銆?); return; }
+    var fileContent = '# 鍏ㄩ儴绗旇\n\n';
     notes.forEach(function(note, index) {
         if (index > 0) { fileContent += '---\n'; }
-        var folderName = folders.find(function(f) { return f.id === note.folderId; }) ? folders.find(function(f) { return f.id === note.folderId; }).name : '未分类';
-        fileContent += '# ' + note.title + '\n\n> 文件夹：' + folderName + '\n\n';
+        var folderName = folders.find(function(f) { return f.id === note.folderId; }) ? folders.find(function(f) { return f.id === note.folderId; }).name : '鏈垎绫?;
+        fileContent += '# ' + note.title + '\n\n> 鏂囦欢澶癸細' + folderName + '\n\n';
         fileContent += cleanContent(note.content) + '\n\n';
     });
-    var filename = '全部笔记_' + new Date().toISOString().slice(0, 10) + '.md';
+    var filename = '鍏ㄩ儴绗旇_' + new Date().toISOString().slice(0, 10) + '.md';
     var blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -1592,13 +1596,13 @@ document.querySelector("#exportAllMdBtn").onclick = function() {
 };
 
 document.querySelector("#exportDataBtn").onclick = function() {
-    if (notes.length === 0) { alert("没有数据可以导出。"); return; }
+    if (notes.length === 0) { alert("娌℃湁鏁版嵁鍙互瀵煎嚭銆?); return; }
     var data = { notes: notes, folders: folders, trash: trash, tags: tags };
     var json = JSON.stringify(data, null, 2);
     var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = '笔记本数据_' + new Date().toISOString().slice(0, 10) + '.json';
+    a.href = url; a.download = '绗旇鏈暟鎹甠' + new Date().toISOString().slice(0, 10) + '.json';
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     actionMenu.style.display = 'none';
 };
@@ -1612,13 +1616,13 @@ importFileInput.onchange = function(e) {
     reader.onload = function(ev) {
         try {
             var data = JSON.parse(ev.target.result);
-            if (!data.notes || !data.folders) { alert("JSON格式不对，缺少 notes 或 folders 字段。"); return; }
-            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹' + (data.trash ? '，' + data.trash.length + ' 条回收站记录' : '') + (data.tags ? '，' + data.tags.length + ' 个标签' : '') + '，是否覆盖当前数据？')) return;
+            if (!data.notes || !data.folders) { alert("JSON鏍煎紡涓嶅锛岀己灏?notes 鎴?folders 瀛楁銆?); return; }
+            if (!confirm('灏嗗鍏?' + data.notes.length + ' 绡囩瑪璁板拰 ' + data.folders.length + ' 涓枃浠跺す' + (data.trash ? '锛? + data.trash.length + ' 鏉″洖鏀剁珯璁板綍' : '') + (data.tags ? '锛? + data.tags.length + ' 涓爣绛? : '') + '锛屾槸鍚﹁鐩栧綋鍓嶆暟鎹紵')) return;
             notes = data.notes;
             folders = data.folders;
             trash = data.trash || [];
             tags = data.tags || [];
-            if (!folders.some(function(f) { return f.id === 'unfiled'; })) { folders.unshift({ id: 'unfiled', name: '无文件夹' }); }
+            if (!folders.some(function(f) { return f.id === 'unfiled'; })) { folders.unshift({ id: 'unfiled', name: '鏃犳枃浠跺す' }); }
             saveData();
             currentPage = 1;
             currentViewingFolderId = null;
@@ -1627,8 +1631,8 @@ importFileInput.onchange = function(e) {
             noteList.style.display = 'block';
             mainSearchBar.style.display = 'block';
             mainSearchBar.value = '';
-            alert("导入成功！");
-        } catch (err) { alert("导入失败：文件格式错误。"); }
+            alert("瀵煎叆鎴愬姛锛?);
+        } catch (err) { alert("瀵煎叆澶辫触锛氭枃浠舵牸寮忛敊璇€?); }
     };
     reader.readAsText(file);
     importFileInput.value = '';
@@ -1662,8 +1666,8 @@ function exportFolderToMd(folderId) {
     var folder = folders.find(function(f) { return f.id === folderId; });
     if (!folder) return;
     var notesInFolder = notes.filter(function(n) { return n.folderId === folderId; });
-    if (notesInFolder.length === 0) { alert('文件夹 "' + folder.name + '" 中没有笔记可以导出。'); return; }
-    var content = '# 文件夹: ' + folder.name + '\n\n';
+    if (notesInFolder.length === 0) { alert('鏂囦欢澶?"' + folder.name + '" 涓病鏈夌瑪璁板彲浠ュ鍑恒€?); return; }
+    var content = '# 鏂囦欢澶? ' + folder.name + '\n\n';
     notesInFolder.forEach(function(note, index) {
         if (index > 0) content += '---\n';
         content += '# ' + note.title + '\n\n' + cleanContent(note.content) + '\n\n';
@@ -1671,7 +1675,7 @@ function exportFolderToMd(folderId) {
     var blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_所有笔记.md';
+    a.href = url; a.download = folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_鎵€鏈夌瑪璁?md';
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
@@ -1679,13 +1683,13 @@ function exportFolderToTxt(folderId) {
     var folder = folders.find(function(f) { return f.id === folderId; });
     if (!folder) return;
     var notesInFolder = notes.filter(function(n) { return n.folderId === folderId; });
-    if (notesInFolder.length === 0) { alert('文件夹 "' + folder.name + '" 中没有笔记可以导出。'); return; }
-    var content = '# 文件夹: ' + folder.name + '\n\n';
+    if (notesInFolder.length === 0) { alert('鏂囦欢澶?"' + folder.name + '" 涓病鏈夌瑪璁板彲浠ュ鍑恒€?); return; }
+    var content = '# 鏂囦欢澶? ' + folder.name + '\n\n';
     notesInFolder.forEach(function(note, index) {
         if (index > 0) content += '---\n';
         content += '# ' + note.title + '\n' + cleanContent(note.content) + '\n';
     });
-    downloadTxtFile(folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_所有笔记.txt', content);
+    downloadTxtFile(folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_鎵€鏈夌瑪璁?txt', content);
 }
 
 renderFoldersDropdowns();
