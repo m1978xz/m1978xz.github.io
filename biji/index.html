@@ -635,16 +635,24 @@ function normalizeContentForDisplay(html) {
     var anchors = [], alinks = [];
     s = s.replace(/<span[^>]*data-anchor-id=["'][^"']*["'][^>]*>.*?<\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
     s = s.replace(/<a[^>]*data-note-anchor=["'][^"']*["'][^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
+    s = s.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function(m, inner) {
+        var items = [];
+        inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(lm, lc) { items.push(lc.trim()); return lm; });
+        return items.map(function(t, i) { return '  ' + (i + 1) + '. ' + t; }).join('\n');
+    });
+    s = s.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(m, inner) {
+        var items = [];
+        inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(lm, lc) { items.push(lc.trim()); return lm; });
+        return items.map(function(t) { return '  • ' + t; }).join('\n');
+    });
     s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
     s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
     s = s.replace(/<\/p>/gi, '\n');
     s = s.replace(/<\/div>/gi, '\n');
     s = s.replace(/<\/h[1-6]>/gi, '\n');
-    s = s.replace(/<\/li>/gi, '\n');
     s = s.replace(/<p[^>]*>/gi, '');
     s = s.replace(/<div[^>]*>/gi, '');
     s = s.replace(/<h[1-6][^>]*>/gi, '');
-    s = s.replace(/<li[^>]*>/gi, '');
     s = s.replace(/<br\s*\/?>/gi, '\n');
     s = s.replace(/\\n/g, '\n');
     anchors.forEach(function(a, i) { s = s.replace('%%AM' + i + '%%', a); });
