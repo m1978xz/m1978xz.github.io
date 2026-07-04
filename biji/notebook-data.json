@@ -1,0 +1,49 @@
+{
+  "notes": [
+    {
+      "id": "id_1764061900226_0f8l0b0sj",
+      "folderId": "id_1764079218381_z4wusdpt8",
+      "title": "我的第一篇笔记",
+      "content": "这是我使用这个<font color=\"#9668c4\" size=\"6\"><b>简洁笔记本</b></font>写的第一篇内容。很高兴能用它来记录我的想法和日常。<div><br><div>试试效果，看看自动保存功能如何。</div></div><div><ul><li>qsd</li></ul><div><ol><li>123</li></ol></div></div>",
+      "lastModified": 1783133870505,
+      "tags": []
+    },
+    {
+      "id": "id_1764061900226_h9v6hz4nj",
+      "folderId": "unfiled",
+      "title": "关于项目X的思考",
+      "content": "项目X的下一步计划需要仔细斟酌。主要挑战在于<font color=\"#c2244b\">资源分配</font>和时间管理，需要和团队成员进行更深入的讨论。",
+      "lastModified": 1783095657589,
+      "tags": []
+    },
+    {
+      "id": "id_1764080074659_d81kubmgn",
+      "folderId": "id_1764079218381_z4wusdpt8",
+      "title": "测试",
+      "content": "测试1",
+      "lastModified": 1783095550904,
+      "tags": []
+    }
+  ],
+  "folders": [
+    {
+      "id": "unfiled",
+      "name": "无文件夹"
+    },
+    {
+      "id": "id_1764079218381_z4wusdpt8",
+      "name": "文件夹1"
+    }
+  ],
+  "trash": [
+    {
+      "id": "id_1764061900226_pgeri3hhy",
+      "folderId": "unfiled",
+      "title": "购物清单",
+      "content": "<b><font size=\"5\" style=\"background-color: rgb(255, 149, 0);\">牛奶</font></b><br>鸡蛋<br><font color=\"#0000ff\">面包</font><br>水果 (苹果和香蕉)<br>洗发水",
+      "lastModified": 1783129550543
+    }
+  ],
+  "tags": [],
+  "version": 2
+}
