@@ -1621,6 +1621,9 @@ function openNoteViewer(id, searchTerm) {
     }
     contentHtml = tagHtml + contentHtml;
     document.querySelector("#viewerContent").innerHTML = contentHtml;
+    document.querySelector("#viewerContent").querySelectorAll('.note-anchor-marker').forEach(function(m) {
+        m.addEventListener('click', function(ev) { ev.stopPropagation(); handleAnchorMarkerClick(this); });
+    });
     if (viewerSearchTerm) {
         var highlights = document.querySelectorAll('#viewerContent .highlight');
         var countEl = document.querySelector("#searchNavCount");
@@ -1740,21 +1743,8 @@ function handleAnchorMarkerClick(marker) {
 }
 
 document.addEventListener('click', function(e) {
-    var el = e.target;
-    while (el) {
-        if (el.getAttribute && el.getAttribute('data-anchor-id') !== null) {
-            var vc = document.querySelector("#viewerContent");
-            if (vc && vc.contains(el)) {
-                e.stopPropagation();
-                handleAnchorMarkerClick(el);
-                return;
-            }
-            break;
-        }
-        el = el.parentElement;
-    }
     var popup = document.querySelector("#anchorInfoPopup");
-    if (popup.style.display !== 'none' && !popup.contains(e.target) && !e.target.closest('[data-anchor-id]')) {
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && !e.target.closest('.note-anchor-marker')) {
         popup.style.display = 'none';
     }
 });
