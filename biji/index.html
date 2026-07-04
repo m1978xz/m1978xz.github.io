@@ -9,9 +9,18 @@
 body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Hiragino Sans GB", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 860px; margin: 0 auto; padding: 24px 20px; background: #f5f5f7; color: #1d1d1f; -webkit-font-smoothing: antialiased; }
 h1 { display: none; }
 #noteList { padding: 0; display: none; }
-#noteList li { list-style: none; padding: 16px; margin-bottom: 10px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.2s; }
-#noteList li:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.note-title { font-weight: 600; margin-bottom: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #1d1d1f; }
+#noteList li { list-style: none; padding: 16px; margin-bottom: 12px; background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02); transition: box-shadow 0.2s, transform 0.15s; cursor:default; }
+#noteList li:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.03); transform: translateY(-1px); }
+body.dark-mode #noteList li { box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04); }
+body.dark-mode #noteList li:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06); }
+.note-title { font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap:8px; font-size: 15px; color: #1d1d1f; }
+.note-title .title-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.note-title .title-meta { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.note-title .title-timestamp { font-size:11px; color:#8e8e93; font-weight:400; white-space:nowrap; }
+.note-card-tags { display:flex; flex-wrap:wrap; gap:4px; margin:4px 0; }
+.note-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid #f0f0f0; }
+body.dark-mode .note-card-footer { border-top-color:#48484a; }
+.note-card-footer .card-folder { font-size:11px; color:#8e8e93; }
 .note-content { margin-top: 12px; padding: 16px; border: 1px solid #e8e8ed; background: #fafafa; border-radius: 10px; display: none; font-size: 14px; line-height: 1.7; }
 button { padding: 8px 18px; margin: 4px 0; cursor: pointer; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; transition: all 0.15s; }
 .action-buttons { margin-top: 12px; text-align: right; display: flex; gap: 6px; justify-content: flex-end; }
@@ -200,7 +209,44 @@ body.dark-mode #settingsContainer input { background:#3a3a3c; border-color:#4848
 .sync-indicator { font-size:12px; color:#8e8e93; margin-left:6px; }
 .sync-indicator.syncing { color:#ff9500; }
 .sync-indicator.done { color:#34c759; }
-.sync-indicator.error { color:#ff3b30; }
+        .sync-indicator.error { color:#ff3b30; }
+        @media (max-width:640px) {
+            body { padding:12px 10px; }
+            #noteList li { padding:12px; }
+            .note-title { font-size:14px; }
+            #editor { padding:14px; }
+            #editorToolbar { padding:8px; gap:4px; }
+            #editorToolbar button { padding:5px 10px; font-size:12px; }
+            #editor input#title { font-size:18px; }
+            #story { min-height:180px; font-size:14px; }
+            .viewer-body { padding:16px 12px; }
+            .viewer-body .viewer-title { font-size:18px; }
+            .viewer-body .viewer-content { font-size:15px; }
+            .viewer-header { padding:8px 10px; flex-wrap:wrap; }
+            .viewer-header .viewer-font-controls { margin-left:auto; margin-right:8px; }
+            #mainSearchBar { padding:10px 14px; font-size:14px; }
+            #actionMenu { min-width:180px; right:-10px; }
+            #actionMenu button, #actionMenu input, #actionMenu select { padding:8px 10px; font-size:12px; }
+            .header-section { margin-bottom:12px; }
+            #folderListContainer, #tagManagementContainer, #trashContainer, #settingsContainer { padding:14px; }
+            button { padding:7px 14px; font-size:12px; }
+            .content-lines { font-size:12px; }
+            .line-number { min-width:24px; }
+            .viewer-content .search-nav { flex-wrap:wrap; }
+            .viewer-content .search-nav button { padding:6px 12px; font-size:13px; min-height:36px; }
+        }
+        @media (max-width:400px) {
+            body { padding:8px 6px; }
+            #noteList li { padding:10px; margin-bottom:6px; }
+            #editorToolbar { gap:3px; }
+            #editorToolbar button { padding:4px 8px; font-size:11px; }
+            .viewer-body .viewer-title { font-size:16px; }
+            .viewer-body .viewer-content { font-size:14px; }
+            .viewer-content .search-nav { padding:4px 8px; }
+            .viewer-content .search-nav button { padding:5px 10px; font-size:12px; min-height:32px; }
+            .search-stats { font-size:12px; padding:6px 10px; }
+        }
+
 
 /* Note viewer fullscreen */
 #noteViewer { position:fixed; top:0; left:0; right:0; bottom:0; background:#fff; z-index:5000; display:none; flex-direction:column; }
@@ -223,10 +269,18 @@ body.dark-mode .viewer-header .viewer-font-controls button { background:#3a3a3c;
 .viewer-header .viewer-close-btn:hover { background:#f0f0f5; color:#1d1d1f; }
 body.dark-mode .viewer-header .viewer-close-btn:hover { background:#3a3a3c; color:#f5f5f7; }
 .viewer-body { flex:1; overflow-y:auto; padding:24px 20px; }
-.viewer-body .viewer-title { font-size:22px; font-weight:700; margin:0 0 16px; line-height:1.3; }
-.viewer-body .viewer-content { font-size:16px; line-height:1.8; }
+body.dark-mode .viewer-body .viewer-content .search-nav { background:rgba(44,44,46,0.95); border-color:#48484a; }
+.viewer-body .viewer-title { font-size:24px; font-weight:700; margin:0 0 16px; line-height:1.3; }
+.viewer-body .viewer-content { font-size:16px; line-height:1.8; max-width:680px; }
 .viewer-body .viewer-content .content-lines { font-family:inherit; font-size:inherit; line-height:inherit; }
 .viewer-body .viewer-content .content-line { padding:0; }
+.viewer-body .viewer-content .highlight { background:#fff176; padding:1px 3px; border-radius:3px; scroll-margin-top:80px; }
+body.dark-mode .viewer-body .viewer-content .highlight { background:#b8860b; color:#fff; }
+.viewer-content .search-nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:6px; margin-bottom:8px; background:rgba(255,255,255,0.95); padding:6px 10px; border-radius:8px; border:1px solid #e8e8ed; backdrop-filter:blur(4px); }
+body.dark-mode .viewer-content .search-nav { background:rgba(44,44,46,0.95); border-color:#48484a; }
+.viewer-content .search-nav button { padding:4px 10px; border:1px solid #d1d1d6; border-radius:6px; background:#f8f8fa; cursor:pointer; font-size:12px; margin:0; }
+body.dark-mode .viewer-content .search-nav button { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.viewer-content .search-nav .search-count { font-size:12px; color:#8e8e93; min-width:60px; text-align:center; }
 .viewer-footer { padding:12px 20px; border-top:1px solid #e8e8ed; display:flex; justify-content:space-between; font-size:12px; color:#8e8e93; flex-shrink:0; }
 body.dark-mode .viewer-footer { border-top-color:#48484a; }
 </style>
@@ -628,7 +682,7 @@ function renderContentWithLines(content, searchTerm) {
         var lines = normalized.split('\n');
         html += '<div class="content-lines">';
         lines.forEach(function(line) {
-            html += '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>';
+            html += '<div class="content-line"><span style="display:inline;">' + (line || '&nbsp;') + '</span></div>';
         });
         html += '</div>';
     }
@@ -692,44 +746,58 @@ function renderList(filteredNotes, searchTerm) {
         var titleDiv = document.createElement("div");
         titleDiv.classList.add("note-title");
         var titleSpan = document.createElement("span");
+        titleSpan.classList.add("title-text");
         titleSpan.textContent = n.title;
         titleDiv.appendChild(titleSpan);
+        var metaSpan = document.createElement("span");
+        metaSpan.classList.add("title-meta");
         var timeSpan = document.createElement("span");
-        timeSpan.style.cssText = 'font-size:12px;color:#8e8e93;font-weight:400;white-space:nowrap;';
+        timeSpan.classList.add("title-timestamp");
         timeSpan.textContent = formatTimestamp(n.lastModified);
-        titleDiv.appendChild(timeSpan);
-        var contentDiv = document.createElement("div");
-        contentDiv.classList.add("note-content");
-        var contentTextDiv = document.createElement("div");
-        contentTextDiv.innerHTML = renderContentWithLines(n.content, searchTerm);
-        contentDiv.appendChild(contentTextDiv);
-        var timestampDiv = document.createElement("div");
-        timestampDiv.classList.add("note-timestamp");
-        timestampDiv.textContent = '最后编辑: ' + formatTimestamp(n.lastModified);
-        contentDiv.appendChild(timestampDiv);
-        var wcDiv = document.createElement("div");
-        wcDiv.className = 'note-wordcount';
-        var text = normalizeContentForDisplay(n.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
-        var charCount = text.length;
-        var lineCount = text ? (text.split('\n').length) : 0;
-        wcDiv.textContent = charCount + ' 字 · ' + lineCount + ' 行';
-        contentDiv.appendChild(wcDiv);
-        var actionButtonsDiv = document.createElement("div");
-        actionButtonsDiv.classList.add("action-buttons");
-        var exportNoteTxtBtn = document.createElement("button");
-        exportNoteTxtBtn.textContent = "导出TXT";
-        exportNoteTxtBtn.classList.add("export-btn");
-        exportNoteTxtBtn.onclick = function(event) { event.stopPropagation(); exportNoteToTxt(n.id); actionMenu.style.display = 'none'; };
-        actionButtonsDiv.appendChild(exportNoteTxtBtn);
-        var exportNoteMdBtn = document.createElement("button");
-        exportNoteMdBtn.textContent = "导出MD";
-        exportNoteMdBtn.classList.add("export-btn");
-        exportNoteMdBtn.style.backgroundColor = "#6f42c1";
-        exportNoteMdBtn.onclick = function(event) { event.stopPropagation(); exportNoteToMd(n.id); actionMenu.style.display = 'none'; };
-        actionButtonsDiv.appendChild(exportNoteMdBtn);
+        metaSpan.appendChild(timeSpan);
+        titleDiv.appendChild(metaSpan);
+        if (n.tags && n.tags.length > 0) {
+            var tagsDiv = document.createElement('div');
+            tagsDiv.className = 'note-card-tags';
+            n.tags.forEach(function(tid) {
+                var t = tags.find(function(tt) { return tt.id === tid; });
+                if (t) {
+                    var badge = document.createElement('span');
+                    badge.className = 'tag-badge';
+                    badge.textContent = t.name;
+                    if (t.color) { badge.style.background = t.color; badge.style.color = '#fff'; }
+                    tagsDiv.appendChild(badge);
+                }
+            });
+            titleDiv.appendChild(tagsDiv);
+        }
+        var cardFooter = document.createElement('div');
+        cardFooter.className = 'note-card-footer';
+        var cardFolder = document.createElement('span');
+        cardFolder.className = 'card-folder';
+        var f = folders.find(function(fold) { return fold.id === n.folderId; });
+        cardFolder.textContent = f ? '📁 ' + f.name : '';
+        cardFooter.appendChild(cardFolder);
+        var cardActions = document.createElement('div');
+        cardActions.className = 'action-buttons';
+        cardActions.style.margin = '0';
+        var exportTxtBtn = document.createElement("button");
+        exportTxtBtn.textContent = "TXT";
+        exportTxtBtn.classList.add("export-btn");
+        exportTxtBtn.style.padding = '3px 10px';
+        exportTxtBtn.onclick = function(event) { event.stopPropagation(); exportNoteToTxt(n.id); };
+        cardActions.appendChild(exportTxtBtn);
+        var exportMdBtn = document.createElement("button");
+        exportMdBtn.textContent = "MD";
+        exportMdBtn.classList.add("export-btn");
+        exportMdBtn.style.padding = '3px 10px';
+        exportMdBtn.style.backgroundColor = "#6f42c1";
+        exportMdBtn.onclick = function(event) { event.stopPropagation(); exportNoteToMd(n.id); };
+        cardActions.appendChild(exportMdBtn);
         var editBtn = document.createElement("button");
         editBtn.textContent = "编辑";
         editBtn.classList.add("edit-btn");
+        editBtn.style.padding = '3px 10px';
         editBtn.onclick = function(event) {
             event.stopPropagation();
             editNote(n.id);
@@ -738,36 +806,30 @@ function renderList(filteredNotes, searchTerm) {
             mainSearchBar.style.display = 'none';
             noteList.style.display = 'none';
         };
-        actionButtonsDiv.appendChild(editBtn);
+        cardActions.appendChild(editBtn);
         var deleteBtn = document.createElement("button");
         deleteBtn.textContent = "删除";
         deleteBtn.classList.add("delete-btn");
+        deleteBtn.style.padding = '3px 10px';
         deleteBtn.onclick = function(event) {
             event.stopPropagation();
             deleteNote(n.id);
             actionMenu.style.display = 'none';
             folderListContainer.style.display = 'none';
         };
-        actionButtonsDiv.appendChild(deleteBtn);
-        contentDiv.appendChild(actionButtonsDiv);
+        cardActions.appendChild(deleteBtn);
+        cardFooter.appendChild(cardActions);
+        li.appendChild(titleDiv);
+        var wcDiv = document.createElement("div");
+        wcDiv.className = 'note-wordcount';
+        wcDiv.style.marginTop = '2px';
+        var text = normalizeContentForDisplay(n.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var charCount = text.length;
+        var lineCount = text ? (text.split('\n').length) : 0;
+        wcDiv.textContent = '📝 ' + charCount + ' 字 · ' + lineCount + ' 行';
+        li.appendChild(wcDiv);
+        li.appendChild(cardFooter);
         titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id, searchTerm); };
-            li.appendChild(titleDiv);
-            if (n.tags && n.tags.length > 0) {
-                var tagsDiv = document.createElement('div');
-                tagsDiv.style.cssText = 'margin-top:4px;margin-bottom:4px;';
-                n.tags.forEach(function(tid) {
-                    var t = tags.find(function(tt) { return tt.id === tid; });
-                    if (t) {
-                        var badge = document.createElement('span');
-                        badge.className = 'tag-badge';
-                        badge.textContent = t.name;
-                        if (t.color) { badge.style.background = t.color; badge.style.color = '#fff'; }
-                        tagsDiv.appendChild(badge);
-                    }
-                });
-                li.appendChild(tagsDiv);
-            }
-        li.appendChild(contentDiv);
         noteList.appendChild(li);
     });
 }
@@ -1531,11 +1593,59 @@ function openNoteViewer(id, searchTerm) {
     var note = notes.find(function(n) { return n.id === id; });
     if (!note) return;
     currentViewerNoteId = id;
+    viewerSearchTerm = searchTerm || '';
     document.querySelector("#viewerTitle").textContent = note.title;
-    document.querySelector("#viewerContent").innerHTML = renderContentWithLines(note.content, searchTerm || '');
+    var tagHtml = '';
+    if (note.tags && note.tags.length > 0) {
+        tagHtml = '<div style="margin-bottom:12px;">';
+        note.tags.forEach(function(tid) {
+            var t = tags.find(function(tt) { return tt.id === tid; });
+            if (t) {
+                var color = t.color || '#e8e8ed';
+                tagHtml += '<span class="tag-badge" style="background:' + color + ';color:' + (t.color ? '#fff' : '#555') + ';">' + t.name + '</span>';
+            }
+        });
+        tagHtml += '</div>';
+    }
+    var folderHtml = '';
+    var f = folders.find(function(fold) { return fold.id === note.folderId; });
+    if (f) folderHtml = '<span style="font-size:12px;color:#8e8e93;">📁 ' + f.name + '</span> &middot; ';
+    var contentHtml = renderContentWithLines(note.content, viewerSearchTerm);
+    if (viewerSearchTerm) {
+        contentHtml = '<div class="search-nav"><button id="searchNavPrev">↑</button><span class="search-count" id="searchNavCount">0/0</span><button id="searchNavNext">↓</button></div>' + contentHtml;
+    }
+    contentHtml = tagHtml + contentHtml;
+    document.querySelector("#viewerContent").innerHTML = contentHtml;
+    if (viewerSearchTerm) {
+        var highlights = document.querySelectorAll('#viewerContent .highlight');
+        var countEl = document.querySelector("#searchNavCount");
+        if (highlights.length > 0) {
+            countEl.textContent = '1/' + highlights.length;
+            highlights[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlights[0].style.outline = '2px solid #007aff';
+        }
+        var curIdx = 0;
+        document.querySelector("#searchNavNext").onclick = function() {
+            if (highlights.length === 0) return;
+            highlights[curIdx].style.outline = '';
+            curIdx = (curIdx + 1) % highlights.length;
+            highlights[curIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlights[curIdx].style.outline = '2px solid #007aff';
+            countEl.textContent = (curIdx + 1) + '/' + highlights.length;
+        };
+        document.querySelector("#searchNavPrev").onclick = function() {
+            if (highlights.length === 0) return;
+            highlights[curIdx].style.outline = '';
+            curIdx = (curIdx - 1 + highlights.length) % highlights.length;
+            highlights[curIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlights[curIdx].style.outline = '2px solid #007aff';
+            countEl.textContent = (curIdx + 1) + '/' + highlights.length;
+        };
+    }
     var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
     document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
-    document.querySelector("#viewerTimestamp").textContent = '最后编辑: ' + formatTimestamp(note.lastModified);
+    document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
+    document.querySelector("#viewerTimestamp").textContent = (folderHtml || '') + '最后编辑: ' + formatTimestamp(note.lastModified);
     document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px';
     document.querySelector("#viewerFontLabel").textContent = viewerFontSize;
     document.querySelector("#viewerMenu").style.display = 'none';
@@ -1548,6 +1658,7 @@ function closeNoteViewer() {
 }
 
 var currentViewerNoteId = null;
+var viewerSearchTerm = '';
 
 document.querySelector("#viewerCloseBtn").onclick = closeNoteViewer;
 document.querySelector("#viewerFontInc").onclick = function() { if (viewerFontSize < 32) { viewerFontSize += 2; localStorage.setItem('simpleNotesAppData_viewerFontSize', viewerFontSize); document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px'; document.querySelector("#viewerFontLabel").textContent = viewerFontSize; } };
