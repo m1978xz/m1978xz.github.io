@@ -62,13 +62,15 @@ button { padding: 8px 18px; margin: 4px 0; cursor: pointer; border: none; border
 #editorToolbar button { padding: 6px 12px; margin: 0; border: 1px solid #e8e8ed; border-radius: 6px; background: #fff; font-size: 13px; font-weight: 500; line-height: 1.4; transition: all 0.15s; }
 #editorToolbar button:hover { background: #f0f0f5; border-color: #d1d1d6; }
 #editorToolbar select { padding: 6px 8px; border: 1px solid #e8e8ed; border-radius: 6px; background: #fff; cursor: pointer; height: 32px; font-size: 13px; }
-#editorToolbar input[type="color"] { width: 28px; height: 28px; padding: 1px; border: 1px solid #e8e8ed; border-radius: 6px; cursor: pointer; background: #fff; }
-.color-group { display: flex; align-items: center; gap: 3px; }
-.color-group button { padding: 6px 8px; font-size: 12px; }
-.color-presets { display: flex; gap: 4px; align-items: center; margin-left: 2px; }
-.color-presets .preset { display: inline-block; width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
-.color-presets .preset:hover { transform: scale(1.2); border-color: #007aff; }
-.color-presets .preset.active { border-color: #007aff; box-shadow: 0 0 0 2px rgba(0,122,255,0.3); }
+/* Color picker popup */
+.color-picker-popup { position: fixed; background: #fff; border: 1px solid #e8e8ed; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 14px; z-index: 2000; min-width: 220px; }
+.color-picker-popup .picker-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #1d1d1f; }
+.color-picker-popup input[type="color"] { width: 100%; height: 36px; border: 1px solid #e8e8ed; border-radius: 8px; cursor: pointer; padding: 2px; background: #fff; margin-bottom: 8px; }
+.color-picker-popup .picker-swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.color-picker-popup .picker-swatches .swatch { display: inline-block; width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+.color-picker-popup .picker-swatches .swatch:hover { transform: scale(1.2); border-color: #007aff; }
+.color-picker-popup .picker-none-btn { display: block; width: 100%; padding: 8px; border: 1px dashed #c7c7cc; border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px; color: #8e8e93; text-align: center; transition: all 0.15s; }
+.color-picker-popup .picker-none-btn:hover { background: #f0f0f5; border-color: #8e8e93; color: #1d1d1f; }
 
 #story { width: 100%; min-height: 220px; padding: 14px; border: 1px solid #e8e8ed; border-radius: 0 0 10px 10px; font-size: 15px; line-height: 1.7; outline: none; overflow-y: auto; background: #fff; }
 #story:focus { border-color: #007aff; }
@@ -134,24 +136,8 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
       <option value="6">大</option>
       <option value="7">超大</option>
     </select>
-    <div class="color-group">
-      <input type="color" id="fmtColor" value="#ff0000" title="文字颜色">
-      <button id="fmtColorBtn">文字色</button>
-    </div>
-    <div class="color-group">
-      <input type="color" id="fmtBgColor" value="#ffeb3b" title="背景颜色">
-      <button id="fmtBgColorBtn">背景色</button>
-    </div>
-    <div class="color-presets">
-      <span class="preset" data-color="#ffeb3b" style="background:#ffeb3b" title="黄色"></span>
-      <span class="preset" data-color="#a5d6a7" style="background:#a5d6a7" title="绿色"></span>
-      <span class="preset" data-color="#90caf9" style="background:#90caf9" title="蓝色"></span>
-      <span class="preset" data-color="#ef9a9a" style="background:#ef9a9a" title="红色"></span>
-      <span class="preset" data-color="#ce93d8" style="background:#ce93d8" title="紫色"></span>
-      <span class="preset" data-color="#fff176" style="background:#fff176" title="淡黄"></span>
-      <span class="preset" data-color="#ffcc80" style="background:#ffcc80" title="橙色"></span>
-      <span class="preset" data-color="#bcaaa4" style="background:#bcaaa4" title="灰色"></span>
-    </div>
+    <button id="fmtColorBtn">文字色</button>
+    <button id="fmtBgColorBtn">背景色</button>
   </div>
   <div id="story" contenteditable="true"></div>
   <p style="margin-top:10px;">
@@ -159,6 +145,13 @@ label[for="noteFolderSelect"] { font-size: 13px; font-weight: 500; margin-right:
     <select id="noteFolderSelect"><option value="unfiled">无文件夹</option></select>
   </p>
   <button id="publishBtn">发布</button>
+</div>
+
+<div id="colorPickerPopup" class="color-picker-popup" style="display:none;">
+  <div class="picker-title" id="colorPickerTitle">选择颜色</div>
+  <input type="color" id="colorPickerWheel" value="#ff0000">
+  <div class="picker-swatches" id="colorPickerSwatches"></div>
+  <button class="picker-none-btn" id="colorPickerNoneBtn">不填充</button>
 </div>
 
 <div id="folderListContainer" style="display: none;">
@@ -433,24 +426,66 @@ document.querySelector("#fmtSize").onchange = function() {
     if (this.value) { storyDiv.focus(); document.execCommand('fontSize', false, this.value); }
     this.value = '';
 };
-document.querySelector("#fmtColorBtn").onclick = function() {
+var colorPickerMode = 'foreColor';
+var SWATCH_COLORS = ['#ff0000','#ff9500','#ffeb3b','#34c759','#007aff','#af52de','#ff2d55','#8e8e93','#000000','#ffffff','#00c7be','#a2845e','#ff6900','#7b68ee','#00bcd4','#f44336'];
+
+function initColorPickerSwatches() {
+    var container = document.querySelector("#colorPickerSwatches");
+    container.innerHTML = '';
+    SWATCH_COLORS.forEach(function(c) {
+        var el = document.createElement('span');
+        el.className = 'swatch';
+        el.style.background = c;
+        el.dataset.color = c;
+        el.onclick = function() {
+            var color = this.dataset.color;
+            storyDiv.focus();
+            document.execCommand(colorPickerMode, false, color);
+            document.querySelector("#colorPickerPopup").style.display = 'none';
+        };
+        container.appendChild(el);
+    });
+}
+initColorPickerSwatches();
+
+document.querySelector("#colorPickerWheel").onchange = function() {
     storyDiv.focus();
-    document.execCommand('foreColor', false, document.querySelector("#fmtColor").value);
-};
-document.querySelector("#fmtBgColorBtn").onclick = function() {
-    storyDiv.focus();
-    document.execCommand('backColor', false, document.querySelector("#fmtBgColor").value);
+    document.execCommand(colorPickerMode, false, this.value);
+    document.querySelector("#colorPickerPopup").style.display = 'none';
 };
 
-document.querySelectorAll(".color-presets .preset").forEach(function(el) {
-    el.onclick = function() {
-        var color = this.dataset.color;
-        storyDiv.focus();
-        document.execCommand('backColor', false, color);
-        document.querySelector("#fmtBgColor").value = color;
-        document.querySelectorAll(".color-presets .preset").forEach(function(p) { p.classList.remove('active'); });
-        this.classList.add('active');
-    };
+document.querySelector("#colorPickerNoneBtn").onclick = function() {
+    storyDiv.focus();
+    if (colorPickerMode === 'backColor') {
+        document.execCommand('backColor', false, 'transparent');
+    } else {
+        document.execCommand('foreColor', false, '#000000');
+    }
+    document.querySelector("#colorPickerPopup").style.display = 'none';
+};
+
+function showColorPicker(mode, btn) {
+    colorPickerMode = mode;
+    document.querySelector("#colorPickerTitle").textContent = mode === 'backColor' ? '选择背景色' : '选择文字色';
+    var popup = document.querySelector("#colorPickerPopup");
+    var rect = btn.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+}
+
+document.querySelector("#fmtColorBtn").onclick = function() {
+    showColorPicker('foreColor', this);
+};
+document.querySelector("#fmtBgColorBtn").onclick = function() {
+    showColorPicker('backColor', this);
+};
+
+document.addEventListener("click", function(event) {
+    var popup = document.querySelector("#colorPickerPopup");
+    if (popup.style.display === 'block' && !popup.contains(event.target) && event.target.id !== 'fmtColorBtn' && event.target.id !== 'fmtBgColorBtn') {
+        popup.style.display = 'none';
+    }
 });
 
 function toggleContent(id, contentDivToShow) {
