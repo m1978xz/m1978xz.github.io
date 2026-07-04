@@ -260,45 +260,44 @@ function highlightText(text, searchTerm) {
 }
 
 function renderContentWithLines(content, searchTerm) {
-    var plainText = content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/\\n/g, '\n');
-    var lines = plainText.split('\n');
     var hasSearch = searchTerm && searchTerm.length > 0;
     var html = '';
 
     if (hasSearch) {
+        var plainText = content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/\\n/g, '\n');
+        var lines = plainText.split('\n');
         var totalCount = 0;
         var matchLines = [];
         lines.forEach(function(line, idx) {
             var regex = new RegExp(escapeRegex(searchTerm), 'gi');
             var count = 0;
             while (regex.exec(line) !== null) { count++; }
-            if (count > 0) {
-                totalCount += count;
-                matchLines.push(idx + 1);
-            }
+            if (count > 0) { totalCount += count; matchLines.push(idx + 1); }
         });
-
         if (totalCount > 0) {
-            html += '<div class="search-stats">';
-            html += '🔍 找到 <strong>' + totalCount + '</strong> 处匹配';
-            html += '，位于第 <strong>' + matchLines.join('、') + '</strong> 行';
+            html += '<div class="search-stats">🔍 找到 <strong>' + totalCount + '</strong> 处匹配，位于第 <strong>' + matchLines.join('、') + '</strong> 行</div>';
+        }
+        html += '<div class="content-lines">';
+        lines.forEach(function(line, idx) {
+            var displayLine = highlightText(line, searchTerm);
+            if (displayLine === '') displayLine = '&nbsp;';
+            html += '<div class="content-line">';
+            html += '<span class="line-number">' + (idx + 1) + '</span>';
+            html += '<span>' + displayLine + '</span>';
             html += '</div>';
-        }
-    }
-
-    html += '<div class="content-lines">';
-    lines.forEach(function(line, idx) {
-        var lineNum = idx + 1;
-        var displayLine = hasSearch ? highlightText(line, searchTerm) : line;
-        if (displayLine === '') { displayLine = '&nbsp;'; }
-        html += '<div class="content-line">';
-        if (hasSearch) {
-            html += '<span class="line-number">' + lineNum + '</span>';
-        }
-        html += '<span>' + displayLine + '</span>';
+        });
         html += '</div>';
-    });
-    html += '</div>';
+    } else {
+        var withBreaks = content.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n');
+        var lines = withBreaks.split('\n');
+        html += '<div class="content-lines">';
+        lines.forEach(function(line) {
+            html += '<div class="content-line">';
+            html += '<span>' + (line || '&nbsp;') + '</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
 
     return html;
 }
