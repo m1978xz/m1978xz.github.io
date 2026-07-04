@@ -887,9 +887,8 @@ function renderTagPicker() {
                     notes[idx].tags.splice(pos, 1);
                 } else {
                     notes[idx].tags.push(t.id);
-                    var text = '# ' + t.name + ' ';
                     storyDiv.focus();
-                    document.execCommand('insertText', false, text);
+                    document.execCommand('insertHTML', false, '<br># ' + t.name + ' ');
                 }
                 saveData();
                 renderTagPicker();
