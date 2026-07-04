@@ -69,7 +69,8 @@
   "tags": [
     {
       "id": "id_1783141134870_xwxjkbn11",
-      "name": "标签1"
+      "name": "标签1",
+      "color": "#ff3b30"
     }
   ],
   "version": 2
