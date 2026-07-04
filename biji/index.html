@@ -888,7 +888,7 @@ function renderTagPicker() {
                 } else {
                     notes[idx].tags.push(t.id);
                     storyDiv.focus();
-                    document.execCommand('insertHTML', false, '<br># ' + t.name + ' ');
+                    document.execCommand('insertHTML', false, '<div><br></div><div># ' + t.name + '</div>');
                 }
                 saveData();
                 renderTagPicker();
