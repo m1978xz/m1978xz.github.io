@@ -4,9 +4,11 @@
       "id": "id_1764061900226_0f8l0b0sj",
       "folderId": "id_1764079218381_z4wusdpt8",
       "title": "我的第一篇笔记",
-      "content": "<br><div>这是我使用这个<font color=\"#9668c4\" size=\"6\"><b>简洁笔记本</b></font>写的第一篇内容。很高兴能用它来记录我的想法和日常。</div><div><br></div><div><br></div>",
-      "lastModified": 1783144707010,
-      "tags": []
+      "content": "<br><div>这是我使用这个<font color=\"#9668c4\" size=\"6\"><b>简洁笔记本</b></font>写的第一篇内容。很高兴能用它来记录我的想法和日常。</div><div><br></div><div><div><br></div><div># 标签1</div></div>",
+      "lastModified": 1783144711858,
+      "tags": [
+        "id_1783141134870_xwxjkbn11"
+      ]
     },
     {
       "id": "id_1764061900226_h9v6hz4nj",
