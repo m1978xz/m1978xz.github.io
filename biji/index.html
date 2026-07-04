@@ -912,7 +912,7 @@ document.querySelector("#fmtAnchor").onclick = function() {
     var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', '');
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
-    var allContent = notes.map(function(n) { return n.content; }).join(' ');
+    var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
     if (allContent.indexOf('data-anchor-id="' + id + '"') >= 0) {
         alert('锚点 "' + name.trim() + '" 已存在。'); return;
     }
