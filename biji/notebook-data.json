@@ -71,6 +71,11 @@
       "id": "id_1783141134870_xwxjkbn11",
       "name": "标签1",
       "color": "#ff3b30"
+    },
+    {
+      "id": "id_1783145813089_1w6b9x1po",
+      "name": "标签2",
+      "color": "#e8e8ed"
     }
   ],
   "version": 2
