@@ -430,7 +430,13 @@ function renderList(filteredNotes, searchTerm) {
         li.draggable = true;
         var titleDiv = document.createElement("div");
         titleDiv.classList.add("note-title");
-        titleDiv.innerHTML = highlightText(n.title, searchTerm);
+        var titleSpan = document.createElement("span");
+        titleSpan.innerHTML = highlightText(n.title, searchTerm);
+        titleDiv.appendChild(titleSpan);
+        var timeSpan = document.createElement("span");
+        timeSpan.style.cssText = 'font-size:12px;color:#8e8e93;font-weight:400;white-space:nowrap;';
+        timeSpan.textContent = formatTimestamp(n.lastModified);
+        titleDiv.appendChild(timeSpan);
         var contentDiv = document.createElement("div");
         contentDiv.classList.add("note-content");
         var contentTextDiv = document.createElement("div");
