@@ -315,7 +315,6 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
   <div id="tagPickerList"></div>
   <div class="tag-new-row">
     <input type="text" id="tagPickerNewInput" placeholder="新建标签...">
-    <span class="new-tag-colors" id="newTagColors"></span>
     <button id="tagPickerNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">添加</button>
   </div>
 </div>
@@ -981,18 +980,6 @@ document.addEventListener('click', function(e) {
 var TAG_COLORS = ['#e8e8ed','#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#5e5ce6','#af52de','#ff2d55'];
 var tagSelectedColor = TAG_COLORS[0];
 
-function renderNewTagColors() {
-    var row = document.querySelector("#newTagColors");
-    row.innerHTML = '';
-    TAG_COLORS.forEach(function(c) {
-        var dot = document.createElement('span');
-        dot.className = 'tag-color-dot' + (c === tagSelectedColor ? ' active' : '');
-        dot.style.background = c;
-        dot.onclick = function() { tagSelectedColor = c; renderNewTagColors(); };
-        row.appendChild(dot);
-    });
-}
-
 function renderTagPicker() {
     var list = document.querySelector("#tagPickerList");
     list.innerHTML = '';
@@ -1023,14 +1010,7 @@ function renderTagPicker() {
                     if (!storyDiv.innerHTML || storyDiv.innerHTML === '<br>') {
                         storyDiv.innerHTML = insertHtml;
                     } else {
-                        storyDiv.focus();
-                        var sel = window.getSelection();
-                        sel.removeAllRanges();
-                        var range = document.createRange();
-                        range.selectNodeContents(storyDiv);
-                        range.collapse(false);
-                        sel.addRange(range);
-                        document.execCommand('insertHTML', false, insertHtml);
+                        storyDiv.insertAdjacentHTML('beforeend', insertHtml);
                     }
                 }
                 saveData();
@@ -1042,7 +1022,6 @@ function renderTagPicker() {
 }
 
 document.querySelector("#fmtTagBtn").onclick = function() {
-    renderNewTagColors();
     tagSelectedColor = TAG_COLORS[0];
     renderTagPicker();
     var popup = document.querySelector("#tagPickerPopup");
