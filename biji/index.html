@@ -529,10 +529,27 @@ function addLinkTarget(html) {
     return html.replace(/<a\s+/gi, '<a target="_blank" rel="noopener" ');
 }
 
+function normalizeContentForDisplay(html) {
+    var s = html;
+    s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
+    s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
+    s = s.replace(/<\/p>/gi, '\n');
+    s = s.replace(/<\/div>/gi, '\n');
+    s = s.replace(/<\/h[1-6]>/gi, '\n');
+    s = s.replace(/<\/li>/gi, '\n');
+    s = s.replace(/<p[^>]*>/gi, '');
+    s = s.replace(/<div[^>]*>/gi, '');
+    s = s.replace(/<h[1-6][^>]*>/gi, '');
+    s = s.replace(/<li[^>]*>/gi, '');
+    s = s.replace(/<br\s*\/?>/gi, '\n');
+    s = s.replace(/\\n/g, '\n');
+    return s;
+}
+
 function renderContentWithLines(content, searchTerm) {
     content = addLinkTarget(content);
     var hasSearch = searchTerm && searchTerm.length > 0;
-    var normalized = content.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n');
+    var normalized = normalizeContentForDisplay(content);
     var html = '';
 
     if (hasSearch) {
@@ -548,14 +565,13 @@ function renderContentWithLines(content, searchTerm) {
         if (totalCount > 0) {
             html += '<div class="search-stats">🔍 找到 <strong>' + totalCount + '</strong> 处匹配，位于第 <strong>' + matchLines.join('、') + '</strong> 行</div>';
         }
-        var displayHtml = highlightTextInHtml(content, searchTerm);
-        var lineNum = 0;
+        var displayHtml = highlightTextInHtml(normalized, searchTerm);
+        var lines = displayHtml.split('\n');
         html += '<div class="content-lines">';
-        html += '<div class="content-line"><span class="line-number">' + (++lineNum) + '</span><span>';
-        html += displayHtml.replace(/<br\s*\/?>/gi, function() {
-            return '</span></div><div class="content-line"><span class="line-number">' + (++lineNum) + '</span><span>';
+        lines.forEach(function(line, idx) {
+            html += '<div class="content-line"><span class="line-number">' + (idx + 1) + '</span><span>' + (line || '&nbsp;') + '</span></div>';
         });
-        html += '</span></div></div>';
+        html += '</div>';
     } else {
         var lines = normalized.split('\n');
         html += '<div class="content-lines">';
@@ -655,7 +671,7 @@ function renderList(filteredNotes, searchTerm) {
         contentDiv.appendChild(timestampDiv);
         var wcDiv = document.createElement("div");
         wcDiv.className = 'note-wordcount';
-        var text = n.content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var text = normalizeContentForDisplay(n.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
         var charCount = text.length;
         var lineCount = text ? (text.split('\n').length) : 0;
         wcDiv.textContent = charCount + ' 字 · ' + lineCount + ' 行';
@@ -1186,7 +1202,7 @@ function updateWordCount(noteId, contentDiv) {
     }
     var note = notes.find(function(n) { return n.id === noteId; });
     if (note) {
-        var text = note.content.replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
         var charCount = text.length;
         var lineCount = (text.match(/\n/g) || []).length + 1;
         wc.textContent = charCount + ' 字 · ' + lineCount + ' 行';
@@ -1272,8 +1288,10 @@ function openNoteViewer(id) {
     currentViewerNoteId = id;
     document.querySelector("#viewerTitle").textContent = note.title;
     var contentWithLinks = addLinkTarget(note.content);
-    document.querySelector("#viewerContent").innerHTML = '<div class="content-lines">' + contentWithLinks.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n').split('\n').map(function(line) { return '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>'; }).join('') + '</div>';
-    var text = note.content.replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+    var normalized = normalizeContentForDisplay(contentWithLinks);
+    var lines = normalized.split('\n');
+    document.querySelector("#viewerContent").innerHTML = '<div class="content-lines">' + lines.map(function(line) { return '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>'; }).join('') + '</div>';
+    var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
     document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
     document.querySelector("#viewerTimestamp").textContent = '最后编辑: ' + formatTimestamp(note.lastModified);
     document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px';
