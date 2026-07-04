@@ -1028,11 +1028,11 @@ document.querySelector("#fmtAnchorLink").onclick = function() {
             }
             var item = document.createElement('div');
             item.className = 'picker-anchor-item';
-            item.textContent = '⚓ ' + a.anchorId;
+            item.textContent = '⚓ ' + a.anchorId.replace('anc_', '');
             item.dataset.noteId = a.noteId;
             item.dataset.anchorId = a.anchorId;
             item.onclick = function() {
-                var linkText = text || a.anchorId;
+                var linkText = text || '跳转至' + a.anchorId.replace('anc_', '');
                 storyDiv.focus();
                 document.execCommand('insertHTML', false, '<a href="#" class="note-anchor-link" data-note-anchor="' + a.noteId + '::' + a.anchorId + '">' + linkText + '</a>');
                 popup.style.display = 'none';
