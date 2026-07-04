@@ -259,16 +259,31 @@ function highlightText(text, searchTerm) {
     return text.replace(regex, function(match) { return '<span class="highlight">' + match + '</span>'; });
 }
 
+function highlightTextInHtml(html, searchTerm) {
+    if (!searchTerm) return html;
+    var regex = new RegExp(escapeRegex(searchTerm), 'gi');
+    var result = '', inTag = false, buf = '';
+    for (var i = 0; i < html.length; i++) {
+        var ch = html[i];
+        if (ch === '<') { inTag = true; if (buf) { result += buf.replace(regex, function(m) { return '<span class="highlight">' + m + '</span>'; }); buf = ''; } result += ch; }
+        else if (ch === '>') { inTag = false; result += ch; }
+        else if (inTag) { result += ch; }
+        else { buf += ch; }
+    }
+    if (buf) result += buf.replace(regex, function(m) { return '<span class="highlight">' + m + '</span>'; });
+    return result;
+}
+
 function renderContentWithLines(content, searchTerm) {
     var hasSearch = searchTerm && searchTerm.length > 0;
+    var normalized = content.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n');
     var html = '';
 
     if (hasSearch) {
-        var plainText = content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').replace(/\\n/g, '\n');
-        var lines = plainText.split('\n');
-        var totalCount = 0;
-        var matchLines = [];
-        lines.forEach(function(line, idx) {
+        var plainText = normalized.replace(/<[^>]+>/g, '');
+        var textLines = plainText.split('\n');
+        var totalCount = 0, matchLines = [];
+        textLines.forEach(function(line, idx) {
             var regex = new RegExp(escapeRegex(searchTerm), 'gi');
             var count = 0;
             while (regex.exec(line) !== null) { count++; }
@@ -277,24 +292,19 @@ function renderContentWithLines(content, searchTerm) {
         if (totalCount > 0) {
             html += '<div class="search-stats">🔍 找到 <strong>' + totalCount + '</strong> 处匹配，位于第 <strong>' + matchLines.join('、') + '</strong> 行</div>';
         }
+        var displayHtml = highlightTextInHtml(content, searchTerm);
+        var lineNum = 0;
         html += '<div class="content-lines">';
-        lines.forEach(function(line, idx) {
-            var displayLine = highlightText(line, searchTerm);
-            if (displayLine === '') displayLine = '&nbsp;';
-            html += '<div class="content-line">';
-            html += '<span class="line-number">' + (idx + 1) + '</span>';
-            html += '<span>' + displayLine + '</span>';
-            html += '</div>';
+        html += '<div class="content-line"><span class="line-number">' + (++lineNum) + '</span><span>';
+        html += displayHtml.replace(/<br\s*\/?>/gi, function() {
+            return '</span></div><div class="content-line"><span class="line-number">' + (++lineNum) + '</span><span>';
         });
-        html += '</div>';
+        html += '</span></div></div>';
     } else {
-        var withBreaks = content.replace(/<br\s*\/?>/gi, '\n').replace(/\\n/g, '\n');
-        var lines = withBreaks.split('\n');
+        var lines = normalized.split('\n');
         html += '<div class="content-lines">';
         lines.forEach(function(line) {
-            html += '<div class="content-line">';
-            html += '<span>' + (line || '&nbsp;') + '</span>';
-            html += '</div>';
+            html += '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>';
         });
         html += '</div>';
     }
