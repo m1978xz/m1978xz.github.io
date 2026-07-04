@@ -1001,6 +1001,8 @@ document.querySelector("#fmtAnchor").onclick = function() {
 document.querySelector("#fmtAnchorLink").onclick = function() {
     var sel = window.getSelection();
     var text = sel.toString().trim();
+    var savedRange = null;
+    if (sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
     var popup = document.querySelector("#anchorPickerPopup");
     var list = document.querySelector("#anchorPickerList");
     var searchInput = document.querySelector("#anchorPickerSearch");
@@ -1033,6 +1035,11 @@ document.querySelector("#fmtAnchorLink").onclick = function() {
             item.dataset.anchorId = a.anchorId;
             item.onclick = function() {
                 var linkText = text || '跳转至' + a.anchorId.replace('anc_', '');
+                if (savedRange) {
+                    var s = window.getSelection();
+                    s.removeAllRanges();
+                    s.addRange(savedRange);
+                }
                 storyDiv.focus();
                 document.execCommand('insertHTML', false, '<a href="#" class="note-anchor-link" data-note-anchor="' + a.noteId + '::' + a.anchorId + '">' + linkText + '</a>');
                 popup.style.display = 'none';
