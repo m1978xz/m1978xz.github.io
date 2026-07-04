@@ -1433,7 +1433,7 @@ function showHomePage() {
     noteList.style.display = 'none';
 }
 
-homeBtn.onclick = function() { showHomePage(); };
+homeBtn.onclick = function() { window.location.href = 'https://191212.xyz/'; };
 
 document.querySelector("#exportAllMdBtn").onclick = function() {
     if (notes.length === 0) { alert("没有笔记可以导出。"); return; }
