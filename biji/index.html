@@ -138,6 +138,7 @@ body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
 /* Tags */
 .tag-badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:10px; margin:2px 3px 2px 0; background:#e8e8ed; color:#555; cursor:default; }
 body.dark-mode .tag-badge { background:#3a3a3c; color:#aaa; }
+body.dark-mode .tag-badge[style*="background"] { color:#fff !important; }
 .tag-picker-popup { position:fixed; background:#fff; border:1px solid #e8e8ed; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15); padding:14px; z-index:2000; min-width:260px; }
 body.dark-mode .tag-picker-popup { background:#2c2c2e; border-color:#48484a; }
 .tag-picker-popup .tag-option { display:inline-block; padding:4px 12px; border-radius:12px; margin:3px; font-size:12px; cursor:pointer; border:1px solid #d1d1d6; background:#f8f8fa; transition:all 0.15s; }
@@ -148,6 +149,11 @@ body.dark-mode .tag-picker-popup .tag-option.selected { background:#007aff; }
 .tag-picker-popup .tag-new-row { display:flex; gap:6px; margin-top:10px; }
 .tag-picker-popup .tag-new-row input { flex:1; padding:8px; border:1px solid #e8e8ed; border-radius:8px; font-size:13px; outline:none; }
 body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.tag-picker-popup .tag-color-row { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
+.tag-picker-popup .tag-color-dot { width:22px; height:22px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:all 0.15s; flex-shrink:0; }
+.tag-picker-popup .tag-color-dot:hover { transform:scale(1.2); }
+.tag-picker-popup .tag-color-dot.active { border-color:#1d1d1f; box-shadow:0 0 0 2px #fff, 0 0 0 4px currentColor; }
+body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
 #tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
 #tagManagementList { list-style:none; padding:0; margin-top:15px; }
 #tagManagementList li { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0f0f0; }
@@ -296,6 +302,7 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
 <div id="tagPickerPopup" class="tag-picker-popup" style="display:none;">
   <div class="picker-title">选择标签</div>
   <div id="tagPickerList"></div>
+  <div class="tag-color-row" id="tagColorRow"></div>
   <div class="tag-new-row">
     <input type="text" id="tagPickerNewInput" placeholder="新建标签...">
     <button id="tagPickerNewBtn" style="background:#007aff;color:white;white-space:nowrap;">添加</button>
@@ -699,21 +706,22 @@ function renderList(filteredNotes, searchTerm) {
         actionButtonsDiv.appendChild(deleteBtn);
         contentDiv.appendChild(actionButtonsDiv);
         titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id, searchTerm); };
-        li.appendChild(titleDiv);
-        if (n.tags && n.tags.length > 0) {
-            var tagsDiv = document.createElement('div');
-            tagsDiv.style.cssText = 'margin-top:4px;margin-bottom:4px;';
-            n.tags.forEach(function(tid) {
-                var t = tags.find(function(tt) { return tt.id === tid; });
-                if (t) {
-                    var badge = document.createElement('span');
-                    badge.className = 'tag-badge';
-                    badge.textContent = t.name;
-                    tagsDiv.appendChild(badge);
-                }
-            });
-            li.appendChild(tagsDiv);
-        }
+            li.appendChild(titleDiv);
+            if (n.tags && n.tags.length > 0) {
+                var tagsDiv = document.createElement('div');
+                tagsDiv.style.cssText = 'margin-top:4px;margin-bottom:4px;';
+                n.tags.forEach(function(tid) {
+                    var t = tags.find(function(tt) { return tt.id === tid; });
+                    if (t) {
+                        var badge = document.createElement('span');
+                        badge.className = 'tag-badge';
+                        badge.textContent = t.name;
+                        if (t.color) { badge.style.background = t.color; badge.style.color = '#fff'; }
+                        tagsDiv.appendChild(badge);
+                    }
+                });
+                li.appendChild(tagsDiv);
+            }
         li.appendChild(contentDiv);
         noteList.appendChild(li);
     });
@@ -865,6 +873,21 @@ document.querySelector("#fmtLink").onclick = function() {
 };
 
 /* --- Tags --- */
+var TAG_COLORS = ['#e8e8ed','#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#5e5ce6','#af52de','#ff2d55'];
+var tagSelectedColor = TAG_COLORS[0];
+
+function renderTagColorRow() {
+    var row = document.querySelector("#tagColorRow");
+    row.innerHTML = '';
+    TAG_COLORS.forEach(function(c) {
+        var dot = document.createElement('span');
+        dot.className = 'tag-color-dot' + (c === tagSelectedColor ? ' active' : '');
+        dot.style.background = c;
+        dot.onclick = function() { tagSelectedColor = c; renderTagColorRow(); };
+        row.appendChild(dot);
+    });
+}
+
 function renderTagPicker() {
     var list = document.querySelector("#tagPickerList");
     list.innerHTML = '';
@@ -872,9 +895,13 @@ function renderTagPicker() {
         var el = document.createElement('span');
         el.className = 'tag-option';
         el.textContent = t.name;
+        if (t.color) el.style.borderColor = t.color; else el.style.borderColor = '#d1d1d6';
         if (editing) {
             var note = notes.find(function(n) { return n.id === editing; });
-            if (note && note.tags && note.tags.indexOf(t.id) >= 0) el.classList.add('selected');
+            if (note && note.tags && note.tags.indexOf(t.id) >= 0) {
+                el.classList.add('selected');
+                if (t.color) el.style.background = t.color;
+            }
         }
         el.onclick = function() {
             if (!editing) { alert('请先保存笔记再添加标签。'); return; }
@@ -887,8 +914,19 @@ function renderTagPicker() {
                     notes[idx].tags.splice(pos, 1);
                 } else {
                     notes[idx].tags.push(t.id);
-                    storyDiv.focus();
-                    document.execCommand('insertHTML', false, '<div><br></div><div># ' + t.name + '</div>');
+                    var insertHtml = '<div><br></div><div># ' + t.name + '</div>';
+                    if (!storyDiv.innerHTML || storyDiv.innerHTML === '<br>') {
+                        storyDiv.innerHTML = insertHtml;
+                    } else {
+                        storyDiv.focus();
+                        var sel = window.getSelection();
+                        sel.removeAllRanges();
+                        var range = document.createRange();
+                        range.selectNodeContents(storyDiv);
+                        range.collapse(false);
+                        sel.addRange(range);
+                        document.execCommand('insertHTML', false, insertHtml);
+                    }
                 }
                 saveData();
                 renderTagPicker();
@@ -899,6 +937,8 @@ function renderTagPicker() {
 }
 
 document.querySelector("#fmtTagBtn").onclick = function() {
+    renderTagColorRow();
+    tagSelectedColor = TAG_COLORS[0];
     renderTagPicker();
     var popup = document.querySelector("#tagPickerPopup");
     var rect = this.getBoundingClientRect();
@@ -911,7 +951,7 @@ document.querySelector("#tagPickerNewBtn").onclick = function() {
     var name = document.querySelector("#tagPickerNewInput").value.trim();
     if (!name) return;
     if (tags.some(function(t) { return t.name === name; })) { alert('标签已存在。'); return; }
-    tags.push({ id: generateUniqueId(), name: name });
+    tags.push({ id: generateUniqueId(), name: name, color: tagSelectedColor });
     document.querySelector("#tagPickerNewInput").value = '';
     saveData();
     renderTagPicker();
@@ -931,6 +971,7 @@ function renderTagManagementList() {
         var li = document.createElement('li');
         var nameSpan = document.createElement('span');
         nameSpan.textContent = t.name;
+        if (t.color) { nameSpan.style.cssText = 'display:inline-flex;align-items:center;gap:6px;'; var dot = document.createElement('span'); dot.style.cssText = 'display:inline-block;width:10px;height:10px;border-radius:50%;background:' + t.color + ';flex-shrink:0;'; nameSpan.prepend(dot); }
         li.appendChild(nameSpan);
         var delBtn = document.createElement('button');
         delBtn.textContent = '删除';
