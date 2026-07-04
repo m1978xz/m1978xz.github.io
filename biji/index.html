@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一页笔记本</title>
+<style>
+body { font-family: system-ui,sans-serif; max-width:800px; margin:auto; padding:20px; }
+h1 { display: none; }
+#noteList { padding: 0; display: none; }
+#noteList li { list-style:none; padding:10px; border-bottom:1px solid #ccc; }
+#noteList li:hover { background:#f0f0f0; }
+.note-title { font-weight: bold; margin-bottom: 5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.note-content { margin-top: 10px; padding: 10px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 4px; display: none; }
+.note-timestamp { font-size: 0.8em; color: #666; margin-top: 10px; text-align: right; border-top: 1px dashed #eee; padding-top: 5px; }
+button { padding:6px 15px; margin:5px 0; cursor: pointer; }
+.action-buttons { margin-top: 10px; text-align: right; }
+.edit-btn, .delete-btn, .export-btn { margin-left: 10px; padding: 4px 8px; font-size: 0.9em; border: none; border-radius: 3px; cursor: pointer; }
+.edit-btn { background-color: #007bff; color: white; }
+.edit-btn:hover { background-color: #0056b3; }
+.delete-btn { background-color: #dc3545; color: white; }
+.delete-btn:hover { background-color: #c82333; }
+.export-btn { background-color: #28a745; color: white; }
+.export-btn:hover { background-color: #218838; }
+.highlight { background-color: yellow; }
+.header-section { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 15px; position: relative; min-height: 20px; }
+.header-section h1 { position: absolute; left: 0; top: 0; visibility: hidden; margin: 0; padding: 0; height: 0; overflow: hidden; }
+#menuToggleButton { background-color: #ccc; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+#menuToggleButton:hover { background-color: #bbb; }
+#menuToggleButton::before { content: ''; }
+#actionMenu { position: absolute; top: calc(100% + 5px); right: 0; background-color: white; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 10px; z-index: 1000; min-width: 200px; text-align: left; border-radius: 4px; display: none; flex-direction: column; gap: 10px; }
+#actionMenu button, #actionMenu input[type="text"], #actionMenu select { display: block; width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; margin: 0 !important; }
+#actionMenu button { background-color: #f8f8f8; color: #333; cursor: pointer; }
+#actionMenu button:hover { background-color: #e8e8e8; }
+#actionMenu .folder-controls { display: flex; gap: 5px; width: 100%; }
+#actionMenu .folder-controls input { flex-grow: 1; margin-bottom: 0; }
+#actionMenu .folder-controls button { width: auto; white-space: nowrap; margin-bottom: 0; }
+#mainSearchBar { width: 100%; padding: 8px 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; display: block; }
+#folderListContainer { margin-top: 20px; border: 1px solid #eee; padding: 15px; border-radius: 8px; background-color: #fff; }
+#folderManagementList { list-style: none; padding: 0; margin-top: 15px; }
+#folderManagementList li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+#folderManagementList li:last-child { border-bottom: none; }
+#folderManagementList .folder-name { font-size: 1.1em; font-weight: bold; }
+#backToNotesBtn { margin-top: 20px; background-color: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+#backToNotesBtn:hover { background-color: #5a6268; }
+#pagination { display: none; text-align: center; margin: 15px 0; user-select: none; }
+#pagination button { padding: 6px 14px; margin: 0 4px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; }
+#pagination button:hover:not(:disabled) { background: #f0f0f0; }
+#pagination button:disabled { color: #aaa; cursor: default; }
+#pagination .page-info { display: inline-block; padding: 6px 12px; font-size: 0.9em; color: #666; }
+#editorToolbar { display: flex; gap: 6px; padding: 8px; border: 1px solid #ccc; border-bottom: none; border-radius: 4px 4px 0 0; background: #f5f5f5; flex-wrap: wrap; align-items: center; }
+#editorToolbar button { padding: 4px 10px; margin: 0; border: 1px solid #ccc; border-radius: 3px; background: #fff; font-size: 14px; cursor: pointer; line-height: 1.4; }
+#editorToolbar button:hover { background: #e8e8e8; }
+#editorToolbar select, #editorToolbar input[type="color"] { padding: 3px 4px; border: 1px solid #ccc; border-radius: 3px; background: #fff; cursor: pointer; height: 28px; }
+#editorToolbar input[type="color"] { padding: 1px 2px; width: 32px; }
+#story { width: 100%; min-height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 0 0 4px 4px; font-size: 16px; line-height: 1.6; box-sizing: border-box; outline: none; overflow-y: auto; }
+#story:focus { border-color: #007bff; }
+</style>
+</head>
+<body>
+
+<div class="header-section">
+    <h1>简洁笔记本</h1>
+    <div style="position: relative;">
+        <button id="menuToggleButton"></button>
+        <div id="actionMenu" style="display: none;">
+            <button id="homeBtn">首页</button>
+            <button id="newBtn">新建笔记</button>
+            <div class="folder-controls">
+                <input type="text" id="newFolderNameInput" placeholder="新文件夹名称">
+                <button id="newFolderBtn">新建文件夹</button>
+            </div>
+            <select id="folderFilter"><option value="">所有笔记</option><option value="unfiled">无文件夹</option></select>
+            <button id="showFolderListBtn">文件夹列表</button>
+            <button id="exportAllMdBtn" style="background-color:#6f42c1;color:white;">导出全部为MD</button>
+            <button id="exportDataBtn">导出数据(JSON)</button>
+            <button id="importDataBtn">导入数据(JSON)</button>
+        </div>
+    </div>
+</div>
+
+<input type="text" id="mainSearchBar" placeholder="搜索笔记..." style="display: block;">
+
+<ul id="noteList" style="display: none;"></ul>
+
+<div id="pagination">
+    <button id="prevPageBtn">上一页</button>
+    <span class="page-info" id="pageInfo"></span>
+    <button id="nextPageBtn">下一页</button>
+</div>
+
+<div id="editor" style="display: none; margin-top: 20px;">
+  <p><input id="title" placeholder="标题" style="width:100%;"></p>
+  <div id="editorToolbar">
+    <button id="fmtBold" title="加粗"><b>B</b></button>
+    <select id="fmtSize">
+      <option value="">大小</option>
+      <option value="3">小</option>
+      <option value="5">中</option>
+      <option value="6">大</option>
+      <option value="7">超大</option>
+    </select>
+    <input type="color" id="fmtColor" value="#ff0000" title="文字颜色">
+    <button id="fmtColorBtn" title="应用颜色">上色</button>
+  </div>
+  <div id="story" contenteditable="true"></div>
+  <p>
+    <label for="noteFolderSelect">选择文件夹:</label>
+    <select id="noteFolderSelect"><option value="unfiled">无文件夹</option></select>
+  </p>
+  <button id="publishBtn">发布</button>
+</div>
+
+<div id="folderListContainer" style="display: none; margin-top: 20px;">
+    <h2>文件夹管理</h2>
+    <ul id="folderManagementList"></ul>
+    <button id="backToNotesBtn">返回笔记列表</button>
+</div>
+
+<input type="file" id="importFileInput" accept=".json" style="display:none;">
+
+<script>
+function generateUniqueId() {
+    return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return year + '年' + month + '月' + day + '日' + hours + '时' + minutes + '分';
+}
+
+function saveData() {
+    localStorage.setItem('simpleNotesAppData_notes', JSON.stringify(notes));
+    localStorage.setItem('simpleNotesAppData_folders', JSON.stringify(folders));
+}
+
+function loadData() {
+    const savedNotes = localStorage.getItem('simpleNotesAppData_notes');
+    const savedFolders = localStorage.getItem('simpleNotesAppData_folders');
+    if (savedNotes && savedFolders) {
+        notes = JSON.parse(savedNotes);
+        folders = JSON.parse(savedFolders);
+        if (!folders.some(function(f) { return f.id === 'unfiled'; })) {
+            folders.unshift({ id: 'unfiled', name: '无文件夹' });
+        }
+        notes.forEach(function(n) {
+            if (!n.lastModified) { n.lastModified = Date.now(); }
+        });
+        return true;
+    }
+    return false;
+}
+
+let notes = [];
+let folders = [];
+
+if (!loadData()) {
+    folders = [{ id: 'unfiled', name: '无文件夹' }];
+    notes = [];
+    saveData();
+}
+
+let editing = null;
+let currentOpenNoteContentDiv = null;
+let currentViewingFolderId = null;
+let currentPage = 1;
+const PAGE_SIZE = 50;
+
+const menuToggleButton = document.querySelector("#menuToggleButton");
+const actionMenu = document.querySelector("#actionMenu");
+const homeBtn = document.querySelector("#homeBtn");
+const newBtn = document.querySelector("#actionMenu #newBtn");
+const newFolderNameInput = document.querySelector("#actionMenu #newFolderNameInput");
+const newFolderBtn = document.querySelector("#actionMenu #newFolderBtn");
+const folderFilter = document.querySelector("#actionMenu #folderFilter");
+const showFolderListBtn = document.querySelector("#actionMenu #showFolderListBtn");
+const mainSearchBar = document.querySelector("#mainSearchBar");
+const noteList = document.querySelector("#noteList");
+const noteFolderSelect = document.querySelector("#noteFolderSelect");
+const editor = document.querySelector("#editor");
+const titleInput = document.querySelector("#title");
+const storyDiv = document.querySelector("#story");
+const publishBtn = document.querySelector("#publishBtn");
+const folderListContainer = document.querySelector("#folderListContainer");
+const folderManagementList = document.querySelector("#folderManagementList");
+const importFileInput = document.querySelector("#importFileInput");
+const paginationDiv = document.querySelector("#pagination");
+const prevPageBtn = document.querySelector("#prevPageBtn");
+const nextPageBtn = document.querySelector("#nextPageBtn");
+const pageInfoSpan = document.querySelector("#pageInfo");
+
+function stripHtml(html) {
+    return html.replace(/<[^>]+>/g, '');
+}
+
+function cleanContent(content) {
+    var text = /<[^>]+>/.test(content) ? stripHtml(content) : content.replace(/\\n/g, '\n');
+    return text.trimEnd();
+}
+
+function highlightText(text, searchTerm) {
+    if (!searchTerm) { return text; }
+    var regex = new RegExp(searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+    return text.replace(regex, function(match) { return '<span class="highlight">' + match + '</span>'; });
+}
+
+function renderFoldersDropdowns() {
+    folderFilter.innerHTML = '';
+    noteFolderSelect.innerHTML = '';
+    var allOption = document.createElement("option");
+    allOption.value = '';
+    allOption.textContent = '所有笔记';
+    folderFilter.appendChild(allOption);
+    folders.forEach(function(f) {
+        var option = document.createElement("option");
+        option.value = f.id;
+        option.textContent = f.name;
+        folderFilter.appendChild(option);
+    });
+    folderFilter.value = currentViewingFolderId === null ? '' : currentViewingFolderId;
+    folders.forEach(function(f) {
+        var option = document.createElement("option");
+        option.value = f.id;
+        option.textContent = f.name;
+        noteFolderSelect.appendChild(option);
+    });
+    noteFolderSelect.value = 'unfiled';
+}
+
+function renderList(filteredNotes, searchTerm) {
+    if (typeof filteredNotes === 'undefined') filteredNotes = notes;
+    if (typeof searchTerm === 'undefined') searchTerm = '';
+    noteList.innerHTML = "";
+    var notesToDisplay = filteredNotes;
+    if (currentViewingFolderId !== null && currentViewingFolderId !== '') {
+        notesToDisplay = filteredNotes.filter(function(n) { return n.folderId === currentViewingFolderId; });
+    }
+    var totalPages = Math.max(1, Math.ceil(notesToDisplay.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    var startIdx = (currentPage - 1) * PAGE_SIZE;
+    var pageNotes = notesToDisplay.slice(startIdx, startIdx + PAGE_SIZE);
+    if (notesToDisplay.length > 0 || searchTerm) {
+        noteList.style.display = 'block';
+    } else {
+        noteList.style.display = 'none';
+    }
+    if (notesToDisplay.length > PAGE_SIZE) {
+        paginationDiv.style.display = 'block';
+        pageInfoSpan.textContent = '第 ' + currentPage + '/' + totalPages + ' 页（共 ' + notesToDisplay.length + ' 条）';
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+    } else {
+        paginationDiv.style.display = 'none';
+    }
+    pageNotes.forEach(function(n) {
+        var li = document.createElement("li");
+        li.dataset.id = n.id;
+        li.draggable = true;
+        var titleDiv = document.createElement("div");
+        titleDiv.classList.add("note-title");
+        titleDiv.innerHTML = highlightText(n.title, searchTerm);
+        var contentDiv = document.createElement("div");
+        contentDiv.classList.add("note-content");
+        var contentTextDiv = document.createElement("div");
+        contentTextDiv.innerHTML = /<[^>]+>/.test(n.content) ? n.content : highlightText(n.content, searchTerm).replace(/\n/g, '<br>');
+        contentDiv.appendChild(contentTextDiv);
+        var timestampDiv = document.createElement("div");
+        timestampDiv.classList.add("note-timestamp");
+        timestampDiv.textContent = '最后编辑: ' + formatTimestamp(n.lastModified);
+        contentDiv.appendChild(timestampDiv);
+        var actionButtonsDiv = document.createElement("div");
+        actionButtonsDiv.classList.add("action-buttons");
+        var exportNoteTxtBtn = document.createElement("button");
+        exportNoteTxtBtn.textContent = "导出TXT";
+        exportNoteTxtBtn.classList.add("export-btn");
+        exportNoteTxtBtn.onclick = function(event) { event.stopPropagation(); exportNoteToTxt(n.id); actionMenu.style.display = 'none'; };
+        actionButtonsDiv.appendChild(exportNoteTxtBtn);
+        var exportNoteMdBtn = document.createElement("button");
+        exportNoteMdBtn.textContent = "导出MD";
+        exportNoteMdBtn.classList.add("export-btn");
+        exportNoteMdBtn.style.backgroundColor = "#6f42c1";
+        exportNoteMdBtn.onclick = function(event) { event.stopPropagation(); exportNoteToMd(n.id); actionMenu.style.display = 'none'; };
+        actionButtonsDiv.appendChild(exportNoteMdBtn);
+        var editBtn = document.createElement("button");
+        editBtn.textContent = "编辑";
+        editBtn.classList.add("edit-btn");
+        editBtn.onclick = function(event) {
+            event.stopPropagation();
+            editNote(n.id);
+            actionMenu.style.display = 'none';
+            folderListContainer.style.display = 'none';
+            mainSearchBar.style.display = 'none';
+            noteList.style.display = 'none';
+        };
+        actionButtonsDiv.appendChild(editBtn);
+        var deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "删除";
+        deleteBtn.classList.add("delete-btn");
+        deleteBtn.onclick = function(event) {
+            event.stopPropagation();
+            deleteNote(n.id);
+            actionMenu.style.display = 'none';
+            folderListContainer.style.display = 'none';
+        };
+        actionButtonsDiv.appendChild(deleteBtn);
+        contentDiv.appendChild(actionButtonsDiv);
+        titleDiv.onclick = function(event) { event.stopPropagation(); toggleContent(n.id, contentDiv); };
+        li.appendChild(titleDiv);
+        li.appendChild(contentDiv);
+        noteList.appendChild(li);
+    });
+}
+
+function goToPage(page) {
+    currentPage = page;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+}
+
+prevPageBtn.onclick = function() { if (currentPage > 1) goToPage(currentPage - 1); };
+nextPageBtn.onclick = function() {
+    var totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
+    if (currentPage < totalPages) goToPage(currentPage + 1);
+};
+
+document.querySelector("#fmtBold").onclick = function() { storyDiv.focus(); document.execCommand('bold'); };
+document.querySelector("#fmtSize").onchange = function() {
+    if (this.value) { storyDiv.focus(); document.execCommand('fontSize', false, this.value); }
+    this.value = '';
+};
+document.querySelector("#fmtColorBtn").onclick = function() {
+    var color = document.querySelector("#fmtColor").value;
+    storyDiv.focus();
+    document.execCommand('foreColor', false, color);
+};
+
+function toggleContent(id, contentDivToShow) {
+    if (currentOpenNoteContentDiv && currentOpenNoteContentDiv !== contentDivToShow) {
+        currentOpenNoteContentDiv.style.display = 'none';
+    }
+    if (contentDivToShow.style.display === 'none') {
+        contentDivToShow.style.display = 'block';
+        currentOpenNoteContentDiv = contentDivToShow;
+    } else {
+        contentDivToShow.style.display = 'none';
+        currentOpenNoteContentDiv = null;
+    }
+}
+
+function editNote(id) {
+    var noteToEdit = notes.find(function(n) { return n.id === id; });
+    if (noteToEdit) {
+        editing = id;
+        titleInput.value = noteToEdit.title;
+        storyDiv.innerHTML = noteToEdit.content.replace(/\\n/g, '<br>');
+        noteFolderSelect.value = noteToEdit.folderId;
+        editor.style.display = "block";
+        if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+        mainSearchBar.style.display = 'none';
+        noteList.style.display = 'none';
+    }
+}
+
+function deleteNote(id) {
+    if (confirm("确定要删除这篇笔记吗？")) {
+        notes = notes.filter(function(n) { return n.id !== id; });
+        if (currentOpenNoteContentDiv && currentOpenNoteContentDiv.closest('li').dataset.id === id) { currentOpenNoteContentDiv = null; }
+        saveData();
+        renderList(notes, mainSearchBar.value.toLowerCase());
+    }
+}
+
+publishBtn.onclick = function() {
+    var t = titleInput.value.trim();
+    var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
+    var folderId = noteFolderSelect.value;
+    var now = Date.now();
+    if (!t) { alert("标题不能为空"); return; }
+    if (editing) {
+        notes = notes.map(function(n) { return n.id === editing ? { ...n, title: t, content: c, folderId: folderId, lastModified: now } : n; });
+    } else {
+        notes.push({ id: generateUniqueId(), folderId: folderId, title: t, content: c, lastModified: now });
+    }
+    editing = null;
+    editor.style.display = "none";
+    titleInput.value = "";
+    storyDiv.innerHTML = "";
+    noteFolderSelect.value = 'unfiled';
+    saveData();
+    renderList(notes, mainSearchBar.value.toLowerCase());
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    noteList.style.display = 'block';
+};
+
+newBtn.onclick = function() {
+    editing = null;
+    titleInput.value = "";
+    storyDiv.innerHTML = "";
+    noteFolderSelect.value = 'unfiled';
+    editor.style.display = "block";
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    noteList.style.display = 'none';
+};
+
+newFolderBtn.onclick = function() {
+    var name = newFolderNameInput.value.trim();
+    if (!name) { alert("文件夹名称不能为空"); return; }
+    if (folders.some(function(f) { return f.name === name; })) { alert("文件夹名称已存在，请使用其他名称。"); return; }
+    folders.push({ id: generateUniqueId(), name: name });
+    newFolderNameInput.value = '';
+    saveData();
+    renderFoldersDropdowns();
+    alert('文件夹 "' + name + '" 已创建！');
+    actionMenu.style.display = 'none';
+    if (folderListContainer.style.display === 'block') { renderFolderManagementList(); }
+};
+
+folderFilter.onchange = function(e) {
+    currentViewingFolderId = e.target.value === '' ? null : e.target.value;
+    mainSearchBar.value = '';
+    currentPage = 1;
+    renderList(notes, '');
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    noteList.style.display = 'block';
+    editor.style.display = 'none';
+};
+
+mainSearchBar.oninput = function() {
+    var searchTerm = mainSearchBar.value.toLowerCase();
+    var allNotesInCurrentView = notes.filter(function(n) { return currentViewingFolderId === null || currentViewingFolderId === '' || n.folderId === currentViewingFolderId; });
+    var filteredNotes = allNotesInCurrentView.filter(function(n) { return n.title.toLowerCase().includes(searchTerm) || stripHtml(n.content).toLowerCase().includes(searchTerm); });
+    currentPage = 1;
+    renderList(filteredNotes, searchTerm);
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+    folderListContainer.style.display = 'none';
+    editor.style.display = 'none';
+    noteList.style.display = 'block';
+};
+
+menuToggleButton.onclick = function(event) {
+    event.stopPropagation();
+    actionMenu.style.display = actionMenu.style.display === 'none' ? 'flex' : 'none';
+    if (actionMenu.style.display === 'flex') { newFolderNameInput.value = ''; folderFilter.value = currentViewingFolderId === null ? '' : currentViewingFolderId; }
+};
+
+document.addEventListener("click", function(event) {
+    if (actionMenu.style.display === 'flex' && !actionMenu.contains(event.target) && !menuToggleButton.contains(event.target)) {
+        actionMenu.style.display = 'none';
+    }
+});
+
+var dragSrc = null;
+document.addEventListener("dragstart", function(e) {
+    if (e.target.closest("li")) { dragSrc = e.target.closest("li"); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragSrc.dataset.id); }
+});
+document.addEventListener("dragover", function(e) { e.preventDefault(); if (e.target.closest("li")) { e.dataTransfer.dropEffect = "move"; } });
+document.addEventListener("drop", function(e) {
+    e.preventDefault();
+    if (dragSrc && e.target.closest("li")) {
+        var dropTargetLi = e.target.closest("li");
+        if (dropTargetLi && dragSrc !== dropTargetLi) {
+            var list = document.querySelector("#noteList");
+            var bounding = dropTargetLi.getBoundingClientRect();
+            var offset = bounding.y + (bounding.height / 2);
+            if (e.clientY - offset > 0) { list.insertBefore(dragSrc, dropTargetLi.nextSibling); }
+            else { list.insertBefore(dragSrc, dropTargetLi); }
+            var displayedNoteIds = [...list.children].map(function(li) { return li.dataset.id; });
+            var reorderedNotes = [];
+            displayedNoteIds.forEach(function(id) { reorderedNotes.push(notes.find(function(n) { return n.id === id; })); });
+            notes.forEach(function(n) { if (!displayedNoteIds.includes(n.id)) { reorderedNotes.push(n); } });
+            notes = reorderedNotes;
+            saveData();
+        }
+    }
+    dragSrc = null;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+});
+
+function renderFolderManagementList() {
+    folderManagementList.innerHTML = '';
+    var userFolders = folders.filter(function(f) { return f.id !== 'unfiled'; });
+    if (userFolders.length === 0) {
+        var msg = document.createElement('li');
+        msg.textContent = '暂无自建文件夹。';
+        folderManagementList.appendChild(msg);
+        return;
+    }
+    userFolders.forEach(function(folder) {
+        var li = document.createElement('li');
+        var nameSpan = document.createElement('span');
+        nameSpan.classList.add('folder-name');
+        nameSpan.textContent = folder.name;
+        li.appendChild(nameSpan);
+        var exportTxtBtn = document.createElement('button');
+        exportTxtBtn.textContent = '导出TXT';
+        exportTxtBtn.classList.add('export-btn');
+        exportTxtBtn.style.marginRight = '10px';
+        exportTxtBtn.onclick = function() { exportFolderToTxt(folder.id); };
+        li.appendChild(exportTxtBtn);
+        var exportMdBtn = document.createElement('button');
+        exportMdBtn.textContent = '导出MD';
+        exportMdBtn.classList.add('export-btn');
+        exportMdBtn.style.backgroundColor = '#6f42c1';
+        exportMdBtn.style.marginRight = '10px';
+        exportMdBtn.onclick = function() { exportFolderToMd(folder.id); };
+        li.appendChild(exportMdBtn);
+        var deleteFolderBtn = document.createElement('button');
+        deleteFolderBtn.textContent = '删除';
+        deleteFolderBtn.classList.add('delete-btn');
+        deleteFolderBtn.onclick = function() { deleteFolder(folder.id); };
+        li.appendChild(deleteFolderBtn);
+        folderManagementList.appendChild(li);
+    });
+}
+
+function deleteFolder(folderId) {
+    var folderToDelete = folders.find(function(f) { return f.id === folderId; });
+    if (!folderToDelete) return;
+    if (confirm('确定要删除文件夹 "' + folderToDelete.name + '" 吗？该文件夹下的所有笔记将移至"无文件夹"。')) {
+        folders = folders.filter(function(f) { return f.id !== folderId; });
+        notes = notes.map(function(n) { return n.folderId === folderId ? { ...n, folderId: 'unfiled' } : n; });
+        if (currentViewingFolderId === folderId) { currentViewingFolderId = null; folderFilter.value = ''; }
+        saveData();
+        renderFoldersDropdowns();
+        renderFolderManagementList();
+        renderList(notes, mainSearchBar.value.toLowerCase());
+        alert('文件夹 "' + folderToDelete.name + '" 已删除，相关笔记已移至"无文件夹"。');
+    }
+}
+
+showFolderListBtn.onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'block';
+    renderFolderManagementList();
+};
+
+backToNotesBtn.onclick = function() {
+    folderListContainer.style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    noteList.style.display = 'block';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+function showHomePage() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    mainSearchBar.value = '';
+    currentViewingFolderId = null;
+    currentPage = 1;
+    renderFoldersDropdowns();
+    noteList.style.display = 'none';
+    renderList();
+    noteList.style.display = 'none';
+}
+
+homeBtn.onclick = function() { showHomePage(); };
+
+document.querySelector("#exportAllMdBtn").onclick = function() {
+    if (notes.length === 0) { alert("没有笔记可以导出。"); return; }
+    var fileContent = '# 全部笔记\n\n';
+    notes.forEach(function(note, index) {
+        if (index > 0) { fileContent += '---\n'; }
+        var folderName = folders.find(function(f) { return f.id === note.folderId; }) ? folders.find(function(f) { return f.id === note.folderId; }).name : '未分类';
+        fileContent += '# ' + note.title + '\n\n> 文件夹：' + folderName + '\n\n';
+        fileContent += cleanContent(note.content) + '\n\n';
+    });
+    var filename = '全部笔记_' + new Date().toISOString().slice(0, 10) + '.md';
+    var blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    actionMenu.style.display = 'none';
+};
+
+document.querySelector("#exportDataBtn").onclick = function() {
+    if (notes.length === 0) { alert("没有数据可以导出。"); return; }
+    var data = { notes: notes, folders: folders };
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = '笔记本数据_' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    actionMenu.style.display = 'none';
+};
+
+document.querySelector("#importDataBtn").onclick = function() { importFileInput.click(); actionMenu.style.display = 'none'; };
+
+importFileInput.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            var data = JSON.parse(ev.target.result);
+            if (!data.notes || !data.folders) { alert("JSON格式不对，缺少 notes 或 folders 字段。"); return; }
+            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹，是否覆盖当前数据？')) return;
+            notes = data.notes;
+            folders = data.folders;
+            if (!folders.some(function(f) { return f.id === 'unfiled'; })) { folders.unshift({ id: 'unfiled', name: '无文件夹' }); }
+            saveData();
+            currentPage = 1;
+            currentViewingFolderId = null;
+            renderFoldersDropdowns();
+            renderList(notes, '');
+            noteList.style.display = 'block';
+            mainSearchBar.style.display = 'block';
+            mainSearchBar.value = '';
+            alert("导入成功！");
+        } catch (err) { alert("导入失败：文件格式错误。"); }
+    };
+    reader.readAsText(file);
+    importFileInput.value = '';
+};
+
+function downloadTxtFile(filename, content) {
+    var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportNoteToTxt(noteId) {
+    var note = notes.find(function(n) { return n.id === noteId; });
+    if (note) { downloadTxtFile(note.title.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '.txt', '# ' + note.title + '\n' + cleanContent(note.content) + '\n'); }
+}
+
+function exportNoteToMd(noteId) {
+    var note = notes.find(function(n) { return n.id === noteId; });
+    if (note) {
+        var content = '# ' + note.title + '\n\n' + cleanContent(note.content) + '\n';
+        var blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = note.title.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '.md';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+}
+
+function exportFolderToMd(folderId) {
+    var folder = folders.find(function(f) { return f.id === folderId; });
+    if (!folder) return;
+    var notesInFolder = notes.filter(function(n) { return n.folderId === folderId; });
+    if (notesInFolder.length === 0) { alert('文件夹 "' + folder.name + '" 中没有笔记可以导出。'); return; }
+    var content = '# 文件夹: ' + folder.name + '\n\n';
+    notesInFolder.forEach(function(note, index) {
+        if (index > 0) content += '---\n';
+        content += '# ' + note.title + '\n\n' + cleanContent(note.content) + '\n\n';
+    });
+    var blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_所有笔记.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportFolderToTxt(folderId) {
+    var folder = folders.find(function(f) { return f.id === folderId; });
+    if (!folder) return;
+    var notesInFolder = notes.filter(function(n) { return n.folderId === folderId; });
+    if (notesInFolder.length === 0) { alert('文件夹 "' + folder.name + '" 中没有笔记可以导出。'); return; }
+    var content = '# 文件夹: ' + folder.name + '\n\n';
+    notesInFolder.forEach(function(note, index) {
+        if (index > 0) content += '---\n';
+        content += '# ' + note.title + '\n' + cleanContent(note.content) + '\n';
+    });
+    downloadTxtFile(folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_所有笔记.txt', content);
+}
+
+renderFoldersDropdowns();
+showHomePage();
+</script>
+</body>
+</html>
