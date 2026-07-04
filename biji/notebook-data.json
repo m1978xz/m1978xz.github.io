@@ -31,14 +31,16 @@
       "folderId": "unfiled",
       "title": "锚点2",
       "content": "<span data-anchor-id=\"anc_m2\" class=\"note-anchor-marker\">⚓m2</span>",
-      "lastModified": 1783153369329
+      "lastModified": 1783153369329,
+      "tags": []
     },
     {
       "id": "id_1783153398311_wjghzau52",
       "folderId": "unfiled",
       "title": "跳m2",
       "content": "<a href=\"#\" class=\"note-anchor-link\" data-note-anchor=\"id_1783153362093_2j3p3z60u::anc_m2\">跳转至m2</a>",
-      "lastModified": 1783153401945
+      "lastModified": 1783153401945,
+      "tags": []
     }
   ],
   "folders": [
