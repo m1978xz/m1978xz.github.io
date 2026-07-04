@@ -159,6 +159,12 @@ body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
 body.dark-mode .note-anchor-marker { opacity:0.4; }
 .note-anchor-link { color:#007aff; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #007aff; }
 body.dark-mode .note-anchor-link { color:#5e9eff; border-bottom-color:#5e9eff; }
+#anchorMgmtSection { margin-top:16px; padding-top:14px; border-top:2px solid #e8e8ed; }
+body.dark-mode #anchorMgmtSection { border-top-color:#48484a; }
+#anchorMgmtList { list-style:none; padding:0; margin-top:8px; }
+#anchorMgmtList li { display:flex; align-items:center; padding:7px 0; border-bottom:1px solid #f0f0f0; font-size:13px; gap:8px; flex-wrap:wrap; }
+#anchorMgmtList li:last-child { border-bottom:none; }
+body.dark-mode #anchorMgmtList li { border-bottom-color:#48484a; }
 #anchorPickerPopup .picker-note-group { font-size:12px; font-weight:600; color:#8e8e93; margin:8px 0 4px 4px; }
 #anchorPickerPopup .picker-anchor-item { display:block; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:#1d1d1f; transition:background 0.15s; }
 #anchorPickerPopup .picker-anchor-item:hover { background:#f0f0f5; }
@@ -353,6 +359,10 @@ body.dark-mode .viewer-footer { border-top-color:#48484a; }
       <button id="tagMgmtNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">新建</button>
     </div>
     <ul id="tagManagementList"></ul>
+    <div id="anchorMgmtSection">
+      <h3 style="font-size:15px;font-weight:600;margin:0 0 4px;">锚点列表</h3>
+      <ul id="anchorMgmtList"></ul>
+    </div>
     <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
 </div>
 
@@ -909,7 +919,13 @@ document.querySelector("#fmtLink").onclick = function() {
 
 /* --- Anchors --- */
 document.querySelector("#fmtAnchor").onclick = function() {
-    var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', '');
+    var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
+    var existingNums = [];
+    var numRegex = /data-anchor-id="anc_m(\d+)"/g;
+    var match;
+    while ((match = numRegex.exec(allContent)) !== null) { existingNums.push(parseInt(match[1], 10)); }
+    var nextNum = existingNums.length > 0 ? Math.max.apply(null, existingNums) + 1 : 1;
+    var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', 'm' + nextNum);
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
     var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
@@ -1119,6 +1135,7 @@ document.querySelector("#showTagsBtn").onclick = function() {
     tagSelectedColor = TAG_COLORS[0];
     renderTagMgmtNewColors();
     renderTagManagementList();
+    renderAnchorMgmtList();
 };
 
 document.querySelector("#backFromTagsBtn").onclick = function() {
@@ -1139,6 +1156,41 @@ function renderTagMgmtNewColors() {
         dot.onclick = function() { tagSelectedColor = c; renderTagMgmtNewColors(); };
         row.appendChild(dot);
     });
+}
+
+function renderAnchorMgmtList() {
+    var list = document.querySelector("#anchorMgmtList");
+    if (!list) return;
+    list.innerHTML = '';
+    var found = {};
+    notes.forEach(function(n) {
+        var regex = /data-anchor-id="([^"]*)"/g;
+        var m;
+        while ((m = regex.exec(n.content)) !== null) {
+            var anchorId = m[1];
+            var key = n.id + '::' + anchorId;
+            if (found[key]) continue;
+            found[key] = true;
+            var folderName = '无文件夹';
+            var f = folders.find(function(fold) { return fold.id === n.folderId; });
+            if (f) folderName = f.name;
+            var backlinks = [];
+            notes.forEach(function(n2) {
+                if (n2.content && n2.content.indexOf('data-note-anchor="' + n.id + '::' + anchorId + '"') >= 0) {
+                    var f2 = folders.find(function(fold) { return fold.id === n2.folderId; });
+                    backlinks.push(f2 ? f2.name : '无文件夹');
+                }
+            });
+            var li = document.createElement('li');
+            var label = anchorId.replace('anc_', '');
+            var backStr = backlinks.length > 0 ? '<span style="color:#8e8e93;">被跳转:</span> ' + backlinks.join(', ') : '<span style="color:#c7c7cc;">无跳转</span>';
+            li.innerHTML = '<span class="note-anchor-marker" style="opacity:0.6;font-size:14px;">⚓' + label + '</span> <span style="color:#8e8e93;">所在:</span> ' + folderName + ' ' + backStr;
+            list.appendChild(li);
+        }
+    });
+    if (list.children.length === 0) {
+        list.innerHTML = '<li style="color:#8e8e93;padding:10px 0;">暂无锚点。</li>';
+    }
 }
 
 document.querySelector("#tagMgmtNewBtn").onclick = function() {
