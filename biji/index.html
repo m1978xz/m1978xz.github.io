@@ -991,7 +991,8 @@ document.querySelector("#fmtAnchor").onclick = function() {
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
     var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
-    if (allContent.indexOf('anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_')) >= 0) {
+    var dupRegex = new RegExp('data-anchor-id=[\'"]' + id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '[\'"]', 'i');
+    if (dupRegex.test(allContent)) {
         alert('锚点 "' + name.trim() + '" 已存在。'); return;
     }
     storyDiv.focus();
