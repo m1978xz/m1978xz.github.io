@@ -1,0 +1,2601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一页笔记本</title>
+<style>
+/* ====== 完整样式 ====== */
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Hiragino Sans GB", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 860px; margin: 0 auto; padding: 24px 20px; background: #f5f5f7; color: #1d1d1f; -webkit-font-smoothing: antialiased; }
+h1 { display: none; }
+#noteList { padding: 0; display: none; }
+#noteList li { list-style: none; padding: 16px; margin-bottom: 12px; background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02); transition: box-shadow 0.2s, transform 0.15s; cursor:default; }
+#noteList li:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.03); transform: translateY(-1px); }
+body.dark-mode #noteList li { box-shadow: 0 1px 4px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04); }
+body.dark-mode #noteList li:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06); }
+.note-title { font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap:8px; font-size: 15px; color: #1d1d1f; }
+.note-title .title-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.note-title .title-meta { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.note-title .title-timestamp { font-size:11px; color:#8e8e93; font-weight:400; white-space:nowrap; }
+.note-card-tags { display:flex; flex-wrap:wrap; gap:4px; margin:4px 0; }
+.note-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid #f0f0f0; }
+body.dark-mode .note-card-footer { border-top-color:#48484a; }
+.note-card-footer .card-folder { font-size:11px; color:#8e8e93; }
+.note-content { margin-top: 12px; padding: 16px; border: 1px solid #e8e8ed; background: #fafafa; border-radius: 10px; display: none; font-size: 14px; line-height: 1.7; }
+button { padding: 8px 18px; margin: 4px 0; cursor: pointer; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+.action-buttons { margin-top: 12px; text-align: right; display: flex; gap: 6px; justify-content: flex-end; }
+.edit-btn, .delete-btn, .export-btn { padding: 5px 14px; font-size: 12px; border: none; border-radius: 6px; font-weight: 500; }
+.edit-btn { background: #007aff; color: white; }
+.edit-btn:hover { background: #0062cc; }
+.delete-btn { background: #ff3b30; color: white; }
+.delete-btn:hover { background: #d62d20; }
+.export-btn { background: #34c759; color: white; }
+.export-btn:hover { background: #28a745; }
+.highlight { background: #fff176; padding: 1px 2px; border-radius: 2px; }
+.header-section { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; position: relative; min-height: 24px; }
+.header-section h1 { position: absolute; left: 0; top: 0; visibility: hidden; margin: 0; padding: 0; height: 0; overflow: hidden; }
+#menuToggleButton { background: #c7c7cc; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: background 0.2s; }
+#menuToggleButton:hover { background: #a8a8ad; }
+#actionMenu { position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border: 1px solid #e8e8ed; box-shadow: 0 4px 20px rgba(0,0,0,0.12); padding: 12px; z-index: 1000; min-width: 220px; border-radius: 12px; display: none; flex-direction: column; gap: 8px; }
+#actionMenu button, #actionMenu input[type="text"], #actionMenu select { display: block; width: 100%; padding: 10px 12px; border: 1px solid #e8e8ed; border-radius: 8px; font-size: 13px; background: #fff; margin: 0 !important; outline: none; }
+#actionMenu button { background: #f8f8fa; color: #1d1d1f; font-weight: 500; border: 1px solid #e8e8ed; }
+#actionMenu button:hover { background: #e8e8ed; }
+#mainSearchBar { width: 100%; padding: 12px 16px; margin-bottom: 12px; border: 2px solid #e8e8ed; border-radius: 10px; font-size: 15px; outline: none; background: #fff; transition: border-color 0.2s; }
+#mainSearchBar:focus { border-color: #007aff; }
+
+/* 文件夹标签栏 */
+#folderTabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding: 8px 0; border-bottom: 1px solid #e8e8ed; }
+body.dark-mode #folderTabs { border-bottom-color: #48484a; }
+#folderTabs .folder-tab { display: inline-flex; align-items: center; gap: 4px; padding: 6px 16px; border: 1px solid #d1d1d6; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: #1d1d1f; }
+#folderTabs .folder-tab:hover { border-color: #007aff; background: #f0f7ff; }
+#folderTabs .folder-tab.active { background: #007aff; color: #fff; border-color: #007aff; }
+body.dark-mode #folderTabs .folder-tab { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #folderTabs .folder-tab:hover { border-color: #5e9eff; background: #1a2a40; }
+body.dark-mode #folderTabs .folder-tab.active { background: #007aff; color: #fff; border-color: #007aff; }
+#folderTabs .folder-tab .tab-count { font-size: 11px; opacity: 0.7; margin-left: 2px; }
+
+#folderListContainer { margin-top: 20px; border: 1px solid #e8e8ed; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+#folderManagementList { list-style: none; padding: 0; margin-top: 15px; }
+#folderManagementList li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 8px; }
+#folderManagementList li:last-child { border-bottom: none; }
+#folderManagementList .folder-name { font-size: 15px; font-weight: 600; }
+#backToNotesBtn { margin-top: 20px; background: #6c757d; color: white; padding: 8px 20px; border-radius: 8px; }
+#backToNotesBtn:hover { background: #5a6268; }
+
+#pagination { display: none; text-align: center; margin: 20px 0; }
+#pagination button { padding: 8px 18px; margin: 0 4px; border: 1px solid #e8e8ed; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+#pagination button:hover:not(:disabled) { background: #f5f5f7; border-color: #d1d1d6; }
+#pagination button:disabled { color: #c7c7cc; cursor: default; background: #f5f5f7; }
+#pagination .page-info { display: inline-block; padding: 8px 14px; font-size: 13px; color: #8e8e93; }
+
+/* Editor */
+#editor { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 20px; }
+#editor input#title { width: 100%; font-size: 20px; font-weight: 700; border: none; outline: none; padding: 8px 0; margin-bottom: 12px; background: transparent; border-bottom: 2px solid #e8e8ed; }
+#editor input#title:focus { border-bottom-color: #007aff; }
+
+#editorToolbar { display: flex; gap: 6px; padding: 10px; border: 1px solid #e8e8ed; border-bottom: none; border-radius: 10px 10px 0 0; background: #fafafa; flex-wrap: wrap; align-items: center; }
+#editorToolbar button { padding: 6px 12px; margin: 0; border: 1px solid #e8e8ed; border-radius: 6px; background: #fff; font-size: 13px; font-weight: 500; line-height: 1.4; transition: all 0.15s; }
+#editorToolbar button:hover { background: #f0f0f5; border-color: #d1d1d6; }
+#editorToolbar select { padding: 6px 8px; border: 1px solid #e8e8ed; border-radius: 6px; background: #fff; cursor: pointer; height: 32px; font-size: 13px; }
+.color-picker-popup { position: fixed; background: #fff; border: 1px solid #e8e8ed; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 14px; z-index: 2000; min-width: 220px; }
+.color-picker-popup .picker-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #1d1d1f; }
+.color-picker-popup .picker-hue-bar { width: 100%; height: 28px; border-radius: 8px; cursor: pointer; margin-bottom: 8px; border: 1px solid #e8e8ed; background: linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%)); position: relative; }
+.color-picker-popup .picker-hue-bar .hue-indicator { position: absolute; top: -2px; bottom: -2px; width: 4px; border-radius: 2px; background: #1d1d1f; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); pointer-events: none; }
+.color-picker-popup .picker-swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.color-picker-popup .picker-swatches .swatch { display: inline-block; width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+.color-picker-popup .picker-swatches .swatch:hover { transform: scale(1.2); border-color: #007aff; }
+.color-picker-popup .picker-none-btn { display: block; width: 100%; padding: 8px; border: 1px dashed #c7c7cc; border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px; color: #8e8e93; text-align: center; transition: all 0.15s; }
+.color-picker-popup .picker-none-btn:hover { background: #f0f0f5; border-color: #8e8e93; color: #1d1d1f; }
+
+#story { width: 100%; min-height: 220px; padding: 14px; border: 1px solid #e8e8ed; border-radius: 0 0 10px 10px; font-size: 15px; line-height: 1.7; outline: none; overflow-y: auto; background: #fff; }
+#story:focus { border-color: #007aff; }
+
+#publishBtn { background: #007aff; color: white; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 12px; transition: background 0.15s; }
+#publishBtn:hover { background: #0062cc; }
+#cancelBtn { background: #8e8e93; color: white; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 12px; margin-left: 8px; transition: background 0.15s; }
+#cancelBtn:hover { background: #6c757d; }
+
+.search-stats { padding: 8px 12px; background: #f0f7ff; border-radius: 8px; margin-bottom: 12px; font-size: 13px; color: #007aff; border: 1px solid #d4e6ff; }
+.search-stats strong { font-weight: 700; }
+.content-lines { font-family: "SF Mono", "Menlo", "Consolas", monospace; font-size: 13px; line-height: 1.8; }
+.content-line { display: flex; padding: 1px 0; align-items: baseline; }
+.line-number { color: #c7c7cc; text-align: right; padding-right: 12px; min-width: 32px; user-select: none; flex-shrink: 0; font-size: 12px; border-right: 1px solid #e8e8ed; margin-right: 12px; }
+/* ★ 方案B修复：给 content-line 的内容 span 添加防溢出属性 */
+.content-line > span:last-child,
+.content-line > span:not(.line-number) {
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* 编辑器文件夹选择区域 */
+#editorFolderRow { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+#editorFolderRow label { font-size: 13px; font-weight: 500; margin: 0; color: #555; white-space: nowrap; }
+#noteFolderSelect { padding: 8px 12px; border: 1px solid #e8e8ed; border-radius: 8px; font-size: 13px; background: #fff; outline: none; flex: 1; min-width: 100px; }
+#editorNewFolderBtn { padding: 6px 12px; border: 1px dashed #007aff; border-radius: 8px; background: transparent; color: #007aff; font-size: 13px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+#editorNewFolderBtn:hover { background: #f0f7ff; border-style: solid; }
+
+.note-timestamp { font-size: 12px; color: #8e8e93; margin-top: 12px; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 8px; }
+.note-wordcount { font-size: 11px; color: #8e8e93; margin-top: 2px; text-align: right; }
+.auto-save-indicator { font-size: 11px; color: #34c759; margin-left: 8px; display: none; }
+
+/* Dark mode */
+body.dark-mode { background: #1c1c1e; color: #f5f5f7; }
+body.dark-mode #noteList li { background: #2c2c2e; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+body.dark-mode .note-content { background: #3a3a3c; border-color: #48484a; }
+body.dark-mode #editor { background: #2c2c2e; }
+body.dark-mode #editorToolbar { background: #3a3a3c; border-color: #48484a; }
+body.dark-mode #editorToolbar button, body.dark-mode #editorToolbar select { background: #48484a; border-color: #555; color: #f5f5f7; }
+body.dark-mode #mainSearchBar { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #story { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #actionMenu { background: #2c2c2e; border-color: #48484a; }
+body.dark-mode #actionMenu button, body.dark-mode #actionMenu input, body.dark-mode #actionMenu select { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #actionMenu button:hover { background: #48484a; }
+body.dark-mode #folderListContainer { background: #2c2c2e; border-color: #48484a; }
+body.dark-mode .color-picker-popup { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode .color-picker-popup .picker-none-btn { background: #3a3a3c; color: #aaa; border-color: #555; }
+body.dark-mode .search-stats { background: #1a2a40; border-color: #2a4a6a; color: #5ac8fa; }
+body.dark-mode #editor input#title { background: transparent; color: #f5f5f7; border-bottom-color: #48484a; }
+body.dark-mode #pagination button { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode .note-timestamp { color: #8e8e93; border-top-color: #48484a; }
+body.dark-mode #folderManagementList li { border-bottom-color: #48484a; }
+body.dark-mode .line-number { color: #555; border-right-color: #48484a; }
+body.dark-mode #trashContainer { background: #2c2c2e; border-color: #48484a; }
+body.dark-mode #trashList li { border-bottom-color: #48484a; color: #f5f5f7; }
+body.dark-mode #colorPickerPopup .picker-hue-bar { border-color: #48484a; }
+body.dark-mode #darkModeToggle { color: #ffd60a; }
+body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
+body.dark-mode #noteFolderSelect { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #editorFolderRow label { color: #aaa; }
+body.dark-mode #editorNewFolderBtn { color: #5e9eff; border-color: #5e9eff; }
+body.dark-mode #editorNewFolderBtn:hover { background: #1a2a40; }
+
+#darkModeToggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 2px 6px; border-radius: 6px; line-height: 1; margin-right: 6px; }
+#darkModeToggle:hover { background: #e8e8ed; }
+
+/* Trash */
+#trashContainer { margin-top: 20px; border: 1px solid #e8e8ed; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: none; }
+#trashList { list-style: none; padding: 0; margin-top: 15px; }
+#trashList li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+#trashList li:last-child { border-bottom: none; }
+.empty-trash-btn { background: #ff3b30; color: white; }
+.empty-trash-btn:hover { background: #d62d20; }
+.restore-btn { background: #ff9500; color: white; }
+.restore-btn:hover { background: #e08600; }
+
+/* Tags */
+.tag-badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:10px; margin:2px 3px 2px 0; background:#e8e8ed; color:#555; cursor:default; }
+body.dark-mode .tag-badge { background:#3a3a3c; color:#aaa; }
+body.dark-mode .tag-badge[style*="background"] { color:#fff !important; }
+.tag-picker-popup { position:fixed; background:#fff; border:1px solid #e8e8ed; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15); padding:14px; z-index:6000; min-width:260px; }
+body.dark-mode .tag-picker-popup { background:#2c2c2e; border-color:#48484a; }
+.tag-picker-popup .tag-option { display:inline-block; padding:4px 12px; border-radius:12px; margin:3px; font-size:12px; cursor:pointer; border:1px solid #d1d1d6; background:#f8f8fa; transition:all 0.15s; }
+.tag-picker-popup .tag-option:hover { border-color:#007aff; }
+.tag-picker-popup .tag-option.selected { background:#007aff; color:#fff; border-color:#007aff; }
+body.dark-mode .tag-picker-popup .tag-option { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+body.dark-mode .tag-picker-popup .tag-option.selected { background:#007aff; }
+.tag-picker-popup .tag-new-row { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.tag-picker-popup .tag-new-row input { flex:1; min-width:120px; padding:8px; border:1px solid #e8e8ed; border-radius:8px; font-size:13px; outline:none; }
+body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.tag-picker-popup .tag-new-row .new-tag-colors { display:flex; gap:4px; align-items:center; }
+.tag-picker-popup .tag-color-dot { width:18px; height:18px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:all 0.15s; flex-shrink:0; }
+.tag-picker-popup .tag-color-dot:hover { transform:scale(1.3); }
+.tag-picker-popup .tag-color-dot.active { border-color:#1d1d1f; box-shadow:0 0 0 1.5px #fff; }
+body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
+#tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
+.note-anchor-marker { display:inline; font-size:11px; opacity:0.5; cursor:pointer; padding:0 2px; user-select:none; }
+body.dark-mode .note-anchor-marker { opacity:0.4; }
+.note-anchor-link { color:#007aff; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #007aff; font-size:13px; }
+body.dark-mode .note-anchor-link { color:#5e9eff; border-bottom-color:#5e9eff; }
+#anchorMgmtSection { margin-top:16px; padding-top:14px; border-top:2px solid #e8e8ed; }
+body.dark-mode #anchorMgmtSection { border-top-color:#48484a; }
+#anchorMgmtList { list-style:none; padding:0; margin-top:8px; }
+#anchorMgmtList li { display:flex; align-items:center; padding:7px 0; border-bottom:1px solid #f0f0f0; font-size:13px; gap:8px; flex-wrap:wrap; }
+#anchorMgmtList li:last-child { border-bottom:none; }
+body.dark-mode #anchorMgmtList li { border-bottom-color:#48484a; }
+#anchorPickerPopup .picker-note-group { font-size:12px; font-weight:600; color:#8e8e93; margin:8px 0 4px 4px; }
+#anchorPickerPopup .picker-anchor-item { display:block; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:#1d1d1f; transition:background 0.15s; }
+#anchorPickerPopup .picker-anchor-item:hover { background:#f0f0f5; }
+body.dark-mode #anchorPickerPopup .picker-anchor-item { color:#f5f5f7; }
+body.dark-mode #anchorPickerPopup .picker-anchor-item:hover { background:#3a3a3c; }
+#tagManagementList { list-style:none; padding:0; margin-top:15px; }
+#tagManagementList li { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0f0f0; }
+#tagManagementList li:last-child { border-bottom:none; }
+body.dark-mode #tagManagementContainer { background:#2c2c2e; border-color:#48484a; }
+body.dark-mode #tagManagementList li { border-bottom-color:#48484a; }
+
+/* Lock screen */
+#lockScreen { position:fixed; top:0; left:0; right:0; bottom:0; background:#f5f5f7; z-index:9999; display:flex; align-items:center; justify-content:center; }
+body.dark-mode #lockScreen { background:#1c1c1e; }
+#lockScreen .lock-card { background:#fff; padding:32px; border-radius:16px; box-shadow:0 4px 24px rgba(0,0,0,0.1); text-align:center; max-width:340px; width:90%; }
+body.dark-mode #lockScreen .lock-card { background:#2c2c2e; }
+#lockScreen .lock-title { font-size:20px; font-weight:700; margin-bottom:20px; }
+#lockScreen input[type="password"] { width:100%; padding:12px; border:2px solid #e8e8ed; border-radius:10px; font-size:16px; outline:none; text-align:center; margin-bottom:12px; }
+#lockScreen input[type="password"]:focus { border-color:#007aff; }
+body.dark-mode #lockScreen input[type="password"] { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
+#lockScreen .lock-error { color:#ff3b30; font-size:13px; margin-bottom:8px; display:none; }
+#lockScreen button { width:100%; padding:12px; border-radius:10px; font-size:16px; font-weight:600; }
+
+/* Settings */
+#settingsContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
+#settingsContainer h2 { font-size:18px; font-weight:700; margin:0 0 16px; }
+#settingsContainer label { display:block; font-size:13px; font-weight:500; color:#555; margin-top:12px; margin-bottom:4px; }
+#settingsContainer input[type="text"], #settingsContainer input[type="password"] { width:100%; padding:10px; border:1px solid #e8e8ed; border-radius:8px; font-size:14px; outline:none; }
+#settingsContainer input:focus { border-color:#007aff; }
+body.dark-mode #settingsContainer { background:#2c2c2e; border-color:#48484a; }
+body.dark-mode #settingsContainer label { color:#aaa; }
+body.dark-mode #settingsContainer input { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
+.sync-indicator { font-size:12px; color:#8e8e93; margin-left:6px; }
+.sync-indicator.syncing { color:#ff9500; }
+.sync-indicator.done { color:#34c759; }
+.sync-indicator.error { color:#ff3b30; }
+@media (max-width:640px) {
+    body { padding:12px 10px; }
+    #noteList li { padding:12px; }
+    .note-title { font-size:14px; }
+    #editor { padding:14px; }
+    #editorToolbar { padding:8px; gap:4px; }
+    #editorToolbar button { padding:5px 10px; font-size:12px; }
+    #editor input#title { font-size:18px; }
+    #story { min-height:180px; font-size:14px; }
+    .viewer-body { padding:16px 12px; }
+    .viewer-body .viewer-title { font-size:18px; }
+    .viewer-body .viewer-content { font-size:15px; }
+    .viewer-header { padding:8px 10px; flex-wrap:wrap; }
+    .viewer-header .viewer-font-controls { margin-left:auto; margin-right:8px; }
+    #mainSearchBar { padding:10px 14px; font-size:14px; }
+    #actionMenu { min-width:180px; right:-10px; }
+    #actionMenu button, #actionMenu input, #actionMenu select { padding:8px 10px; font-size:12px; }
+    .header-section { margin-bottom:12px; }
+    #folderListContainer, #tagManagementContainer, #trashContainer, #settingsContainer { padding:14px; }
+    button { padding:7px 14px; font-size:12px; }
+    .content-lines { font-size:12px; }
+    .line-number { min-width:24px; }
+    .viewer-content .search-nav { flex-wrap:wrap; }
+    .viewer-content .search-nav button { padding:6px 12px; font-size:13px; min-height:36px; }
+    #folderTabs { gap: 6px; }
+    #folderTabs .folder-tab { padding: 4px 12px; font-size: 12px; }
+}
+@media (max-width:400px) {
+    body { padding:8px 6px; }
+    #noteList li { padding:10px; margin-bottom:6px; }
+    #editorToolbar { gap:3px; }
+    #editorToolbar button { padding:4px 8px; font-size:11px; }
+    .viewer-body .viewer-title { font-size:16px; }
+    .viewer-body .viewer-content { font-size:14px; }
+    .viewer-content .search-nav { padding:4px 8px; }
+    .viewer-content .search-nav button { padding:5px 10px; font-size:12px; min-height:32px; }
+    .search-stats { font-size:12px; padding:6px 10px; }
+    #folderTabs .folder-tab { padding: 3px 10px; font-size: 11px; }
+}
+
+
+/* Note viewer fullscreen */
+#noteViewer { position:fixed; top:0; left:0; right:0; bottom:0; background:#fff; z-index:5000; display:none; flex-direction:column; }
+body.dark-mode #noteViewer { background:#1c1c1e; }
+.viewer-header { display:flex; align-items:center; padding:12px 16px; border-bottom:1px solid #e8e8ed; flex-shrink:0; position:relative; }
+body.dark-mode .viewer-header { border-bottom-color:#48484a; }
+.viewer-header .viewer-menu-btn { background:none; border:none; font-size:22px; cursor:pointer; padding:4px 8px; border-radius:6px; margin:0; line-height:1; }
+.viewer-header .viewer-menu-btn:hover { background:#f0f0f5; }
+body.dark-mode .viewer-header .viewer-menu-btn:hover { background:#3a3a3c; }
+.viewer-header .viewer-menu { position:absolute; top:calc(100% + 4px); left:16px; background:#fff; border:1px solid #e8e8ed; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); padding:8px; z-index:5001; display:none; flex-direction:column; gap:4px; min-width:140px; }
+body.dark-mode .viewer-header .viewer-menu { background:#2c2c2e; border-color:#48484a; }
+.viewer-header .viewer-menu button { width:100%; padding:8px 14px; border:none; border-radius:6px; font-size:13px; cursor:pointer; text-align:left; background:none; margin:0; }
+.viewer-header .viewer-menu button:hover { background:#f0f0f5; }
+body.dark-mode .viewer-header .viewer-menu button:hover { background:#3a3a3c; }
+.viewer-header .viewer-font-controls { display:flex; align-items:center; gap:4px; margin-left:auto; margin-right:12px; }
+.viewer-header .viewer-font-controls button { padding:4px 10px; border:1px solid #e8e8ed; border-radius:6px; background:#fff; cursor:pointer; font-size:15px; font-weight:600; margin:0; line-height:1.4; }
+body.dark-mode .viewer-header .viewer-font-controls button { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.viewer-header .viewer-font-controls .font-size-label { font-size:13px; min-width:28px; text-align:center; color:#8e8e93; }
+.viewer-header .viewer-close-btn { background:none; border:none; font-size:24px; cursor:pointer; padding:4px 8px; border-radius:6px; margin:0; line-height:1; color:#8e8e93; }
+.viewer-header .viewer-close-btn:hover { background:#f0f0f5; color:#1d1d1f; }
+body.dark-mode .viewer-header .viewer-close-btn:hover { background:#3a3a3c; color:#f5f5f7; }
+.viewer-body { flex:1; overflow-y:auto; padding:24px 20px; }
+body.dark-mode .viewer-body .viewer-content .search-nav { background:rgba(44,44,46,0.95); border-color:#48484a; }
+.viewer-body .viewer-title { font-size:24px; font-weight:700; margin:0 0 16px; line-height:1.3; }
+.viewer-body .viewer-content { font-size:16px; line-height:1.8; max-width:680px; }
+.viewer-body .viewer-content .content-lines { font-family:inherit; font-size:inherit; line-height:inherit; }
+.viewer-body .viewer-content .content-line { padding:0; }
+.viewer-body .viewer-content .content-line > span:last-child,
+.viewer-body .viewer-content .content-line > span:not(.line-number) {
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+.viewer-body .viewer-content .highlight { background:#fff176; padding:1px 3px; border-radius:3px; scroll-margin-top:80px; }
+body.dark-mode .viewer-body .viewer-content .highlight { background:#b8860b; color:#fff; }
+.viewer-content .search-nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:6px; margin-bottom:8px; background:rgba(255,255,255,0.95); padding:6px 10px; border-radius:8px; border:1px solid #e8e8ed; backdrop-filter:blur(4px); }
+body.dark-mode .viewer-content .search-nav { background:rgba(44,44,46,0.95); border-color:#48484a; }
+.viewer-content .search-nav button { padding:4px 10px; border:1px solid #d1d1d6; border-radius:6px; background:#f8f8fa; cursor:pointer; font-size:12px; margin:0; }
+body.dark-mode .viewer-content .search-nav button { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.viewer-content .search-nav .search-count { font-size:12px; color:#8e8e93; min-width:60px; text-align:center; }
+.viewer-footer { padding:12px 20px; border-top:1px solid #e8e8ed; display:flex; justify-content:space-between; font-size:12px; color:#8e8e93; flex-shrink:0; }
+body.dark-mode .viewer-footer { border-top-color:#48484a; }
+
+/* 锚点搜索结果区域 */
+#anchorSearchResults {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e8e8ed;
+    max-height: 40vh;
+    overflow-y: auto;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 6000;
+}
+body.dark-mode #anchorSearchResults {
+    background: #2c2c2e;
+    border-top-color: #48484a;
+}
+#anchorSearchResults h3 {
+    padding: 12px 16px;
+    margin: 0;
+    background: #f5f5f7;
+    border-bottom: 1px solid #e8e8ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+body.dark-mode #anchorSearchResults h3 {
+    background: #3a3a3c;
+    border-bottom-color: #48484a;
+    color: #f5f5f7;
+}
+#anchorSearchResults h3 button {
+    background: #8e8e93;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+#anchorSearchResults h3 button:hover {
+    background: #6c757d;
+}
+#anchorSearchResults ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#anchorSearchResults li {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+body.dark-mode #anchorSearchResults li {
+    border-bottom-color: #48484a;
+    color: #f5f5f7;
+}
+#anchorSearchResults li:hover {
+    background: #f0f0f5;
+}
+body.dark-mode #anchorSearchResults li:hover {
+    background: #3a3a3c;
+}
+#anchorSearchResults .note-title {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+#anchorSearchResults .note-preview {
+    font-size: 12px;
+    color: #8e8e93;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =====新增锚点样式===== */
+.note-anchor-marker.linked { color:#007aff; opacity:1; font-size:14px; font-weight:600; }
+body.dark-mode .note-anchor-marker.linked { color:#5e9eff; }
+.note-anchor-marker .anchor-jump-info { font-size:11px; font-weight:400; color:#007aff; margin-left:2px; opacity:0.8; }
+body.dark-mode .note-anchor-marker .anchor-jump-info { color:#5e9eff; }
+.note-anchor-link.linked { color:#007aff; border-bottom-color:#007aff; font-size:14px; font-weight:600; }
+body.dark-mode .note-anchor-link.linked { color:#5e9eff; border-bottom-color:#5e9eff; }
+.note-anchor-link .anchor-jump-info { font-size:11px; font-weight:400; color:#007aff; margin-left:2px; opacity:0.8; }
+body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
+</style>
+</head>
+<body>
+
+<div class="header-section">
+    <h1>简洁笔记本</h1>
+    <button id="darkModeToggle">🌙</button>
+    <div style="position: relative;">
+        <button id="menuToggleButton"></button>
+        <div id="actionMenu" style="display: none;">
+            <button id="homeBtn">首页</button>
+            <button id="newBtn">新建笔记</button>
+            <button id="showAllNotesBtn">全部笔记</button>
+            <button id="showTrashBtn" style="background:#ff3b30;color:white;">回收站</button>
+            <button id="showTagsBtn" style="background:#5e5ce6;color:white;">标签管理</button>
+            <button id="exportDataBtn">导出数据(JSON)</button>
+            <button id="importDataBtn">导入数据(JSON)</button>
+            <button id="showSettingsBtn">⚙️ 设置</button>
+        </div>
+    </div>
+</div>
+
+<input type="text" id="mainSearchBar" placeholder="搜索笔记..." style="display: block;">
+
+<!-- 文件夹标签栏 -->
+<div id="folderTabs" style="display: none;"></div>
+
+<ul id="noteList" style="display: none;"></ul>
+
+<div id="pagination">
+    <button id="prevPageBtn">上一页</button>
+    <span class="page-info" id="pageInfo"></span>
+    <button id="nextPageBtn">下一页</button>
+</div>
+
+<div id="editor" style="display: none;">
+  <p><input id="title" placeholder="标题"></p>
+  <div id="editorToolbar">
+    <button id="fmtUndo" title="撤销">↩</button>
+    <button id="fmtRedo" title="重做">↪</button>
+    <button id="fmtBold" title="加粗"><b>B</b></button>
+    <select id="fmtSize">
+      <option value="">大小</option>
+      <option value="3">小</option>
+      <option value="5">中</option>
+      <option value="6">大</option>
+      <option value="7">超大</option>
+    </select>
+    <button id="fmtColorBtn">文字色</button>
+    <button id="fmtBgColorBtn">背景色</button>
+    <!-- ★ 标题下拉菜单已删除 -->
+    <button id="fmtLink" title="插入链接">🔗 链接</button>
+    <button id="fmtAnchor" title="插入锚点">⚓ 锚点</button>
+    <button id="fmtAnchorLink" title="插入跳转到锚点的链接">↗ 跳转</button>
+    <button id="fmtBullet" title="项目符号">• 列表</button>
+    <button id="fmtNumber" title="编号列表">1. 列表</button>
+    <button id="fmtTagBtn" title="标签" style="background:#5e5ce6;color:white;"># 标签</button>
+    <span class="auto-save-indicator" id="autoSaveIndicator">已保存</span>
+  </div>
+  <div id="story" contenteditable="true"></div>
+  <div id="editorFolderRow">
+    <label for="noteFolderSelect">选择文件夹:</label>
+    <select id="noteFolderSelect"><option value="unfiled">无文件夹</option></select>
+    <button id="editorNewFolderBtn">➕ 新建文件夹</button>
+  </div>
+  <div style="display: flex; gap: 8px; margin-top: 12px;">
+    <button id="publishBtn">发布</button>
+    <button id="cancelBtn">取消</button>
+  </div>
+</div>
+
+<div id="colorPickerPopup" class="color-picker-popup" style="display:none;">
+  <div class="picker-title" id="colorPickerTitle">选择颜色</div>
+  <div class="picker-hue-bar" id="colorPickerHueBar"><div class="hue-indicator" id="hueIndicator" style="left:0;"></div></div>
+  <div class="picker-swatches" id="colorPickerSwatches"></div>
+  <button class="picker-none-btn" id="colorPickerNoneBtn">不填充</button>
+</div>
+
+<div id="tagPickerPopup" class="tag-picker-popup" style="display:none;">
+  <div class="picker-title">选择标签</div>
+  <div id="tagPickerList"></div>
+  <div class="tag-new-row">
+    <input type="text" id="tagPickerNewInput" placeholder="新建标签...">
+    <button id="tagPickerNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">添加</button>
+  </div>
+</div>
+
+<div id="anchorPickerPopup" class="tag-picker-popup" style="display:none;">
+  <div class="picker-title">选择要跳转到的锚点</div>
+  <div id="anchorPickerList"></div>
+  <div class="tag-new-row">
+    <input type="text" id="anchorPickerSearch" placeholder="搜索笔记或锚点...">
+  </div>
+</div>
+
+<!-- 已不再弹出锚点信息，保留结构但隐藏 -->
+<div id="anchorInfoPopup" class="tag-picker-popup" style="display:none;">
+  <div class="picker-title" id="anchorInfoTitle">锚点信息</div>
+  <div id="anchorInfoList"></div>
+</div>
+
+<!-- 版本历史弹窗 -->
+<div id="versionHistoryPopup" class="tag-picker-popup" style="display:none; max-height: 70vh; overflow-y: auto; min-width: 320px;">
+  <div class="picker-title">📋 版本历史（最近30天）</div>
+  <div style="font-size:12px; color:#8e8e93; margin-bottom:10px;">点击日期可恢复该版本（会自动备份当前版本）</div>
+  <div id="versionHistoryList" style="margin-bottom:8px;"></div>
+  <div style="display:flex; gap:6px;">
+    <button id="versionHistoryCloseBtn" style="flex:1; background:#8e8e93; color:white;">关闭</button>
+    <button id="versionHistoryBackupBtn" style="flex:1; background:#007aff; color:white;">📥 导出当前数据</button>
+  </div>
+</div>
+
+<div id="folderListContainer" style="display: none;">
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">文件夹管理</h2>
+    <ul id="folderManagementList"></ul>
+    <button id="backToNotesBtn">返回笔记列表</button>
+</div>
+
+<div id="trashContainer">
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">回收站</h2>
+    <ul id="trashList"></ul>
+    <button class="empty-trash-btn" id="emptyTrashBtn">清空回收站</button>
+    <button id="backFromTrashBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+</div>
+
+<div id="tagManagementContainer">
+    <h2 style="font-size:18px;font-weight:700;margin-top:0;">标签管理</h2>
+    <div class="tag-new-row" style="margin-bottom:12px;">
+      <input type="text" id="tagMgmtNewInput" placeholder="新建标签...">
+      <span class="new-tag-colors" id="tagMgmtNewColors"></span>
+      <button id="tagMgmtNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">新建</button>
+    </div>
+    <ul id="tagManagementList"></ul>
+    <div id="anchorMgmtSection">
+      <h3 style="font-size:15px;font-weight:600;margin:0 0 4px;">锚点列表</h3>
+      <ul id="anchorMgmtList"></ul>
+    </div>
+    <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+</div>
+
+<div id="noteViewer">
+  <div class="viewer-header">
+    <button class="viewer-menu-btn" id="viewerMenuBtn">☰</button>
+    <div class="viewer-menu" id="viewerMenu">
+      <button id="viewerEditBtn">✏️ 编辑</button>
+      <button id="viewerExportTxtBtn">📄 导出TXT</button>
+      <button id="viewerExportMdBtn">📝 导出MD</button>
+      <button id="viewerHistoryBtn">⏱️ 版本历史</button>
+      <button id="viewerDeleteBtn">🗑️ 删除</button>
+    </div>
+    <div class="viewer-font-controls">
+      <button id="viewerFontDec">A−</button>
+      <span class="font-size-label" id="viewerFontLabel">16</span>
+      <button id="viewerFontInc">A+</button>
+    </div>
+    <button class="viewer-close-btn" id="viewerCloseBtn">✕</button>
+  </div>
+  <div class="viewer-body">
+    <div class="viewer-title" id="viewerTitle"></div>
+    <div class="viewer-content" id="viewerContent"></div>
+  </div>
+  <div class="viewer-footer">
+    <span id="viewerWordCount"></span>
+    <span id="viewerTimestamp"></span>
+  </div>
+</div>
+
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-title">🔒 笔记已锁定</div>
+    <input type="password" id="lockPasswordInput" placeholder="请输入密码" autocomplete="off">
+    <div class="lock-error" id="lockError">密码错误，请重试</div>
+    <button id="lockUnlockBtn" style="background:#007aff;color:white;">解锁</button>
+  </div>
+</div>
+
+<div id="settingsContainer">
+  <h2>⚙️ 设置</h2>
+  <label>密码保护</label>
+  <input type="password" id="settingsPassword" placeholder="留空则不设密码">
+  <label>确认密码</label>
+  <input type="password" id="settingsPasswordConfirm" placeholder="再次输入密码">
+  <button id="settingsSavePasswordBtn" style="background:#ff9500;color:white;margin-bottom:16px;">保存密码</button>
+  <hr style="border:none;border-top:1px solid #e8e8ed;margin:16px 0;">
+  <label>GitHub Token</label>
+  <input type="text" id="settingsGitToken" placeholder="ghp_...">
+  <label>仓库 (owner/repo)</label>
+  <input type="text" id="settingsGitRepo" value="m1978xz/m1978xz.github.io">
+  <label>文件路径</label>
+  <input type="text" id="settingsGitPath" value="biji/notebook-data.json">
+  <button id="settingsSaveGitBtn" style="background:#007aff;color:white;margin-top:8px;">保存设置</button>
+  <span class="sync-indicator" id="syncIndicator"></span>
+</div>
+
+<input type="file" id="importFileInput" accept=".json" style="display:none;">
+
+<!-- 锚点搜索结果区域 -->
+<div id="anchorSearchResults">
+    <h3>
+        <span id="anchorSearchTitle">包含锚点的笔记</span>
+        <button onclick="closeAnchorSearchResults()">关闭</button>
+    </h3>
+    <ul id="anchorSearchResultsList"></ul>
+</div>
+
+<script>
+function generateUniqueId() {
+    return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function formatTimestamp(timestamp) {
+    var date = new Date(timestamp);
+    var year = date.getFullYear();
+    var month = (date.getMonth() + 1).toString().padStart(2, '0');
+    var day = date.getDate().toString().padStart(2, '0');
+    var hours = date.getHours().toString().padStart(2, '0');
+    var minutes = date.getMinutes().toString().padStart(2, '0');
+    return year + '年' + month + '月' + day + '日' + hours + '时' + minutes + '分';
+}
+
+var notes = [];
+var folders = [];
+var trash = [];
+var tags = [];
+// 快照队列
+var snapshots = {};
+var SNAPSHOT_MAX_DAYS = 30;
+var lastContentHash = '';
+
+// 当前选中的文件夹ID（用于标签过滤），null表示"全部"
+var currentFolderFilter = null;
+
+function repairGarbled(str) {
+    var prev = null, cur = str;
+    while (cur !== prev) {
+        prev = cur;
+        try { cur = decodeURIComponent(escape(cur)); } catch(e) { break; }
+    }
+    return cur;
+}
+function repairAllStrings(arr) {
+    for (var i = 0; i < arr.length; i++) {
+        var item = arr[i];
+        if (typeof item === 'object' && item !== null) {
+            for (var key in item) {
+                if (typeof item[key] === 'string') {
+                    item[key] = repairGarbled(item[key]);
+                }
+            }
+        }
+    }
+}
+
+function saveData() {
+    localStorage.setItem('simpleNotesAppData_notes', JSON.stringify(notes));
+    localStorage.setItem('simpleNotesAppData_folders', JSON.stringify(folders));
+    localStorage.setItem('simpleNotesAppData_trash', JSON.stringify(trash));
+    localStorage.setItem('simpleNotesAppData_tags', JSON.stringify(tags));
+
+    var currentData = { notes: notes, folders: folders, trash: trash, tags: tags };
+    var currentHash = JSON.stringify(currentData);
+    if (currentHash !== lastContentHash) {
+        var now = new Date();
+        var dateKey = now.getFullYear() + '-' +
+                      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(now.getDate()).padStart(2, '0') +
+                      ' ' + String(now.getHours()).padStart(2, '0') + ':' +
+                      String(now.getMinutes()).padStart(2, '0');
+        var dayKey = now.getFullYear() + '-' +
+                     String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                     String(now.getDate()).padStart(2, '0');
+        
+        snapshots[dayKey] = {
+            timestamp: now.getTime(),
+            label: dateKey,
+            data: JSON.parse(currentHash)
+        };
+
+        var keys = Object.keys(snapshots).sort();
+        if (keys.length > SNAPSHOT_MAX_DAYS) {
+            var toDelete = keys.slice(0, keys.length - SNAPSHOT_MAX_DAYS);
+            toDelete.forEach(function(k) { delete snapshots[k]; });
+        }
+
+        localStorage.setItem('simpleNotesAppData_snapshots', JSON.stringify(snapshots));
+        lastContentHash = currentHash;
+    }
+}
+
+function loadData() {
+    var savedNotes = localStorage.getItem('simpleNotesAppData_notes');
+    var savedFolders = localStorage.getItem('simpleNotesAppData_folders');
+    var savedTrash = localStorage.getItem('simpleNotesAppData_trash');
+    var savedTags = localStorage.getItem('simpleNotesAppData_tags');
+
+    var savedSnapshots = localStorage.getItem('simpleNotesAppData_snapshots');
+    if (savedSnapshots) {
+        snapshots = JSON.parse(savedSnapshots);
+        lastContentHash = JSON.stringify({ notes: notes, folders: folders, trash: trash, tags: tags });
+    }
+
+    if (savedNotes && savedFolders) {
+        notes = JSON.parse(savedNotes);
+        folders = JSON.parse(savedFolders);
+        trash = savedTrash ? JSON.parse(savedTrash) : [];
+        tags = savedTags ? JSON.parse(savedTags) : [];
+        repairAllStrings(notes);
+        repairAllStrings(folders);
+        repairAllStrings(trash);
+        repairAllStrings(tags);
+        if (!folders.some(function(f) { return f.id === 'unfiled'; })) {
+            folders.unshift({ id: 'unfiled', name: '无文件夹' });
+        }
+        notes.forEach(function(n) {
+            if (!n.lastModified) { n.lastModified = Date.now(); }
+            if (!n.tags) { n.tags = []; }
+        });
+        return true;
+    }
+    return false;
+}
+
+if (!loadData()) {
+    folders = [{ id: 'unfiled', name: '无文件夹' }];
+    notes = [];
+    trash = [];
+    tags = [];
+    saveData();
+}
+
+var editing = null;
+var currentOpenNoteContentDiv = null;
+var currentViewingFolderId = null;
+var currentPage = 1;
+var currentSearchTerm = '';
+var PAGE_SIZE = 50;
+
+var menuToggleButton = document.querySelector("#menuToggleButton");
+var actionMenu = document.querySelector("#actionMenu");
+var homeBtn = document.querySelector("#homeBtn");
+var newBtn = document.querySelector("#actionMenu #newBtn");
+var mainSearchBar = document.querySelector("#mainSearchBar");
+var noteList = document.querySelector("#noteList");
+var noteFolderSelect = document.querySelector("#noteFolderSelect");
+var editor = document.querySelector("#editor");
+var titleInput = document.querySelector("#title");
+var storyDiv = document.querySelector("#story");
+var publishBtn = document.querySelector("#publishBtn");
+var cancelBtn = document.querySelector("#cancelBtn");
+var folderListContainer = document.querySelector("#folderListContainer");
+var folderManagementList = document.querySelector("#folderManagementList");
+var importFileInput = document.querySelector("#importFileInput");
+var paginationDiv = document.querySelector("#pagination");
+var prevPageBtn = document.querySelector("#prevPageBtn");
+var nextPageBtn = document.querySelector("#nextPageBtn");
+var pageInfoSpan = document.querySelector("#pageInfo");
+var folderTabs = document.querySelector("#folderTabs");
+
+function stripHtml(html) {
+    return html.replace(/<[^>]+>/g, '');
+}
+
+function cleanContent(content) {
+    var text = content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+    if (!/<[^>]+>/.test(content)) { text = content.replace(/\\n/g, '\n'); }
+    return text.trimEnd();
+}
+
+function escapeRegex(str) {
+    return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function highlightText(text, searchTerm) {
+    if (!searchTerm) { return text; }
+    var regex = new RegExp(escapeRegex(searchTerm), 'gi');
+    return text.replace(regex, function(match) { return '<span class="highlight">' + match + '</span>'; });
+}
+
+function highlightTextInHtml(html, searchTerm) {
+    if (!searchTerm) return html;
+    var regex = new RegExp(escapeRegex(searchTerm), 'gi');
+    var result = '', inTag = false, buf = '';
+    for (var i = 0; i < html.length; i++) {
+        var ch = html[i];
+        if (ch === '<') { inTag = true; if (buf) { result += buf.replace(regex, function(m) { return '<span class="highlight">' + m + '</span>'; }); buf = ''; } result += ch; }
+        else if (ch === '>') { inTag = false; result += ch; }
+        else if (inTag) { result += ch; }
+        else { buf += ch; }
+    }
+    if (buf) result += buf.replace(regex, function(m) { return '<span class="highlight">' + m + '</span>'; });
+    return result;
+}
+
+function addLinkTarget(html) {
+    return html.replace(/<a\s+([^>]*?)>/gi, function(m, attrs) {
+        if (/data-note-anchor/i.test(attrs) || /target\s*=/i.test(attrs)) return m;
+        return '<a target="_blank" rel="noopener" ' + attrs + '>';
+    });
+}
+
+function normalizeContentForDisplay(html) {
+    var s = html;
+    var anchors = [], alinks = [];
+    s = s.replace(/<span[^>]*data-anchor-id=["'][^"']*["'][^>]*>.*?<\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
+    s = s.replace(/<a[^>]*data-note-anchor=["'][^"']*["'][^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
+    s = s.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, function(m, inner) {
+        var items = [];
+        inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(lm, lc) { items.push(lc.trim()); return lm; });
+        return items.map(function(t, i) { return '  ' + (i + 1) + '. ' + t; }).join('\n') + '\n';
+    });
+    s = s.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, function(m, inner) {
+        var items = [];
+        inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(lm, lc) { items.push(lc.trim()); return lm; });
+        return items.map(function(t) { return '  \u2022 ' + t; }).join('\n') + '\n';
+    });
+    s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
+    s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
+    s = s.replace(/<\/p>/gi, '\n');
+    s = s.replace(/<\/div>/gi, '\n');
+    s = s.replace(/<\/h[1-6]>/gi, '\n');
+    s = s.replace(/<p[^>]*>/gi, '');
+    s = s.replace(/<div[^>]*>/gi, '');
+    s = s.replace(/<h[1-6][^>]*>/gi, '');
+    s = s.replace(/<br\s*\/?>/gi, '\n');
+    s = s.replace(/\\n/g, '\n');
+    anchors.forEach(function(a, i) { s = s.replace('%%AM' + i + '%%', a); });
+    alinks.forEach(function(a, i) { s = s.replace('%%AL' + i + '%%', a); });
+    return s;
+}
+
+function renderContentWithLines(content, searchTerm) {
+    content = addLinkTarget(content);
+    var hasSearch = searchTerm && searchTerm.length > 0;
+    var normalized = normalizeContentForDisplay(content);
+    var html = '';
+
+    if (hasSearch) {
+        var plainText = normalized.replace(/<[^>]+>/g, '');
+        var textLines = plainText.split('\n');
+        var totalCount = 0, matchLines = [];
+        textLines.forEach(function(line, idx) {
+            var regex = new RegExp(escapeRegex(searchTerm), 'gi');
+            var count = 0;
+            while (regex.exec(line) !== null) { count++; }
+            if (count > 0) { totalCount += count; matchLines.push(idx + 1); }
+        });
+        if (totalCount > 0) {
+            html += '<div class="search-stats">🔍 找到 <strong>' + totalCount + '</strong> 处匹配，位于第 <strong>' + matchLines.join('、') + '</strong> 行</div>';
+        }
+        var displayHtml = highlightTextInHtml(normalized, searchTerm);
+        var lines = displayHtml.split('\n');
+        html += '<div class="content-lines">';
+        lines.forEach(function(line, idx) {
+            html += '<div class="content-line"><span class="line-number">' + (idx + 1) + '</span><span>' + (line || '&nbsp;') + '</span></div>';
+        });
+        html += '</div>';
+    } else {
+        var lines = normalized.split('\n');
+        html += '<div class="content-lines">';
+        lines.forEach(function(line) {
+            html += '<div class="content-line"><span>' + (line || '&nbsp;') + '</span></div>';
+        });
+        html += '</div>';
+    }
+    return html;
+}
+
+/** 渲染文件夹标签栏 */
+function renderFolderTabs() {
+    folderTabs.innerHTML = '';
+    // 全部标签
+    var allTab = document.createElement('button');
+    allTab.className = 'folder-tab' + (currentFolderFilter === null ? ' active' : '');
+    allTab.textContent = '全部 (' + notes.length + ')';
+    allTab.onclick = function() {
+        currentFolderFilter = null;
+        currentViewingFolderId = null;
+        currentPage = 1;
+        renderFolderTabs();
+        renderList(notes, mainSearchBar.value.toLowerCase());
+    };
+    folderTabs.appendChild(allTab);
+
+    // 每个文件夹一个标签
+    folders.forEach(function(f) {
+        var count = notes.filter(function(n) { return n.folderId === f.id; }).length;
+        var tab = document.createElement('button');
+        tab.className = 'folder-tab' + (currentFolderFilter === f.id ? ' active' : '');
+        tab.textContent = f.name + ' (' + count + ')';
+        tab.onclick = function() {
+            currentFolderFilter = f.id;
+            currentViewingFolderId = f.id;
+            currentPage = 1;
+            renderFolderTabs();
+            renderList(notes, mainSearchBar.value.toLowerCase());
+        };
+        folderTabs.appendChild(tab);
+    });
+    folderTabs.style.display = 'flex';
+}
+
+function renderFoldersDropdowns() {
+    noteFolderSelect.innerHTML = '';
+    folders.forEach(function(f) {
+        var option = document.createElement("option");
+        option.value = f.id;
+        option.textContent = f.name;
+        noteFolderSelect.appendChild(option);
+    });
+    noteFolderSelect.value = 'unfiled';
+}
+
+function renderList(filteredNotes, searchTerm) {
+    if (typeof filteredNotes === 'undefined') filteredNotes = notes;
+    if (typeof searchTerm === 'undefined') searchTerm = '';
+    currentSearchTerm = searchTerm;
+    noteList.innerHTML = "";
+    var notesToDisplay = filteredNotes;
+    // 按文件夹过滤
+    if (currentFolderFilter !== null) {
+        notesToDisplay = filteredNotes.filter(function(n) { return n.folderId === currentFolderFilter; });
+    }
+    var totalPages = Math.max(1, Math.ceil(notesToDisplay.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    var startIdx = (currentPage - 1) * PAGE_SIZE;
+    var pageNotes = notesToDisplay.slice(startIdx, startIdx + PAGE_SIZE);
+    if (notesToDisplay.length > 0 || searchTerm) {
+        noteList.style.display = 'block';
+    } else {
+        noteList.style.display = 'none';
+    }
+    if (notesToDisplay.length > PAGE_SIZE) {
+        paginationDiv.style.display = 'block';
+        pageInfoSpan.textContent = '第 ' + currentPage + '/' + totalPages + ' 页（共 ' + notesToDisplay.length + ' 条）';
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+    } else {
+        paginationDiv.style.display = 'none';
+    }
+    pageNotes.forEach(function(n) {
+        var li = document.createElement("li");
+        li.dataset.id = n.id;
+        li.draggable = true;
+        var titleDiv = document.createElement("div");
+        titleDiv.classList.add("note-title");
+        var titleSpan = document.createElement("span");
+        titleSpan.classList.add("title-text");
+        titleSpan.textContent = n.title;
+        titleDiv.appendChild(titleSpan);
+        var metaSpan = document.createElement("span");
+        metaSpan.classList.add("title-meta");
+        var timeSpan = document.createElement("span");
+        timeSpan.classList.add("title-timestamp");
+        timeSpan.textContent = formatTimestamp(n.lastModified);
+        metaSpan.appendChild(timeSpan);
+        titleDiv.appendChild(metaSpan);
+        if (n.tags && n.tags.length > 0) {
+            var tagsDiv = document.createElement('div');
+            tagsDiv.className = 'note-card-tags';
+            n.tags.forEach(function(tid) {
+                var t = tags.find(function(tt) { return tt.id === tid; });
+                if (t) {
+                    var badge = document.createElement('span');
+                    badge.className = 'tag-badge';
+                    badge.textContent = t.name;
+                    if (t.color) { badge.style.background = t.color; badge.style.color = '#fff'; }
+                    tagsDiv.appendChild(badge);
+                }
+            });
+            titleDiv.appendChild(tagsDiv);
+        }
+        var cardFooter = document.createElement('div');
+        cardFooter.className = 'note-card-footer';
+        var cardFolder = document.createElement('span');
+        cardFolder.className = 'card-folder';
+        var f = folders.find(function(fold) { return fold.id === n.folderId; });
+        cardFolder.textContent = f ? '📁 ' + f.name : '';
+        cardFooter.appendChild(cardFolder);
+        var cardActions = document.createElement('div');
+        cardActions.className = 'action-buttons';
+        cardActions.style.margin = '0';
+        var exportTxtBtn = document.createElement("button");
+        exportTxtBtn.textContent = "TXT";
+        exportTxtBtn.classList.add("export-btn");
+        exportTxtBtn.style.padding = '3px 10px';
+        exportTxtBtn.onclick = function(event) { event.stopPropagation(); exportNoteToTxt(n.id); };
+        cardActions.appendChild(exportTxtBtn);
+        var exportMdBtn = document.createElement("button");
+        exportMdBtn.textContent = "MD";
+        exportMdBtn.classList.add("export-btn");
+        exportMdBtn.style.padding = '3px 10px';
+        exportMdBtn.style.backgroundColor = "#6f42c1";
+        exportMdBtn.onclick = function(event) { event.stopPropagation(); exportNoteToMd(n.id); };
+        cardActions.appendChild(exportMdBtn);
+        var editBtn = document.createElement("button");
+        editBtn.textContent = "编辑";
+        editBtn.classList.add("edit-btn");
+        editBtn.style.padding = '3px 10px';
+        editBtn.onclick = function(event) {
+            event.stopPropagation();
+            editNote(n.id);
+            actionMenu.style.display = 'none';
+            folderListContainer.style.display = 'none';
+            mainSearchBar.style.display = 'none';
+            folderTabs.style.display = 'none';
+            noteList.style.display = 'none';
+        };
+        cardActions.appendChild(editBtn);
+        var deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "删除";
+        deleteBtn.classList.add("delete-btn");
+        deleteBtn.style.padding = '3px 10px';
+        deleteBtn.onclick = function(event) {
+            event.stopPropagation();
+            deleteNote(n.id);
+            actionMenu.style.display = 'none';
+            folderListContainer.style.display = 'none';
+        };
+        cardActions.appendChild(deleteBtn);
+        cardFooter.appendChild(cardActions);
+        li.appendChild(titleDiv);
+        var wcDiv = document.createElement("div");
+        wcDiv.className = 'note-wordcount';
+        wcDiv.style.marginTop = '2px';
+        var text = normalizeContentForDisplay(n.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var charCount = text.length;
+        var lineCount = text ? (text.split('\n').length) : 0;
+        wcDiv.textContent = '📝 ' + charCount + ' 字 · ' + lineCount + ' 行';
+        li.appendChild(wcDiv);
+        li.appendChild(cardFooter);
+        titleDiv.onclick = function(event) { event.stopPropagation(); openNoteViewer(n.id, searchTerm); };
+        noteList.appendChild(li);
+    });
+}
+
+function goToPage(page) {
+    currentPage = page;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+}
+
+prevPageBtn.onclick = function() { if (currentPage > 1) goToPage(currentPage - 1); };
+nextPageBtn.onclick = function() {
+    var totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
+    if (currentPage < totalPages) goToPage(currentPage + 1);
+};
+
+document.querySelector("#fmtBold").onclick = function() { storyDiv.focus(); if (savedRange) { var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); savedRange = null; } document.execCommand('bold'); };
+document.querySelector("#fmtSize").onmousedown = function() { saveSelection(); };
+document.querySelector("#fmtSize").ontouchstart = function() { saveSelection(); };
+document.querySelector("#fmtSize").onchange = function() {
+    if (this.value) {
+        storyDiv.focus();
+        if (savedRange) { var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); savedRange = null; }
+        document.execCommand('fontSize', false, this.value);
+    }
+    this.value = '';
+};
+var colorPickerMode = 'foreColor';
+var savedRange = null;
+var SWATCH_COLORS = ['#ff0000','#ff9500','#ffeb3b','#34c759','#007aff','#af52de','#ff2d55','#8e8e93','#000000','#ffffff','#00c7be','#a2845e','#ff6900','#7b68ee','#00bcd4','#f44336'];
+
+function applyColor(color) {
+    storyDiv.focus();
+    if (savedRange) {
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+        savedRange = null;
+    }
+    document.execCommand(colorPickerMode, false, color);
+    document.querySelector("#colorPickerPopup").style.display = 'none';
+}
+
+function saveSelection() {
+    var sel = window.getSelection();
+    if (sel.rangeCount > 0 && storyDiv.contains(sel.anchorNode)) {
+        savedRange = sel.getRangeAt(0).cloneRange();
+    }
+}
+
+function initColorPickerSwatches() {
+    var container = document.querySelector("#colorPickerSwatches");
+    container.innerHTML = '';
+    SWATCH_COLORS.forEach(function(c) {
+        var el = document.createElement('span');
+        el.className = 'swatch';
+        el.style.background = c;
+        el.dataset.color = c;
+        el.onclick = function() { applyColor(this.dataset.color); };
+        container.appendChild(el);
+    });
+}
+initColorPickerSwatches();
+
+function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    var c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2, r, g, b;
+    if (h < 60) { r = c; g = x; b = 0; } else if (h < 120) { r = x; g = c; b = 0; } else if (h < 180) { r = 0; g = c; b = x; } else if (h < 240) { r = 0; g = x; b = c; } else if (h < 300) { r = x; g = 0; b = c; } else { r = c; g = 0; b = x; }
+    return '#' + [r, g, b].map(function(v) { return Math.round((v + m) * 255).toString(16).padStart(2, '0'); }).join('');
+}
+
+function hueFromX(hueBar, x) {
+    var rect = hueBar.getBoundingClientRect();
+    var pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    return Math.round(pct * 360);
+}
+
+function onHueBarMouseDown(e) {
+    var hueBar = document.querySelector("#colorPickerHueBar");
+    var indicator = document.querySelector("#hueIndicator");
+    var rect = hueBar.getBoundingClientRect();
+    var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    indicator.style.left = (pct * 100) + '%';
+    var hue = hueFromX(hueBar, e.clientX);
+    applyColor(hslToHex(hue, 100, 50));
+}
+
+document.querySelector("#colorPickerHueBar").onmousedown = function(e) {
+    onHueBarMouseDown(e);
+};
+
+document.querySelector("#colorPickerNoneBtn").onclick = function() {
+    if (colorPickerMode === 'backColor') {
+        applyColor('transparent');
+    } else {
+        applyColor('#000000');
+    }
+};
+
+function showColorPicker(mode, btn) {
+    colorPickerMode = mode;
+    document.querySelector("#colorPickerTitle").textContent = mode === 'backColor' ? '选择背景色' : '选择文字色';
+    var popup = document.querySelector("#colorPickerPopup");
+    var rect = btn.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+}
+
+document.querySelector("#fmtColorBtn").onmousedown = function() { saveSelection(); };
+document.querySelector("#fmtColorBtn").onclick = function() { document.querySelector("#tagPickerPopup").style.display = 'none'; showColorPicker('foreColor', this); };
+document.querySelector("#fmtBgColorBtn").onmousedown = function() { saveSelection(); };
+document.querySelector("#fmtBgColorBtn").onclick = function() { document.querySelector("#tagPickerPopup").style.display = 'none'; showColorPicker('backColor', this); };
+
+document.addEventListener("click", function(event) {
+    var popup = document.querySelector("#colorPickerPopup");
+    if (popup.style.display === 'block' && !popup.contains(event.target) && event.target.id !== 'fmtColorBtn' && event.target.id !== 'fmtBgColorBtn') {
+        popup.style.display = 'none';
+    }
+    var tPopup = document.querySelector("#tagPickerPopup");
+    if (tPopup.style.display === 'block' && !tPopup.contains(event.target) && event.target.id !== 'fmtTagBtn') {
+        tPopup.style.display = 'none';
+    }
+});
+
+document.querySelector("#fmtUndo").onclick = function() { storyDiv.focus(); document.execCommand('undo'); };
+document.querySelector("#fmtRedo").onclick = function() { storyDiv.focus(); document.execCommand('redo'); };
+document.querySelector("#fmtBullet").onclick = function() { storyDiv.focus(); document.execCommand('insertUnorderedList'); };
+document.querySelector("#fmtNumber").onclick = function() { storyDiv.focus(); document.execCommand('insertOrderedList'); };
+
+// ★ fmtHeading 相关代码已删除
+
+document.querySelector("#fmtLink").onclick = function() {
+    var sel = window.getSelection();
+    if (!sel.toString().trim()) { alert('请先选中要添加链接的文字。'); return; }
+    var url = prompt('输入链接地址（URL）：', 'https://');
+    if (url && url.trim()) {
+        storyDiv.focus();
+        document.execCommand('createLink', false, url.trim());
+        var links = storyDiv.querySelectorAll('a');
+        if (links.length) links[links.length - 1].setAttribute('target', '_blank');
+    }
+};
+
+document.querySelector("#fmtAnchor").onclick = function() {
+    var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
+    var existingNums = [];
+    var numRegex = /data-anchor-id=["']anc_m(\d+)["']/g;
+    var match;
+    while ((match = numRegex.exec(allContent)) !== null) { existingNums.push(parseInt(match[1], 10)); }
+    var nextNum = existingNums.length > 0 ? Math.max.apply(null, existingNums) + 1 : 1;
+    var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', 'm' + nextNum);
+    if (!name || !name.trim()) return;
+    var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
+    var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
+    var dupRegex = new RegExp('data-anchor-id=[\']' + id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '[\']', 'i');
+    if (dupRegex.test(allContent)) {
+        alert('锚点 "' + name.trim() + '" 已存在。'); return;
+    }
+    storyDiv.focus();
+    document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker">⚓' + name.trim() + '</span>');
+};
+
+document.querySelector("#fmtAnchorLink").onclick = function() {
+    var sel = window.getSelection();
+    var text = sel.toString().trim();
+    var savedRange = null;
+    if (sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
+    var popup = document.querySelector("#anchorPickerPopup");
+    var list = document.querySelector("#anchorPickerList");
+    var searchInput = document.querySelector("#anchorPickerSearch");
+    list.innerHTML = '';
+    searchInput.value = '';
+    var allAnchors = [];
+    notes.forEach(function(n) {
+        var regex = /data-anchor-id=["']([^"']*)["']/gi;
+        var m;
+        while ((m = regex.exec(n.content)) !== null) {
+            allAnchors.push({ noteId: n.id, noteTitle: n.title, anchorId: m[1] });
+        }
+    });
+    if (allAnchors.length === 0) {
+        list.innerHTML = '<div style="padding:10px;color:#8e8e93;font-size:13px;">暂无锚点，请先在笔记中插入锚点。</div>';
+    } else {
+        var lastNote = null;
+        allAnchors.forEach(function(a) {
+            if (lastNote !== a.noteId) {
+                var header = document.createElement('div');
+                header.className = 'picker-note-group';
+                header.textContent = a.noteTitle;
+                list.appendChild(header);
+                lastNote = a.noteId;
+            }
+            var item = document.createElement('div');
+            item.className = 'picker-anchor-item';
+            item.textContent = '⚓ ' + a.anchorId.replace('anc_', '');
+            item.dataset.noteId = a.noteId;
+            item.dataset.anchorId = a.anchorId;
+            item.onclick = function() {
+                var linkText = text || '跳转至' + a.anchorId.replace('anc_', '');
+                if (savedRange) {
+                    var s = window.getSelection();
+                    s.removeAllRanges();
+                    s.addRange(savedRange);
+                }
+                storyDiv.focus();
+                document.execCommand('insertHTML', false, '<a href="#" class="note-anchor-link" data-note-anchor="' + a.noteId + '::' + a.anchorId + '">' + linkText + '</a>');
+                popup.style.display = 'none';
+            };
+            list.appendChild(item);
+        });
+    }
+    var rect = this.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+    searchInput.focus();
+};
+
+document.querySelector("#anchorPickerSearch").oninput = function() {
+    var q = this.value.toLowerCase();
+    document.querySelectorAll("#anchorPickerList .picker-note-group, #anchorPickerList .picker-anchor-item").forEach(function(el) {
+        el.style.display = el.textContent.toLowerCase().indexOf(q) >= 0 ? '' : 'none';
+    });
+};
+
+document.addEventListener('click', function(e) {
+    var popup = document.querySelector("#anchorPickerPopup");
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && e.target.id !== 'fmtAnchorLink') {
+        popup.style.display = 'none';
+    }
+});
+
+var TAG_COLORS = ['#e8e8ed','#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#5e5ce6','#af52de','#ff2d55'];
+var tagSelectedColor = TAG_COLORS[0];
+
+function renderTagPicker() {
+    var list = document.querySelector("#tagPickerList");
+    list.innerHTML = '';
+    tags.forEach(function(t) {
+        var el = document.createElement('span');
+        el.className = 'tag-option';
+        el.textContent = t.name;
+        if (t.color) el.style.borderColor = t.color; else el.style.borderColor = '#d1d1d6';
+        if (editing) {
+            var note = notes.find(function(n) { return n.id === editing; });
+            if (note && note.tags && note.tags.indexOf(t.id) >= 0) {
+                el.classList.add('selected');
+                if (t.color) el.style.background = t.color;
+            }
+        }
+        el.onclick = function() {
+            if (!editing) { alert('请先保存笔记再添加标签。'); return; }
+            var idx = -1;
+            notes.forEach(function(n, i) { if (n.id === editing) idx = i; });
+            if (idx >= 0) {
+                if (!notes[idx].tags) notes[idx].tags = [];
+                var pos = notes[idx].tags.indexOf(t.id);
+                if (pos >= 0) {
+                    notes[idx].tags.splice(pos, 1);
+                } else {
+                    notes[idx].tags.push(t.id);
+                    var insertHtml = '<div><br></div><div># ' + t.name + '</div>';
+                    if (!storyDiv.innerHTML || storyDiv.innerHTML === '<br>') {
+                        storyDiv.innerHTML = insertHtml;
+                    } else {
+                        storyDiv.insertAdjacentHTML('beforeend', insertHtml);
+                    }
+                }
+                saveData();
+                renderTagPicker();
+            }
+        };
+        list.appendChild(el);
+    });
+}
+
+document.querySelector("#fmtTagBtn").onclick = function() {
+    tagSelectedColor = TAG_COLORS[0];
+    renderTagPicker();
+    var popup = document.querySelector("#tagPickerPopup");
+    var rect = this.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+};
+
+document.querySelector("#tagPickerNewBtn").onclick = function() {
+    var name = document.querySelector("#tagPickerNewInput").value.trim();
+    if (!name) return;
+    if (tags.some(function(t) { return t.name === name; })) { alert('标签已存在。'); return; }
+    tags.push({ id: generateUniqueId(), name: name, color: tagSelectedColor });
+    document.querySelector("#tagPickerNewInput").value = '';
+    saveData();
+    renderTagPicker();
+};
+
+document.querySelector("#tagPickerNewInput").onkeydown = function(e) {
+    if (e.key === 'Enter') document.querySelector("#tagPickerNewBtn").click();
+};
+
+function renderTagManagementList() {
+    var list = document.querySelector("#tagManagementList");
+    list.innerHTML = '';
+    if (tags.length === 0) {
+        var li = document.createElement('li'); li.textContent = '暂无标签。'; list.appendChild(li); return;
+    }
+    var groups = {};
+    tags.forEach(function(t) {
+        var c = t.color || '#e8e8ed';
+        if (!groups[c]) groups[c] = [];
+        groups[c].push(t);
+    });
+    var colorNames = { '#e8e8ed':'默认','#ff3b30':'红','#ff9500':'橙','#ffcc00':'黄','#34c759':'绿','#007aff':'蓝','#5e5ce6':'靛','#af52de':'紫','#ff2d55':'粉' };
+    Object.keys(groups).forEach(function(c) {
+        var groupHeader = document.createElement('div');
+        groupHeader.style.cssText = 'font-size:13px;font-weight:600;color:' + c + ';margin:12px 0 4px 0;padding-top:8px;border-top:1px solid #e8e8ed;';
+        groupHeader.textContent = colorNames[c] || c;
+        list.appendChild(groupHeader);
+        groups[c].forEach(function(t) {
+            var li = document.createElement('li');
+            var nameSpan = document.createElement('span');
+            nameSpan.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
+            var dot = document.createElement('span');
+            dot.style.cssText = 'display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (t.color || '#e8e8ed') + ';flex-shrink:0;';
+            nameSpan.appendChild(dot);
+            nameSpan.appendChild(document.createTextNode(t.name));
+            var colorChanger = document.createElement('select');
+            colorChanger.style.cssText = 'margin-left:8px;padding:2px 4px;border-radius:4px;font-size:11px;border:1px solid #d1d1d6;';
+            TAG_COLORS.forEach(function(c2) {
+                var opt = document.createElement('option');
+                opt.value = c2;
+                opt.textContent = colorNames[c2] || c2;
+                if (c2 === t.color) opt.selected = true;
+                colorChanger.appendChild(opt);
+            });
+            colorChanger.onchange = function() { t.color = colorChanger.value; saveData(); renderTagManagementList(); };
+            li.appendChild(nameSpan);
+            li.appendChild(colorChanger);
+            var delBtn = document.createElement('button');
+            delBtn.textContent = '删除';
+            delBtn.className = 'delete-btn';
+            delBtn.onclick = function() {
+                if (confirm('删除标签 "' + t.name + '"？所有笔记中该标签将被移除。')) {
+                    tags = tags.filter(function(x) { return x.id !== t.id; });
+                    notes.forEach(function(n) { if (n.tags) n.tags = n.tags.filter(function(tid) { return tid !== t.id; }); });
+                    saveData();
+                    renderTagManagementList();
+                }
+            };
+            li.appendChild(delBtn);
+            list.appendChild(li);
+        });
+    });
+}
+
+document.querySelector("#showTagsBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    folderTabs.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'block';
+    tagSelectedColor = TAG_COLORS[0];
+    renderTagMgmtNewColors();
+    renderTagManagementList();
+    renderAnchorMgmtList();
+};
+
+document.querySelector("#backFromTagsBtn").onclick = function() {
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    folderTabs.style.display = 'flex';
+    noteList.style.display = 'block';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+function renderTagMgmtNewColors() {
+    var row = document.querySelector("#tagMgmtNewColors");
+    row.innerHTML = '';
+    TAG_COLORS.forEach(function(c) {
+        var dot = document.createElement('span');
+        dot.className = 'tag-color-dot' + (c === tagSelectedColor ? ' active' : '');
+        dot.style.background = c;
+        dot.onclick = function() { tagSelectedColor = c; renderTagMgmtNewColors(); };
+        row.appendChild(dot);
+    });
+}
+
+function renderAnchorMgmtList() {
+    var list = document.querySelector("#anchorMgmtList");
+    if (!list) return;
+    list.innerHTML = '';
+    var found = {};
+    notes.forEach(function(n) {
+        var regex = /data-anchor-id=["']([^"']*)["']/g;
+        var m;
+        while ((m = regex.exec(n.content)) !== null) {
+            var anchorId = m[1];
+            var key = n.id + '::' + anchorId;
+            if (found[key]) continue;
+            found[key] = true;
+            var noteTitle = n.title || '(无标题)';
+            var backlinks = [];
+            notes.forEach(function(n2) {
+                if (n2.content && n2.content.indexOf(n.id + '::' + anchorId) >= 0) {
+                    backlinks.push(n2.title || '(无标题)');
+                }
+            });
+            var li = document.createElement('li');
+            var label = anchorId.replace('anc_', '');
+            var backStr = backlinks.length > 0 ? '<span style="color:#8e8e93;">被跳转:</span> ' + backlinks.join(', ') : '<span style="color:#c7c7cc;">无跳转</span>';
+            li.innerHTML = '<span class="note-anchor-marker" style="opacity:0.6;font-size:14px;">⚓' + label + '</span> <span style="color:#8e8e93;">所在:</span> ' + noteTitle + ' ' + backStr;
+            list.appendChild(li);
+        }
+    });
+    if (list.children.length === 0) {
+        list.innerHTML = '<li style="color:#8e8e93;padding:10px 0;">暂无锚点。</li>';
+    }
+}
+
+document.querySelector("#tagMgmtNewBtn").onclick = function() {
+    var name = document.querySelector("#tagMgmtNewInput").value.trim();
+    if (!name) return;
+    if (tags.some(function(t) { return t.name === name; })) { alert('标签已存在。'); return; }
+    tags.push({ id: generateUniqueId(), name: name, color: tagSelectedColor });
+    document.querySelector("#tagMgmtNewInput").value = '';
+    saveData();
+    renderTagManagementList();
+};
+
+document.querySelector("#tagMgmtNewInput").onkeydown = function(e) {
+    if (e.key === 'Enter') document.querySelector("#tagMgmtNewBtn").click();
+};
+
+/* --- Password --- */
+var passwordHash = localStorage.getItem('simpleNotesAppData_passwordHash') || '';
+
+function simpleHash(str) {
+    if (!str) return '';
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) { var c = str.charCodeAt(i); hash = ((hash << 5) - hash) + c; hash |= 0; }
+    return hash.toString(36);
+}
+
+function checkPassword() {
+    if (!passwordHash) { document.querySelector("#lockScreen").style.display = 'none'; return; }
+    document.querySelector("#lockScreen").style.display = 'flex';
+}
+
+document.querySelector("#lockUnlockBtn").onclick = function() {
+    var input = document.querySelector("#lockPasswordInput");
+    if (simpleHash(input.value) === passwordHash) {
+        document.querySelector("#lockScreen").style.display = 'none';
+        document.querySelector("#lockError").style.display = 'none';
+        input.value = '';
+    } else {
+        document.querySelector("#lockError").style.display = 'block';
+    }
+};
+document.querySelector("#lockPasswordInput").onkeydown = function(e) {
+    if (e.key === 'Enter') document.querySelector("#lockUnlockBtn").click();
+};
+
+document.querySelector("#settingsSavePasswordBtn").onclick = function() {
+    var p1 = document.querySelector("#settingsPassword").value;
+    var p2 = document.querySelector("#settingsPasswordConfirm").value;
+    if (p1 !== p2) { alert('两次输入的密码不一致。'); return; }
+    if (p1 && p1.length < 3) { alert('密码至少3个字符。'); return; }
+    passwordHash = p1 ? simpleHash(p1) : '';
+    localStorage.setItem('simpleNotesAppData_passwordHash', passwordHash);
+    document.querySelector("#settingsPassword").value = '';
+    document.querySelector("#settingsPasswordConfirm").value = '';
+    alert(p1 ? '密码已设置。' : '密码已清除。');
+    checkPassword();
+};
+
+var gitSettings = JSON.parse(localStorage.getItem('simpleNotesAppData_gitSettings') || '{"token":"","repo":"m1978xz/m1978xz.github.io","path":"biji/notebook-data.json"}');
+
+function loadGitSettings() {
+    document.querySelector("#settingsGitToken").value = gitSettings.token;
+    document.querySelector("#settingsGitRepo").value = gitSettings.repo;
+    document.querySelector("#settingsGitPath").value = gitSettings.path;
+}
+
+function saveGitSettings() {
+    gitSettings.token = document.querySelector("#settingsGitToken").value.trim();
+    gitSettings.repo = document.querySelector("#settingsGitRepo").value.trim();
+    gitSettings.path = document.querySelector("#settingsGitPath").value.trim();
+    localStorage.setItem('simpleNotesAppData_gitSettings', JSON.stringify(gitSettings));
+}
+
+function setSyncIndicator(msg, cls) {
+    var el = document.querySelector("#syncIndicator");
+    el.textContent = msg;
+    el.className = 'sync-indicator' + (cls ? ' ' + cls : '');
+}
+
+function fetchFromGitHub(callback) {
+    var url = 'https://api.github.com/repos/' + gitSettings.repo + '/contents/' + gitSettings.path;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('Authorization', 'token ' + gitSettings.token);
+    xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var resp = JSON.parse(xhr.responseText);
+            var contentBytes = atob(resp.content);
+            var content = decodeURIComponent(escape(contentBytes));
+            try { callback(null, JSON.parse(content), resp.sha); } catch(e) { callback('解析失败'); }
+        } else if (xhr.status === 404) { callback(null, null, null); }
+        else { callback('HTTP ' + xhr.status); }
+    };
+    xhr.onerror = function() { callback('网络错误'); };
+    xhr.send();
+}
+
+function pushToGitHub(data, sha, callback) {
+    var url = 'https://api.github.com/repos/' + gitSettings.repo + '/contents/' + gitSettings.path;
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    var body = { message: 'Sync notebook data ' + new Date().toISOString(), content: content, branch: 'main' };
+    if (sha) body.sha = sha;
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', url, true);
+    xhr.setRequestHeader('Authorization', 'token ' + gitSettings.token);
+    xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+        if (xhr.status === 200 || xhr.status === 201) { callback(null, JSON.parse(xhr.responseText).content.sha); }
+        else { callback('HTTP ' + xhr.status); }
+    };
+    xhr.onerror = function() { callback('网络错误'); };
+    xhr.send(JSON.stringify(body));
+}
+
+var gitSha = null;
+var syncTimer = null;
+
+function triggerGitSync() {
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(function() {
+        var data = { notes: notes, folders: folders, trash: trash, tags: tags, version: 2 };
+        setSyncIndicator('同步中...', 'syncing');
+        pushToGitHub(data, gitSha, function(err, sha) {
+            if (err) { setSyncIndicator('同步失败', 'error'); console.log('Git sync error:', err); return; }
+            gitSha = sha;
+            setSyncIndicator('已同步', 'done');
+            setTimeout(function() { setSyncIndicator('', ''); }, 3000);
+        });
+    }, 3000);
+}
+
+function loadFromGitHub() {
+    setSyncIndicator('加载中...', 'syncing');
+    fetchFromGitHub(function(err, data, sha) {
+        if (err) { setSyncIndicator('加载失败', 'error'); return; }
+        if (!data) { setSyncIndicator('首次使用', ''); return; }
+        gitSha = sha;
+        if (data.notes) {
+            repairAllStrings(data.notes);
+            repairAllStrings(data.folders || []);
+            repairAllStrings(data.trash || []);
+            repairAllStrings(data.tags || []);
+            if (data.version >= 2) {
+                notes = data.notes || [];
+                folders = data.folders || [{ id: 'unfiled', name: '无文件夹' }];
+                trash = data.trash || [];
+                tags = data.tags || [];
+            } else {
+                notes = data.notes || [];
+                folders = data.folders || [{ id: 'unfiled', name: '无文件夹' }];
+            }
+            if (!folders.some(function(f) { return f.id === 'unfiled'; })) folders.unshift({ id: 'unfiled', name: '无文件夹' });
+            notes.forEach(function(n) { if (!n.lastModified) n.lastModified = Date.now(); if (!n.tags) n.tags = []; });
+            saveData();
+            renderFoldersDropdowns();
+            renderFolderTabs();
+            renderList(notes, mainSearchBar.value.toLowerCase());
+        }
+        setSyncIndicator('已加载', 'done');
+        setTimeout(function() { setSyncIndicator('', ''); }, 2000);
+    });
+}
+
+document.querySelector("#showSettingsBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    folderTabs.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    loadGitSettings();
+    document.querySelector("#settingsContainer").style.display = 'block';
+};
+
+document.querySelector("#settingsSaveGitBtn").onclick = function() {
+    saveGitSettings();
+    alert('GitHub 设置已保存。');
+    loadFromGitHub();
+};
+
+var origSaveData = saveData;
+saveData = function() {
+    origSaveData();
+    triggerGitSync();
+};
+
+var autoSaveTimer = null;
+function triggerAutoSave() {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(function() {
+        if (editor.style.display === 'block') {
+            var t = titleInput.value.trim();
+            var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
+            var folderId = noteFolderSelect.value;
+            var now = Date.now();
+            if (t) {
+                if (editing) {
+                    notes = notes.map(function(n) { return n.id === editing ? { ...n, title: t, content: c, folderId: folderId, lastModified: now } : n; });
+                } else {
+                    editing = generateUniqueId();
+                    notes.push({ id: editing, folderId: folderId, title: t, content: c, lastModified: now });
+                }
+                saveData();
+            }
+            var indicator = document.querySelector("#autoSaveIndicator");
+            indicator.style.display = 'inline';
+            setTimeout(function() { indicator.style.display = 'none'; }, 2000);
+        }
+    }, 1500);
+}
+storyDiv.addEventListener('input', triggerAutoSave);
+titleInput.addEventListener('input', triggerAutoSave);
+
+document.addEventListener('keydown', function(e) {
+    if (editor.style.display !== 'block') return;
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); if (autoSaveTimer) clearTimeout(autoSaveTimer); triggerAutoSave(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); storyDiv.focus(); document.execCommand('undo'); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); storyDiv.focus(); document.execCommand('redo'); }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); storyDiv.focus(); document.execCommand('bold'); }
+});
+
+var darkMode = localStorage.getItem('simpleNotesAppData_darkMode') === 'true';
+if (darkMode) { document.body.classList.add('dark-mode'); document.querySelector("#darkModeToggle").textContent = '☀️'; }
+document.querySelector("#darkModeToggle").onclick = function() {
+    darkMode = !darkMode;
+    document.body.classList.toggle('dark-mode', darkMode);
+    this.textContent = darkMode ? '☀️' : '🌙';
+    localStorage.setItem('simpleNotesAppData_darkMode', darkMode);
+};
+
+function updateWordCount(noteId, contentDiv) {
+    var wc = contentDiv.querySelector('.note-wordcount');
+    if (!wc) {
+        wc = document.createElement('div');
+        wc.className = 'note-wordcount';
+        contentDiv.appendChild(wc);
+    }
+    var note = notes.find(function(n) { return n.id === noteId; });
+    if (note) {
+        var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+        var charCount = text.length;
+        var lineCount = (text.match(/\n/g) || []).length + 1;
+        wc.textContent = charCount + ' 字 · ' + lineCount + ' 行';
+    }
+}
+
+function renderTrashList() {
+    var list = document.querySelector("#trashList");
+    list.innerHTML = '';
+    if (trash.length === 0) {
+        var li = document.createElement('li');
+        li.textContent = '回收站为空。';
+        list.appendChild(li);
+        return;
+    }
+    trash.forEach(function(note) {
+        var li = document.createElement('li');
+        var nameSpan = document.createElement('span');
+        nameSpan.textContent = note.title + ' (' + formatTimestamp(note.lastModified) + ')';
+        li.appendChild(nameSpan);
+        var btnDiv = document.createElement('div');
+        var restoreBtn = document.createElement('button');
+        restoreBtn.textContent = '恢复';
+        restoreBtn.className = 'restore-btn';
+        restoreBtn.onclick = function() {
+            notes.push(note);
+            trash = trash.filter(function(t) { return t.id !== note.id; });
+            saveData();
+            renderTrashList();
+        };
+        btnDiv.appendChild(restoreBtn);
+        var delBtn = document.createElement('button');
+        delBtn.textContent = '永久删除';
+        delBtn.className = 'delete-btn';
+        delBtn.onclick = function() {
+            if (confirm('永久删除 "' + note.title + '"？不可恢复。')) {
+                trash = trash.filter(function(t) { return t.id !== note.id; });
+                saveData();
+                renderTrashList();
+            }
+        };
+        btnDiv.appendChild(delBtn);
+        li.appendChild(btnDiv);
+        list.appendChild(li);
+    });
+}
+
+document.querySelector("#emptyTrashBtn").onclick = function() {
+    if (trash.length === 0) { alert('回收站已为空。'); return; }
+    if (confirm('确定清空回收站？所有笔记将被永久删除。')) {
+        trash = [];
+        saveData();
+        renderTrashList();
+    }
+};
+
+document.querySelector("#showTrashBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    folderTabs.style.display = 'none';
+    noteList.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'block';
+    renderTrashList();
+};
+
+document.querySelector("#backFromTrashBtn").onclick = function() {
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    folderTabs.style.display = 'flex';
+    noteList.style.display = 'block';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+var viewerFontSize = parseInt(localStorage.getItem('simpleNotesAppData_viewerFontSize') || '16');
+
+// ====== 锚点双向映射 ======
+var anchorPositions = {};  // anchorId -> { noteId, noteTitle, lineNumber }
+var anchorLinkPositions = {}; // noteId::anchorId -> { noteId, noteTitle, lineNumber }
+
+/* ★★★ 修改1: buildAnchorMap —— 使用通用正则，不再限定标签名 ★★★ */
+function buildAnchorMap() {
+    anchorPositions = {};
+    anchorLinkPositions = {};
+    notes.forEach(function(n) {
+        var content = n.content;
+        if (!content) return;
+
+        // 匹配任意带 data-anchor-id 属性的标签（不限定 span）
+        var markerRegex = /<[a-z][^>]*\s+data-anchor-id\s*=\s*["']([^"']*)["'][^>]*>/gi;
+        var match;
+        while ((match = markerRegex.exec(content)) !== null) {
+            var anchorId = match[1];
+            var textBefore = content.substring(0, match.index);
+            var lineNumber = (textBefore.match(/\n/g) || []).length + 1;
+            anchorPositions[anchorId] = { noteId: n.id, noteTitle: n.title, lineNumber: lineNumber };
+        }
+
+        // 匹配任意带 data-note-anchor 属性的标签（不限定 a）
+        var linkRegex = /<[a-z][^>]*\s+data-note-anchor\s*=\s*["']([^"']*)["'][^>]*>/gi;
+        while ((match = linkRegex.exec(content)) !== null) {
+            var target = match[1]; // noteId::anchorId
+            var textBefore = content.substring(0, match.index);
+            var lineNumber = (textBefore.match(/\n/g) || []).length + 1;
+            anchorLinkPositions[target] = { noteId: n.id, noteTitle: n.title, lineNumber: lineNumber };
+        }
+    });
+}
+
+/* ★★★ 修改2: updateAnchorDisplaysInViewer —— 完善双向跳转逻辑 ★★★ */
+function updateAnchorDisplaysInViewer(noteId) {
+    var viewer = document.querySelector("#viewerContent");
+    if (!viewer) return;
+
+    // 处理锚点标记
+    var markers = viewer.querySelectorAll('.note-anchor-marker');
+    markers.forEach(function(marker) {
+        var anchorId = marker.getAttribute('data-anchor-id');
+        if (!anchorId) return;
+
+        // 移除之前可能添加的信息 span
+        var oldInfo = marker.querySelector('.anchor-jump-info');
+        if (oldInfo) oldInfo.remove();
+        marker.classList.remove('linked');
+
+        // 查找是否有锚点链接指向这个锚点，取第一个外部引用
+        var linkInfo = null;
+        for (var key in anchorLinkPositions) {
+            if (key.endsWith('::' + anchorId)) {
+                linkInfo = anchorLinkPositions[key];
+                break;
+            }
+        }
+
+        if (linkInfo) {
+            // 有双向跳转能力
+            marker.classList.add('linked');
+            marker.style.cursor = 'pointer';
+            marker.title = '点击跳回「' + linkInfo.noteTitle + '」第' + linkInfo.lineNumber + '行';
+            var infoSpan = document.createElement('span');
+            infoSpan.className = 'anchor-jump-info';
+            infoSpan.textContent = '⤴「' + linkInfo.noteTitle + '」L' + linkInfo.lineNumber;
+            marker.appendChild(infoSpan);
+
+            marker.onclick = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                // 关闭当前查看器，打开引用笔记并滚动到对应链接
+                closeNoteViewer();
+                openNoteViewer(linkInfo.noteId, '');
+                setTimeout(function() {
+                    var targetViewer = document.querySelector("#viewerContent");
+                    if (targetViewer) {
+                        var links = targetViewer.querySelectorAll('[data-note-anchor]');
+                        for (var i = 0; i < links.length; i++) {
+                            var val = links[i].getAttribute('data-note-anchor');
+                            if (val === linkInfo.noteId + '::' + anchorId) {
+                                links[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                links[i].style.outline = '3px solid #ff6d00';
+                                setTimeout(function() { links[i].style.outline = ''; }, 2000);
+                                break;
+                            }
+                        }
+                    }
+                }, 200);
+            };
+        } else {
+            // 单向锚点，灰色半透明（保留默认样式）
+            marker.style.cursor = 'default';
+            marker.onclick = null;
+        }
+    });
+
+    // 处理锚点链接
+    var links = viewer.querySelectorAll('.note-anchor-link');
+    links.forEach(function(link) {
+        var target = link.getAttribute('data-note-anchor');
+        if (!target) return;
+        var parts = target.split('::');
+        if (parts.length !== 2) return;
+        var targetNoteId = parts[0], targetAnchorId = parts[1];
+        var targetPos = anchorPositions[targetAnchorId];
+
+        // 移除旧信息
+        var oldInfo = link.querySelector('.anchor-jump-info');
+        if (oldInfo) oldInfo.remove();
+        link.classList.remove('linked');
+
+        if (targetPos) {
+            link.classList.add('linked');
+            var infoSpan = document.createElement('span');
+            infoSpan.className = 'anchor-jump-info';
+            infoSpan.textContent = '⤵「' + targetPos.noteTitle + '」L' + targetPos.lineNumber;
+            link.appendChild(infoSpan);
+        }
+    });
+}
+// ====== 结束锚点双向映射 ======
+
+function openNoteViewer(id, searchTerm) {
+    buildAnchorMap(); // 每次打开时重建
+    var note = notes.find(function(n) { return n.id === id; });
+    if (!note) return;
+    currentViewerNoteId = id;
+    viewerSearchTerm = searchTerm || '';
+    document.querySelector("#viewerTitle").textContent = note.title;
+    var tagHtml = '';
+    if (note.tags && note.tags.length > 0) {
+        tagHtml = '<div style="margin-bottom:12px;">';
+        note.tags.forEach(function(tid) {
+            var t = tags.find(function(tt) { return tt.id === tid; });
+            if (t) {
+                var color = t.color || '#e8e8ed';
+                tagHtml += '<span class="tag-badge" style="background:' + color + ';color:' + (t.color ? '#fff' : '#555') + ';">' + t.name + '</span>';
+            }
+        });
+        tagHtml += '</div>';
+    }
+    var folderHtml = '';
+    var f = folders.find(function(fold) { return fold.id === note.folderId; });
+    if (f) folderHtml = '<span style="font-size:12px;color:#8e8e93;">📁 ' + f.name + '</span> &middot; ';
+    var contentHtml = renderContentWithLines(note.content, viewerSearchTerm);
+    if (viewerSearchTerm) {
+        contentHtml = '<div class="search-nav"><button id="searchNavPrev">↑</button><span class="search-count" id="searchNavCount">0/0</span><button id="searchNavNext">↓</button></div>' + contentHtml;
+    }
+    contentHtml = tagHtml + contentHtml;
+    document.querySelector("#viewerContent").innerHTML = contentHtml;
+    
+    // 更新锚点显示
+    updateAnchorDisplaysInViewer(note.id);
+    
+    if (viewerSearchTerm) {
+        var highlights = document.querySelectorAll('#viewerContent .highlight');
+        var countEl = document.querySelector("#searchNavCount");
+        if (highlights.length > 0) {
+            countEl.textContent = '1/' + highlights.length;
+            highlights[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlights[0].style.outline = '2px solid #007aff';
+        }
+        var curIdx = 0;
+        document.querySelector("#searchNavNext").onclick = function() {
+            if (highlights.length === 0) return;
+            highlights[curIdx].style.outline = '';
+            curIdx = (curIdx + 1) % highlights.length;
+            highlights[curIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlights[curIdx].style.outline = '2px solid #007aff';
+            countEl.textContent = (curIdx + 1) + '/' + highlights.length;
+        };
+        document.querySelector("#searchNavPrev").onclick = function() {
+            if (highlights.length === 0) return;
+            highlights[curIdx].style.outline = '';
+            curIdx = (curIdx - 1 + highlights.length) % highlights.length;
+            highlights[curIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlights[curIdx].style.outline = '2px solid #007aff';
+            countEl.textContent = (curIdx + 1) + '/' + highlights.length;
+        };
+    }
+    var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
+    document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
+    document.querySelector("#viewerTimestamp").textContent = (folderHtml || '') + '最后编辑: ' + formatTimestamp(note.lastModified);
+    document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px';
+    document.querySelector("#viewerFontLabel").textContent = viewerFontSize;
+    document.querySelector("#viewerMenu").style.display = 'none';
+    document.querySelector("#noteViewer").style.display = 'flex';
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+}
+
+function closeNoteViewer() {
+    document.querySelector("#noteViewer").style.display = 'none';
+}
+
+var currentViewerNoteId = null;
+var viewerSearchTerm = '';
+
+document.querySelector("#viewerCloseBtn").onclick = closeNoteViewer;
+document.querySelector("#viewerFontInc").onclick = function() { if (viewerFontSize < 32) { viewerFontSize += 2; localStorage.setItem('simpleNotesAppData_viewerFontSize', viewerFontSize); document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px'; document.querySelector("#viewerFontLabel").textContent = viewerFontSize; } };
+document.querySelector("#viewerFontDec").onclick = function() { if (viewerFontSize > 10) { viewerFontSize -= 2; localStorage.setItem('simpleNotesAppData_viewerFontSize', viewerFontSize); document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px'; document.querySelector("#viewerFontLabel").textContent = viewerFontSize; } };
+document.querySelector("#viewerMenuBtn").onclick = function() { var m = document.querySelector("#viewerMenu"); m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; };
+document.addEventListener("click", function(e) { var m = document.querySelector("#viewerMenu"); if (m.style.display === 'flex' && !m.contains(e.target) && e.target.id !== 'viewerMenuBtn') { m.style.display = 'none'; } });
+document.querySelector("#viewerEditBtn").onclick = function() { closeNoteViewer(); if (currentViewerNoteId) editNote(currentViewerNoteId); };
+document.querySelector("#viewerExportTxtBtn").onclick = function() { if (currentViewerNoteId) { exportNoteToTxt(currentViewerNoteId); document.querySelector("#viewerMenu").style.display = 'none'; } };
+document.querySelector("#viewerExportMdBtn").onclick = function() { if (currentViewerNoteId) { exportNoteToMd(currentViewerNoteId); document.querySelector("#viewerMenu").style.display = 'none'; } };
+document.querySelector("#viewerDeleteBtn").onclick = function() { if (currentViewerNoteId) { document.querySelector("#viewerMenu").style.display = 'none'; closeNoteViewer(); deleteNote(currentViewerNoteId); } };
+
+// ======= 版本历史功能 =======
+document.querySelector("#viewerHistoryBtn").onclick = function() {
+    document.querySelector("#viewerMenu").style.display = 'none';
+    openVersionHistoryPopup();
+};
+
+function openVersionHistoryPopup() {
+    document.querySelector("#anchorInfoPopup").style.display = 'none';
+    document.querySelector("#anchorPickerPopup").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    document.querySelector("#colorPickerPopup").style.display = 'none';
+    
+    var popup = document.querySelector("#versionHistoryPopup");
+    renderVersionHistory();
+    popup.style.display = 'block';
+    popup.style.left = '50%';
+    popup.style.top = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.position = 'fixed';
+}
+
+function renderVersionHistory() {
+    var list = document.querySelector("#versionHistoryList");
+    list.innerHTML = '';
+    var keys = Object.keys(snapshots).sort().reverse();
+    if (keys.length === 0) {
+        list.innerHTML = '<div style="padding:16px; color:#8e8e93; text-align:center;">暂无版本快照</div>';
+        return;
+    }
+    keys.forEach(function(dayKey) {
+        var snap = snapshots[dayKey];
+        var item = document.createElement('div');
+        item.className = 'picker-anchor-item';
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px 12px; margin:4px 0; border-radius:8px; background:#f8f8fa; cursor:pointer;';
+        var labelSpan = document.createElement('span');
+        labelSpan.textContent = snap.label || dayKey;
+        labelSpan.style.fontWeight = '500';
+        var restoreBtn = document.createElement('button');
+        restoreBtn.textContent = '恢复';
+        restoreBtn.style.cssText = 'padding:4px 12px; border:none; border-radius:6px; background:#007aff; color:white; cursor:pointer; font-size:12px;';
+        restoreBtn.onclick = function(e) {
+            e.stopPropagation();
+            restoreSnapshot(dayKey);
+        };
+        item.appendChild(labelSpan);
+        item.appendChild(restoreBtn);
+        item.onclick = function() { restoreSnapshot(dayKey); };
+        list.appendChild(item);
+    });
+}
+
+function restoreSnapshot(dayKey) {
+    var snap = snapshots[dayKey];
+    if (!snap) { alert('该快照不存在'); return; }
+    if (!confirm('确定要将数据恢复到 ' + (snap.label || dayKey) + ' 的状态吗？\n当前数据会自动备份到今天。')) return;
+
+    var now = new Date();
+    var todayKey = now.getFullYear() + '-' +
+                   String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                   String(now.getDate()).padStart(2, '0');
+    var currentData = { notes: notes, folders: folders, trash: trash, tags: tags };
+    snapshots[todayKey] = {
+        timestamp: now.getTime(),
+        label: todayKey + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + '（恢复前备份）',
+        data: JSON.parse(JSON.stringify(currentData))
+    };
+    var keys = Object.keys(snapshots).sort();
+    if (keys.length > SNAPSHOT_MAX_DAYS) {
+        var toDelete = keys.slice(0, keys.length - SNAPSHOT_MAX_DAYS);
+        toDelete.forEach(function(k) { delete snapshots[k]; });
+    }
+
+    var restored = snap.data;
+    notes = restored.notes || [];
+    folders = restored.folders || [];
+    trash = restored.trash || [];
+    tags = restored.tags || [];
+
+    if (!folders.some(function(f) { return f.id === 'unfiled'; })) {
+        folders.unshift({ id: 'unfiled', name: '无文件夹' });
+    }
+    notes.forEach(function(n) {
+        if (!n.lastModified) n.lastModified = Date.now();
+        if (!n.tags) n.tags = [];
+    });
+
+    lastContentHash = JSON.stringify({ notes: notes, folders: folders, trash: trash, tags: tags });
+    saveData();
+    renderFoldersDropdowns();
+    renderFolderTabs();
+    renderList(notes, mainSearchBar.value.toLowerCase());
+    document.querySelector("#versionHistoryPopup").style.display = 'none';
+    closeNoteViewer();
+    alert('已恢复到 ' + (snap.label || dayKey) + ' 的版本。');
+}
+
+document.querySelector("#versionHistoryCloseBtn").onclick = function() {
+    document.querySelector("#versionHistoryPopup").style.display = 'none';
+};
+document.querySelector("#versionHistoryBackupBtn").onclick = function() {
+    document.querySelector("#exportDataBtn").click();
+    document.querySelector("#versionHistoryPopup").style.display = 'none';
+};
+document.addEventListener('click', function(e) {
+    var popup = document.querySelector("#versionHistoryPopup");
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && 
+        e.target.id !== 'viewerHistoryBtn' && !e.target.closest('#viewerHistoryBtn')) {
+        popup.style.display = 'none';
+    }
+});
+// ======= 结束：版本历史功能 =======
+
+/* ★★★ 修改3: 查看器 click 事件 —— 锚点标记由 updateAnchorDisplaysInViewer 绑定，此处只处理链接 ★★★ */
+document.querySelector("#viewerContent").addEventListener('click', function(e) {
+    // 只处理锚点链接点击，锚点标记的 onclick 已在 updateAnchorDisplaysInViewer 中绑定
+    var link = e.target.closest('[data-note-anchor]');
+    if (link) {
+        e.preventDefault();
+        var target = link.getAttribute('data-note-anchor');
+        var parts = target.split('::');
+        if (parts.length === 2) {
+            var noteId = parts[0], anchorId = parts[1];
+            if (noteId === currentViewerNoteId) {
+                // 同笔记内跳转
+                var els = document.querySelectorAll('#viewerContent [data-anchor-id]');
+                for (var i = 0; i < els.length; i++) {
+                    if (els[i].getAttribute('data-anchor-id') === anchorId) {
+                        els[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        els[i].style.outline = '3px solid #ff6d00';
+                        setTimeout(function() { els[i].style.outline = ''; }, 2000);
+                        break;
+                    }
+                }
+            } else {
+                // 跨笔记跳转
+                closeNoteViewer();
+                openNoteViewer(noteId, '');
+                setTimeout(function() {
+                    var els = document.querySelectorAll('#viewerContent [data-anchor-id]');
+                    for (var i = 0; i < els.length; i++) {
+                        if (els[i].getAttribute('data-anchor-id') === anchorId) {
+                            els[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            els[i].style.outline = '3px solid #ff6d00';
+                            setTimeout(function() { els[i].style.outline = ''; }, 2000);
+                            break;
+                        }
+                    }
+                }, 200);
+            }
+        }
+        return;
+    }
+    // 锚点标记的点击在 updateAnchorDisplaysInViewer 中处理，此处不再处理
+});
+
+function handleAnchorMarkerClick(marker) {
+    // 不再使用弹窗，已被直接跳转取代
+    return;
+}
+
+function closeAnchorInfoPopup() {
+    document.querySelector("#anchorInfoPopup").style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+    var popup = document.querySelector("#anchorInfoPopup");
+    if (popup.style.display !== 'none' && !popup.contains(e.target) && !e.target.closest('.note-anchor-marker')) {
+        popup.style.display = 'none';
+    }
+});
+
+function toggleContent(id, contentDivToShow) {
+    if (currentOpenNoteContentDiv && currentOpenNoteContentDiv !== contentDivToShow) {
+        currentOpenNoteContentDiv.style.display = 'none';
+    }
+    if (contentDivToShow.style.display === 'none') {
+        contentDivToShow.style.display = 'block';
+        currentOpenNoteContentDiv = contentDivToShow;
+    } else {
+        contentDivToShow.style.display = 'none';
+        currentOpenNoteContentDiv = null;
+    }
+}
+
+function editNote(id) {
+    var noteToEdit = notes.find(function(n) { return n.id === id; });
+    if (noteToEdit) {
+        editing = id;
+        titleInput.value = noteToEdit.title;
+        storyDiv.innerHTML = noteToEdit.content.replace(/\\n/g, '<br>');
+        noteFolderSelect.value = noteToEdit.folderId;
+        editor.style.display = "block";
+        if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+        mainSearchBar.style.display = 'none';
+        folderTabs.style.display = 'none';
+        noteList.style.display = 'none';
+    }
+}
+
+function deleteNote(id) {
+    if (confirm("确定要删除这篇笔记吗？可前往回收站恢复。")) {
+        var idx = -1;
+        notes.forEach(function(n, i) { if (n.id === id) idx = i; });
+        if (idx >= 0) {
+            trash.push(notes[idx]);
+            notes.splice(idx, 1);
+        }
+        if (currentOpenNoteContentDiv && currentOpenNoteContentDiv.closest('li').dataset.id === id) { currentOpenNoteContentDiv = null; }
+        saveData();
+        renderFolderTabs();
+        renderList(notes, mainSearchBar.value.toLowerCase());
+    }
+}
+
+// ========== 编辑器中的新建文件夹按钮 ==========
+document.querySelector("#editorNewFolderBtn").onclick = function() {
+    var name = prompt('请输入新文件夹名称：');
+    if (!name || !name.trim()) return;
+    name = name.trim();
+    if (folders.some(function(f) { return f.name === name; })) { alert('文件夹名称已存在，请使用其他名称。'); return; }
+    folders.push({ id: generateUniqueId(), name: name });
+    saveData();
+    renderFoldersDropdowns();
+    // 自动选中新建的文件夹
+    folders.forEach(function(f) {
+        if (f.name === name) { noteFolderSelect.value = f.id; }
+    });
+    alert('文件夹 "' + name + '" 已创建！');
+};
+
+// ========== 取消按钮 ==========
+cancelBtn.onclick = function() {
+    editor.style.display = 'none';
+    titleInput.value = '';
+    storyDiv.innerHTML = '';
+    noteFolderSelect.value = 'unfiled';
+    editing = null;
+    mainSearchBar.style.display = 'block';
+    folderTabs.style.display = 'flex';
+    noteList.style.display = 'block';
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+// ========== 发布按钮 ==========
+publishBtn.onclick = function() {
+    var t = titleInput.value.trim();
+    var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
+    var folderId = noteFolderSelect.value;
+    var now = Date.now();
+    if (!t) { alert("标题不能为空"); return; }
+    if (editing) {
+        notes = notes.map(function(n) { return n.id === editing ? { ...n, title: t, content: c, folderId: folderId, lastModified: now } : n; });
+    } else {
+        notes.push({ id: generateUniqueId(), folderId: folderId, title: t, content: c, lastModified: now });
+    }
+    editing = null;
+    editor.style.display = "none";
+    titleInput.value = "";
+    storyDiv.innerHTML = "";
+    noteFolderSelect.value = 'unfiled';
+    saveData();
+    renderFolderTabs();
+    renderList(notes, mainSearchBar.value.toLowerCase());
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    folderTabs.style.display = 'flex';
+    noteList.style.display = 'block';
+};
+
+newBtn.onclick = function() {
+    editing = null;
+    titleInput.value = "";
+    storyDiv.innerHTML = "";
+    noteFolderSelect.value = 'unfiled';
+    editor.style.display = "block";
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    folderTabs.style.display = 'none';
+    noteList.style.display = 'none';
+};
+
+// ========== 全部笔记按钮 ==========
+document.querySelector("#showAllNotesBtn").onclick = function() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
+    currentFolderFilter = null;
+    currentViewingFolderId = null;
+    currentPage = 1;
+    mainSearchBar.value = '';
+    mainSearchBar.style.display = 'block';
+    folderTabs.style.display = 'flex';
+    noteList.style.display = 'block';
+    renderFolderTabs();
+    renderList(notes, '');
+};
+
+// ========== 搜索 ==========
+mainSearchBar.oninput = function() {
+    var searchTerm = mainSearchBar.value.toLowerCase();
+    var allNotesInCurrentView = notes.filter(function(n) { return currentFolderFilter === null || n.folderId === currentFolderFilter; });
+    var filteredNotes = allNotesInCurrentView.filter(function(n) { return n.title.toLowerCase().includes(searchTerm) || n.content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').toLowerCase().includes(searchTerm); });
+    currentPage = 1;
+    renderList(filteredNotes, searchTerm);
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+    folderListContainer.style.display = 'none';
+    editor.style.display = 'none';
+    noteList.style.display = 'block';
+};
+
+menuToggleButton.onclick = function(event) {
+    event.stopPropagation();
+    actionMenu.style.display = actionMenu.style.display === 'none' ? 'flex' : 'none';
+};
+
+document.addEventListener("click", function(event) {
+    if (actionMenu.style.display === 'flex' && !actionMenu.contains(event.target) && !menuToggleButton.contains(event.target)) {
+        actionMenu.style.display = 'none';
+    }
+});
+
+var dragSrc = null;
+document.addEventListener("dragstart", function(e) {
+    if (e.target.closest("li")) { dragSrc = e.target.closest("li"); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", dragSrc.dataset.id); }
+});
+document.addEventListener("dragover", function(e) { e.preventDefault(); if (e.target.closest("li")) { e.dataTransfer.dropEffect = "move"; } });
+document.addEventListener("drop", function(e) {
+    e.preventDefault();
+    if (dragSrc && e.target.closest("li")) {
+        var dropTargetLi = e.target.closest("li");
+        if (dropTargetLi && dragSrc !== dropTargetLi) {
+            var list = document.querySelector("#noteList");
+            var bounding = dropTargetLi.getBoundingClientRect();
+            var offset = bounding.y + (bounding.height / 2);
+            if (e.clientY - offset > 0) { list.insertBefore(dragSrc, dropTargetLi.nextSibling); }
+            else { list.insertBefore(dragSrc, dropTargetLi); }
+            var displayedNoteIds = [...list.children].map(function(li) { return li.dataset.id; });
+            var reorderedNotes = [];
+            displayedNoteIds.forEach(function(id) { reorderedNotes.push(notes.find(function(n) { return n.id === id; })); });
+            notes.forEach(function(n) { if (!displayedNoteIds.includes(n.id)) { reorderedNotes.push(n); } });
+            notes = reorderedNotes;
+            saveData();
+        }
+    }
+    dragSrc = null;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+});
+
+function renderFolderManagementList() {
+    folderManagementList.innerHTML = '';
+    var userFolders = folders.filter(function(f) { return f.id !== 'unfiled'; });
+    if (userFolders.length === 0) {
+        var msg = document.createElement('li');
+        msg.textContent = '暂无自建文件夹。';
+        folderManagementList.appendChild(msg);
+        return;
+    }
+    userFolders.forEach(function(folder) {
+        var li = document.createElement('li');
+        var nameSpan = document.createElement('span');
+        nameSpan.classList.add('folder-name');
+        nameSpan.textContent = folder.name;
+        li.appendChild(nameSpan);
+        var exportTxtBtn = document.createElement('button');
+        exportTxtBtn.textContent = '导出TXT';
+        exportTxtBtn.classList.add('export-btn');
+        exportTxtBtn.style.marginRight = '6px';
+        exportTxtBtn.onclick = function() { exportFolderToTxt(folder.id); };
+        li.appendChild(exportTxtBtn);
+        var exportMdBtn = document.createElement('button');
+        exportMdBtn.textContent = '导出MD';
+        exportMdBtn.classList.add('export-btn');
+        exportMdBtn.style.backgroundColor = '#6f42c1';
+        exportMdBtn.style.marginRight = '6px';
+        exportMdBtn.onclick = function() { exportFolderToMd(folder.id); };
+        li.appendChild(exportMdBtn);
+        var deleteFolderBtn = document.createElement('button');
+        deleteFolderBtn.textContent = '删除';
+        deleteFolderBtn.classList.add('delete-btn');
+        deleteFolderBtn.onclick = function() { deleteFolder(folder.id); };
+        li.appendChild(deleteFolderBtn);
+        folderManagementList.appendChild(li);
+    });
+}
+
+function deleteFolder(folderId) {
+    var folderToDelete = folders.find(function(f) { return f.id === folderId; });
+    if (!folderToDelete) return;
+    if (confirm('确定要删除文件夹 "' + folderToDelete.name + '" 吗？该文件夹下的所有笔记将移至"无文件夹"。')) {
+        folders = folders.filter(function(f) { return f.id !== folderId; });
+        notes = notes.map(function(n) { return n.folderId === folderId ? { ...n, folderId: 'unfiled' } : n; });
+        if (currentFolderFilter === folderId) { currentFolderFilter = null; }
+        saveData();
+        renderFoldersDropdowns();
+        renderFolderTabs();
+        renderFolderManagementList();
+        renderList(notes, mainSearchBar.value.toLowerCase());
+        alert('文件夹 "' + folderToDelete.name + '" 已删除，相关笔记已移至"无文件夹"。');
+    }
+}
+
+backToNotesBtn.onclick = function() {
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    folderTabs.style.display = 'flex';
+    noteList.style.display = 'block';
+    currentPage = 1;
+    renderList(notes, mainSearchBar.value.toLowerCase());
+};
+
+function showHomePage() {
+    actionMenu.style.display = 'none';
+    editor.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    document.querySelector("#settingsContainer").style.display = 'none';
+    mainSearchBar.style.display = 'block';
+    mainSearchBar.value = '';
+    currentFolderFilter = null;
+    currentViewingFolderId = null;
+    currentPage = 1;
+    renderFoldersDropdowns();
+    renderFolderTabs();
+    renderList();
+}
+
+homeBtn.onclick = function() { window.location.href = 'https://191212.xyz/'; };
+
+document.querySelector("#exportDataBtn").onclick = function() {
+    if (notes.length === 0) { alert("没有数据可以导出。"); return; }
+    var data = { notes: notes, folders: folders, trash: trash, tags: tags };
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = '笔记本数据_' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    actionMenu.style.display = 'none';
+};
+
+document.querySelector("#importDataBtn").onclick = function() { importFileInput.click(); actionMenu.style.display = 'none'; };
+
+importFileInput.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            var data = JSON.parse(ev.target.result);
+            if (!data.notes || !data.folders) { alert("JSON格式不对，缺少 notes 或 folders 字段。"); return; }
+            if (!confirm('将导入 ' + data.notes.length + ' 篇笔记和 ' + data.folders.length + ' 个文件夹' + (data.trash ? '，' + data.trash.length + ' 条回收站记录' : '') + (data.tags ? '，' + data.tags.length + ' 个标签' : '') + '，是否覆盖当前数据？')) return;
+            notes = data.notes;
+            folders = data.folders;
+            trash = data.trash || [];
+            tags = data.tags || [];
+            if (!folders.some(function(f) { return f.id === 'unfiled'; })) { folders.unshift({ id: 'unfiled', name: '无文件夹' }); }
+            saveData();
+            currentPage = 1;
+            currentFolderFilter = null;
+            renderFoldersDropdowns();
+            renderFolderTabs();
+            renderList(notes, '');
+            noteList.style.display = 'block';
+            mainSearchBar.style.display = 'block';
+            folderTabs.style.display = 'flex';
+            mainSearchBar.value = '';
+            alert("导入成功！");
+        } catch (err) { alert("导入失败：文件格式错误。"); }
+    };
+    reader.readAsText(file);
+    importFileInput.value = '';
+};
+
+function downloadTxtFile(filename, content) {
+    var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportNoteToTxt(noteId) {
+    var note = notes.find(function(n) { return n.id === noteId; });
+    if (note) { downloadTxtFile(note.title.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '.txt', '# ' + note.title + '\n' + cleanContent(note.content) + '\n'); }
+}
+
+function exportNoteToMd(noteId) {
+    var note = notes.find(function(n) { return n.id === noteId; });
+    if (note) {
+        var content = '# ' + note.title + '\n\n' + cleanContent(note.content) + '\n';
+        var blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = note.title.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '.md';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+}
+
+function exportFolderToMd(folderId) {
+    var folder = folders.find(function(f) { return f.id === folderId; });
+    if (!folder) return;
+    var notesInFolder = notes.filter(function(n) { return n.folderId === folderId; });
+    if (notesInFolder.length === 0) { alert('文件夹 "' + folder.name + '" 中没有笔记可以导出。'); return; }
+    var content = '# 文件夹: ' + folder.name + '\n\n';
+    notesInFolder.forEach(function(note, index) {
+        if (index > 0) content += '---\n';
+        content += '# ' + note.title + '\n\n' + cleanContent(note.content) + '\n\n';
+    });
+    var blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_所有笔记.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportFolderToTxt(folderId) {
+    var folder = folders.find(function(f) { return f.id === folderId; });
+    if (!folder) return;
+    var notesInFolder = notes.filter(function(n) { return n.folderId === folderId; });
+    if (notesInFolder.length === 0) { alert('文件夹 "' + folder.name + '" 中没有笔记可以导出。'); return; }
+    var content = '# 文件夹: ' + folder.name + '\n\n';
+    notesInFolder.forEach(function(note, index) {
+        if (index > 0) content += '---\n';
+        content += '# ' + note.title + '\n' + cleanContent(note.content) + '\n';
+    });
+    downloadTxtFile(folder.name.replace(/[^a-z0-9\u4e00-\u9fa5]/gi, '_') + '_所有笔记.txt', content);
+}
+
+function searchNotesByAnchor(anchorName) {
+    var results = [];
+    notes.forEach(function(n) {
+        if (n.content && n.content.toLowerCase().indexOf(anchorName.toLowerCase()) >= 0) {
+            results.push(n);
+        }
+    });
+    return results;
+}
+
+function showAnchorSearchResults(anchorName) {
+    var results = searchNotesByAnchor(anchorName);
+    var container = document.getElementById('anchorSearchResults');
+    var list = document.getElementById('anchorSearchResultsList');
+    var title = document.getElementById('anchorSearchTitle');
+    
+    title.textContent = '包含锚点 "' + anchorName + '" 的笔记 (' + results.length + ' 个)';
+    list.innerHTML = '';
+    
+    if (results.length === 0) {
+        var li = document.createElement('li');
+        li.textContent = '没有找到包含该锚点的笔记';
+        list.appendChild(li);
+    } else {
+        results.forEach(function(note) {
+            var li = document.createElement('li');
+            li.onclick = function() {
+                openNoteViewer(note.id, anchorName);
+                closeAnchorSearchResults();
+            };
+            
+            var titleSpan = document.createElement('span');
+            titleSpan.className = 'note-title';
+            titleSpan.textContent = note.title || '无标题';
+            
+            var previewSpan = document.createElement('span');
+            previewSpan.className = 'note-preview';
+            var plainText = note.content.replace(/<[^>]+>/g, '');
+            previewSpan.textContent = plainText.substring(0, 80) + (plainText.length > 80 ? '...' : '');
+            
+            li.appendChild(titleSpan);
+            li.appendChild(previewSpan);
+            list.appendChild(li);
+        });
+    }
+    
+    container.style.display = 'block';
+}
+
+function closeAnchorSearchResults() {
+    document.getElementById('anchorSearchResults').style.display = 'none';
+}
+
+renderFoldersDropdowns();
+showHomePage();
+checkPassword();
+loadFromGitHub();
+</script>
+</body>
+</html>
