@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -26,12 +26,12 @@ body.dark-mode .note-card-footer { border-top-color:#48484a; }
 button { padding: 8px 18px; margin: 4px 0; cursor: pointer; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; transition: all 0.15s; }
 .action-buttons { margin-top: 12px; text-align: right; display: flex; gap: 6px; justify-content: flex-end; }
 .edit-btn, .delete-btn, .export-btn { padding: 5px 14px; font-size: 12px; border: none; border-radius: 6px; font-weight: 500; }
-.edit-btn { background: #007aff; color: white; }
-.edit-btn:hover { background: #0062cc; }
-.delete-btn { background: #ff3b30; color: white; }
-.delete-btn:hover { background: #d62d20; }
-.export-btn { background: #34c759; color: white; }
-.export-btn:hover { background: #28a745; }
+.edit-btn { background: #5b8dd9; color: white; }
+.edit-btn:hover { background: #4a7bbd; }
+.delete-btn { background: #e8685a; color: white; }
+.delete-btn:hover { background: #ce5c4e; }
+.export-btn { background: #6bb39b; color: white; }
+.export-btn:hover { background: #5a9e86; }
 .highlight { background: #fff176; padding: 1px 2px; border-radius: 2px; }
 .header-section { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; position: relative; min-height: 24px; }
 .header-section h1 { position: absolute; left: 0; top: 0; visibility: hidden; margin: 0; padding: 0; height: 0; overflow: hidden; }
@@ -42,17 +42,17 @@ button { padding: 8px 18px; margin: 4px 0; cursor: pointer; border: none; border
 #actionMenu button { background: #f8f8fa; color: #1d1d1f; font-weight: 500; border: 1px solid #e8e8ed; }
 #actionMenu button:hover { background: #e8e8ed; }
 #mainSearchBar { width: 100%; padding: 12px 16px; margin-bottom: 12px; border: 2px solid #e8e8ed; border-radius: 10px; font-size: 15px; outline: none; background: #fff; transition: border-color 0.2s; }
-#mainSearchBar:focus { border-color: #007aff; }
+#mainSearchBar:focus { border-color: #5b8dd9; }
 
 /* 文件夹标签栏 */
 #folderTabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding: 8px 0; border-bottom: 1px solid #e8e8ed; }
 body.dark-mode #folderTabs { border-bottom-color: #48484a; }
 #folderTabs .folder-tab { display: inline-flex; align-items: center; gap: 4px; padding: 6px 16px; border: 1px solid #d1d1d6; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; color: #1d1d1f; }
-#folderTabs .folder-tab:hover { border-color: #007aff; background: #f0f7ff; }
-#folderTabs .folder-tab.active { background: #007aff; color: #fff; border-color: #007aff; }
+#folderTabs .folder-tab:hover { border-color: #5b8dd9; background: #f0f7ff; }
+#folderTabs .folder-tab.active { background: #5b8dd9; color: #fff; border-color: #5b8dd9; }
 body.dark-mode #folderTabs .folder-tab { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
-body.dark-mode #folderTabs .folder-tab:hover { border-color: #5e9eff; background: #1a2a40; }
-body.dark-mode #folderTabs .folder-tab.active { background: #007aff; color: #fff; border-color: #007aff; }
+body.dark-mode #folderTabs .folder-tab:hover { border-color: #5b8dd9; background: #1a2a40; }
+body.dark-mode #folderTabs .folder-tab.active { background: #5b8dd9; color: #fff; border-color: #5b8dd9; }
 #folderTabs .folder-tab .tab-count { font-size: 11px; opacity: 0.7; margin-left: 2px; }
 
 #folderListContainer { margin-top: 20px; border: 1px solid #e8e8ed; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
@@ -60,8 +60,8 @@ body.dark-mode #folderTabs .folder-tab.active { background: #007aff; color: #fff
 #folderManagementList li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 8px; }
 #folderManagementList li:last-child { border-bottom: none; }
 #folderManagementList .folder-name { font-size: 15px; font-weight: 600; }
-#backToNotesBtn { margin-top: 20px; background: #6c757d; color: white; padding: 8px 20px; border-radius: 8px; }
-#backToNotesBtn:hover { background: #5a6268; }
+#backToNotesBtn { margin-top: 20px; background: #9aa5b5; color: white; padding: 8px 20px; border-radius: 8px; }
+#backToNotesBtn:hover { background: #8692a2; }
 
 #pagination { display: none; text-align: center; margin: 20px 0; }
 #pagination button { padding: 8px 18px; margin: 0 4px; border: 1px solid #e8e8ed; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; transition: all 0.15s; }
@@ -72,31 +72,32 @@ body.dark-mode #folderTabs .folder-tab.active { background: #007aff; color: #fff
 /* Editor */
 #editor { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 20px; }
 #editor input#title { width: 100%; font-size: 20px; font-weight: 700; border: none; outline: none; padding: 8px 0; margin-bottom: 12px; background: transparent; border-bottom: 2px solid #e8e8ed; }
-#editor input#title:focus { border-bottom-color: #007aff; }
+#editor input#title:focus { border-bottom-color: #5b8dd9; }
 
 #editorToolbar { display: flex; gap: 6px; padding: 10px; border: 1px solid #e8e8ed; border-bottom: none; border-radius: 10px 10px 0 0; background: #fafafa; flex-wrap: wrap; align-items: center; }
-#editorToolbar button { padding: 6px 12px; margin: 0; border: 1px solid #e8e8ed; border-radius: 6px; background: #fff; font-size: 13px; font-weight: 500; line-height: 1.4; transition: all 0.15s; }
-#editorToolbar button:hover { background: #f0f0f5; border-color: #d1d1d6; }
-#editorToolbar select { padding: 6px 8px; border: 1px solid #e8e8ed; border-radius: 6px; background: #fff; cursor: pointer; height: 32px; font-size: 13px; }
+#editorToolbar button { padding: 6px 12px; margin: 0; border: 1px solid #9aa5b5; border-radius: 6px; background: #eef2f7; font-size: 13px; font-weight: 500; line-height: 1.4; transition: all 0.15s; color: #5b6a7a; }
+#editorToolbar button:hover { background: #dce3ed; border-color: #8a96a6; }
+#editorToolbar select { padding: 6px 8px; border: 1px solid #9aa5b5; border-radius: 6px; background: #eef2f7; cursor: pointer; height: 32px; font-size: 13px; color: #5b6a7a; }
+#editorToolbar select:hover { background: #dce3ed; }
 .color-picker-popup { position: fixed; background: #fff; border: 1px solid #e8e8ed; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 14px; z-index: 2000; min-width: 220px; }
 .color-picker-popup .picker-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #1d1d1f; }
 .color-picker-popup .picker-hue-bar { width: 100%; height: 28px; border-radius: 8px; cursor: pointer; margin-bottom: 8px; border: 1px solid #e8e8ed; background: linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%)); position: relative; }
 .color-picker-popup .picker-hue-bar .hue-indicator { position: absolute; top: -2px; bottom: -2px; width: 4px; border-radius: 2px; background: #1d1d1f; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); pointer-events: none; }
 .color-picker-popup .picker-swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .color-picker-popup .picker-swatches .swatch { display: inline-block; width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
-.color-picker-popup .picker-swatches .swatch:hover { transform: scale(1.2); border-color: #007aff; }
+.color-picker-popup .picker-swatches .swatch:hover { transform: scale(1.2); border-color: #5b8dd9; }
 .color-picker-popup .picker-none-btn { display: block; width: 100%; padding: 8px; border: 1px dashed #c7c7cc; border-radius: 8px; background: #fafafa; cursor: pointer; font-size: 13px; color: #8e8e93; text-align: center; transition: all 0.15s; }
 .color-picker-popup .picker-none-btn:hover { background: #f0f0f5; border-color: #8e8e93; color: #1d1d1f; }
 
 #story { width: 100%; min-height: 220px; padding: 14px; border: 1px solid #e8e8ed; border-radius: 0 0 10px 10px; font-size: 15px; line-height: 1.7; outline: none; overflow-y: auto; background: #fff; }
-#story:focus { border-color: #007aff; }
+#story:focus { border-color: #5b8dd9; }
 
-#publishBtn { background: #007aff; color: white; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 12px; transition: background 0.15s; }
-#publishBtn:hover { background: #0062cc; }
-#cancelBtn { background: #8e8e93; color: white; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 12px; margin-left: 8px; transition: background 0.15s; }
-#cancelBtn:hover { background: #6c757d; }
+#publishBtn { background: #5b8dd9; color: white; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 12px; transition: background 0.15s; }
+#publishBtn:hover { background: #4a7bbd; }
+#cancelBtn { background: #9aa5b5; color: white; padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 12px; margin-left: 8px; transition: background 0.15s; }
+#cancelBtn:hover { background: #8692a2; }
 
-.search-stats { padding: 8px 12px; background: #f0f7ff; border-radius: 8px; margin-bottom: 12px; font-size: 13px; color: #007aff; border: 1px solid #d4e6ff; }
+.search-stats { padding: 8px 12px; background: #f0f7ff; border-radius: 8px; margin-bottom: 12px; font-size: 13px; color: #5b8dd9; border: 1px solid #d4e6ff; }
 .search-stats strong { font-weight: 700; }
 .content-lines { font-family: "SF Mono", "Menlo", "Consolas", monospace; font-size: 13px; line-height: 1.8; }
 .content-line { display: flex; padding: 1px 0; align-items: baseline; }
@@ -113,12 +114,12 @@ body.dark-mode #folderTabs .folder-tab.active { background: #007aff; color: #fff
 #editorFolderRow { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 #editorFolderRow label { font-size: 13px; font-weight: 500; margin: 0; color: #555; white-space: nowrap; }
 #noteFolderSelect { padding: 8px 12px; border: 1px solid #e8e8ed; border-radius: 8px; font-size: 13px; background: #fff; outline: none; flex: 1; min-width: 100px; }
-#editorNewFolderBtn { padding: 6px 12px; border: 1px dashed #007aff; border-radius: 8px; background: transparent; color: #007aff; font-size: 13px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+#editorNewFolderBtn { padding: 6px 12px; border: 1px dashed #5b8dd9; border-radius: 8px; background: transparent; color: #5b8dd9; font-size: 13px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
 #editorNewFolderBtn:hover { background: #f0f7ff; border-style: solid; }
 
 .note-timestamp { font-size: 12px; color: #8e8e93; margin-top: 12px; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 8px; }
 .note-wordcount { font-size: 11px; color: #8e8e93; margin-top: 2px; text-align: right; }
-.auto-save-indicator { font-size: 11px; color: #34c759; margin-left: 8px; display: none; }
+.auto-save-indicator { font-size: 11px; color: #6bb39b; margin-left: 8px; display: none; }
 
 /* Dark mode */
 body.dark-mode { background: #1c1c1e; color: #f5f5f7; }
@@ -126,8 +127,11 @@ body.dark-mode #noteList li { background: #2c2c2e; box-shadow: 0 1px 3px rgba(0,
 body.dark-mode .note-content { background: #3a3a3c; border-color: #48484a; }
 body.dark-mode #editor { background: #2c2c2e; }
 body.dark-mode #editorToolbar { background: #3a3a3c; border-color: #48484a; }
-body.dark-mode #editorToolbar button, body.dark-mode #editorToolbar select { background: #48484a; border-color: #555; color: #f5f5f7; }
+body.dark-mode #editorToolbar button, body.dark-mode #editorToolbar select { background: #48484a; border-color: #6a6a6e; color: #f5f5f7; }
+body.dark-mode #editorToolbar button:hover { background: #5a5a5e; }
 body.dark-mode #mainSearchBar { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
+body.dark-mode #mainSearchBar:focus { border-color: #5b8dd9; }
+body.dark-mode #story:focus { border-color: #5b8dd9; }
 body.dark-mode #story { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
 body.dark-mode #actionMenu { background: #2c2c2e; border-color: #48484a; }
 body.dark-mode #actionMenu button, body.dark-mode #actionMenu input, body.dark-mode #actionMenu select { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
@@ -135,7 +139,7 @@ body.dark-mode #actionMenu button:hover { background: #48484a; }
 body.dark-mode #folderListContainer { background: #2c2c2e; border-color: #48484a; }
 body.dark-mode .color-picker-popup { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
 body.dark-mode .color-picker-popup .picker-none-btn { background: #3a3a3c; color: #aaa; border-color: #555; }
-body.dark-mode .search-stats { background: #1a2a40; border-color: #2a4a6a; color: #5ac8fa; }
+body.dark-mode .search-stats { background: #1a2a40; border-color: #2a4a6a; color: #5b8dd9; }
 body.dark-mode #editor input#title { background: transparent; color: #f5f5f7; border-bottom-color: #48484a; }
 body.dark-mode #pagination button { background: #2c2c2e; border-color: #48484a; color: #f5f5f7; }
 body.dark-mode .note-timestamp { color: #8e8e93; border-top-color: #48484a; }
@@ -148,21 +152,25 @@ body.dark-mode #darkModeToggle { color: #ffd60a; }
 body.dark-mode #darkModeToggle:hover { background: #3a3a3c; }
 body.dark-mode #noteFolderSelect { background: #3a3a3c; border-color: #48484a; color: #f5f5f7; }
 body.dark-mode #editorFolderRow label { color: #aaa; }
-body.dark-mode #editorNewFolderBtn { color: #5e9eff; border-color: #5e9eff; }
+body.dark-mode #editorNewFolderBtn { color: #5b8dd9; border-color: #5b8dd9; }
 body.dark-mode #editorNewFolderBtn:hover { background: #1a2a40; }
 
 #darkModeToggle { background: none; border: none; font-size: 20px; cursor: pointer; padding: 2px 6px; border-radius: 6px; line-height: 1; margin-right: 6px; }
 #darkModeToggle:hover { background: #e8e8ed; }
+#headerNewBtn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 2px 10px; border-radius: 6px; line-height: 1; margin-right: 4px; font-weight: 600; color: #5b8dd9; }
+#headerNewBtn:hover { background: #e8e8ed; }
+body.dark-mode #headerNewBtn { color: #5b8dd9; }
+body.dark-mode #headerNewBtn:hover { background: #3a3a3c; }
 
 /* Trash */
 #trashContainer { margin-top: 20px; border: 1px solid #e8e8ed; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: none; }
 #trashList { list-style: none; padding: 0; margin-top: 15px; }
 #trashList li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
 #trashList li:last-child { border-bottom: none; }
-.empty-trash-btn { background: #ff3b30; color: white; }
-.empty-trash-btn:hover { background: #d62d20; }
-.restore-btn { background: #ff9500; color: white; }
-.restore-btn:hover { background: #e08600; }
+.empty-trash-btn { background: #e8685a; color: white; }
+.empty-trash-btn:hover { background: #ce5c4e; }
+.restore-btn { background: #5b8dd9; color: white; }
+.restore-btn:hover { background: #4a7bbd; }
 
 /* Tags */
 .tag-badge { display:inline-block; font-size:11px; padding:2px 8px; border-radius:10px; margin:2px 3px 2px 0; background:#e8e8ed; color:#555; cursor:default; }
@@ -171,10 +179,10 @@ body.dark-mode .tag-badge[style*="background"] { color:#fff !important; }
 .tag-picker-popup { position:fixed; background:#fff; border:1px solid #e8e8ed; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15); padding:14px; z-index:6000; min-width:260px; }
 body.dark-mode .tag-picker-popup { background:#2c2c2e; border-color:#48484a; }
 .tag-picker-popup .tag-option { display:inline-block; padding:4px 12px; border-radius:12px; margin:3px; font-size:12px; cursor:pointer; border:1px solid #d1d1d6; background:#f8f8fa; transition:all 0.15s; }
-.tag-picker-popup .tag-option:hover { border-color:#007aff; }
-.tag-picker-popup .tag-option.selected { background:#007aff; color:#fff; border-color:#007aff; }
+.tag-picker-popup .tag-option:hover { border-color:#5b8dd9; }
+.tag-picker-popup .tag-option.selected { background:#5b8dd9; color:#fff; border-color:#5b8dd9; }
 body.dark-mode .tag-picker-popup .tag-option { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
-body.dark-mode .tag-picker-popup .tag-option.selected { background:#007aff; }
+body.dark-mode .tag-picker-popup .tag-option.selected { background:#5b8dd9; }
 .tag-picker-popup .tag-new-row { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
 .tag-picker-popup .tag-new-row input { flex:1; min-width:120px; padding:8px; border:1px solid #e8e8ed; border-radius:8px; font-size:13px; outline:none; }
 body.dark-mode .tag-picker-popup .tag-new-row input { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
@@ -186,8 +194,8 @@ body.dark-mode .tag-picker-popup .tag-color-dot.active { border-color:#fff; }
 #tagManagementContainer { margin-top:20px; border:1px solid #e8e8ed; padding:20px; border-radius:12px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); display:none; }
 .note-anchor-marker { display:inline; font-size:11px; opacity:0.5; cursor:pointer; padding:0 2px; user-select:none; }
 body.dark-mode .note-anchor-marker { opacity:0.4; }
-.note-anchor-link { color:#007aff; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #007aff; font-size:13px; }
-body.dark-mode .note-anchor-link { color:#5e9eff; border-bottom-color:#5e9eff; }
+.note-anchor-link { color:#5b8dd9; text-decoration:underline; cursor:pointer; border-bottom:1px dashed #5b8dd9; font-size:13px; }
+body.dark-mode .note-anchor-link { color:#5b8dd9; border-bottom-color:#5b8dd9; }
 #anchorMgmtSection { margin-top:16px; padding-top:14px; border-top:2px solid #e8e8ed; }
 body.dark-mode #anchorMgmtSection { border-top-color:#48484a; }
 #anchorMgmtList { list-style:none; padding:0; margin-top:8px; }
@@ -212,9 +220,9 @@ body.dark-mode #lockScreen { background:#1c1c1e; }
 body.dark-mode #lockScreen .lock-card { background:#2c2c2e; }
 #lockScreen .lock-title { font-size:20px; font-weight:700; margin-bottom:20px; }
 #lockScreen input[type="password"] { width:100%; padding:12px; border:2px solid #e8e8ed; border-radius:10px; font-size:16px; outline:none; text-align:center; margin-bottom:12px; }
-#lockScreen input[type="password"]:focus { border-color:#007aff; }
+#lockScreen input[type="password"]:focus { border-color:#5b8dd9; }
 body.dark-mode #lockScreen input[type="password"] { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
-#lockScreen .lock-error { color:#ff3b30; font-size:13px; margin-bottom:8px; display:none; }
+#lockScreen .lock-error { color:#e8685a; font-size:13px; margin-bottom:8px; display:none; }
 #lockScreen button { width:100%; padding:12px; border-radius:10px; font-size:16px; font-weight:600; }
 
 /* Settings */
@@ -222,10 +230,17 @@ body.dark-mode #lockScreen input[type="password"] { background:#3a3a3c; border-c
 #settingsContainer h2 { font-size:18px; font-weight:700; margin:0 0 16px; }
 #settingsContainer label { display:block; font-size:13px; font-weight:500; color:#555; margin-top:12px; margin-bottom:4px; }
 #settingsContainer input[type="text"], #settingsContainer input[type="password"] { width:100%; padding:10px; border:1px solid #e8e8ed; border-radius:8px; font-size:14px; outline:none; }
-#settingsContainer input:focus { border-color:#007aff; }
+#settingsContainer input:focus { border-color:#5b8dd9; }
+#anchorNamePopup .popup-input { width:100%; padding:10px; border:1px solid #e8e8ed; border-radius:8px; font-size:14px; outline:none; box-sizing:border-box; }
+#anchorNamePopup .popup-input:focus { border-color:#5b8dd9; }
+#anchorNamePopup .popup-cancel-btn { padding:8px 16px; border:1px solid #e8e8ed; border-radius:8px; background:#f8f8fa; cursor:pointer; font-size:13px; }
+#anchorNamePopup .popup-confirm-btn { padding:8px 16px; border:none; border-radius:8px; background:#5b8dd9; color:#fff; cursor:pointer; font-size:13px; }
+#anchorNamePopup .popup-confirm-btn:hover { background:#4a7bbd; }
 body.dark-mode #settingsContainer { background:#2c2c2e; border-color:#48484a; }
 body.dark-mode #settingsContainer label { color:#aaa; }
 body.dark-mode #settingsContainer input { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
+body.dark-mode #anchorNamePopup .popup-input { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
+body.dark-mode #anchorNamePopup .popup-cancel-btn { background:#3a3a3c; border-color:#48484a; color:#f5f5f7; }
 .sync-indicator { font-size:12px; color:#8e8e93; margin-left:6px; }
 .sync-indicator.syncing { color:#ff9500; }
 .sync-indicator.done { color:#34c759; }
@@ -279,14 +294,14 @@ body.dark-mode .viewer-header { border-bottom-color:#48484a; }
 .viewer-header .viewer-menu-btn { background:none; border:none; font-size:22px; cursor:pointer; padding:4px 8px; border-radius:6px; margin:0; line-height:1; }
 .viewer-header .viewer-menu-btn:hover { background:#f0f0f5; }
 body.dark-mode .viewer-header .viewer-menu-btn:hover { background:#3a3a3c; }
-.viewer-header .viewer-menu { position:absolute; top:calc(100% + 4px); left:16px; background:#fff; border:1px solid #e8e8ed; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); padding:8px; z-index:5001; display:none; flex-direction:column; gap:4px; min-width:140px; }
+.viewer-header .viewer-menu { position:absolute; top:calc(100% + 4px); right:16px; background:#fff; border:1px solid #e8e8ed; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); padding:8px; z-index:5001; display:none; flex-direction:column; gap:4px; min-width:140px; }
 body.dark-mode .viewer-header .viewer-menu { background:#2c2c2e; border-color:#48484a; }
 .viewer-header .viewer-menu button { width:100%; padding:8px 14px; border:none; border-radius:6px; font-size:13px; cursor:pointer; text-align:left; background:none; margin:0; }
 .viewer-header .viewer-menu button:hover { background:#f0f0f5; }
 body.dark-mode .viewer-header .viewer-menu button:hover { background:#3a3a3c; }
 .viewer-header .viewer-font-controls { display:flex; align-items:center; gap:4px; margin-left:auto; margin-right:12px; }
-.viewer-header .viewer-font-controls button { padding:4px 10px; border:1px solid #e8e8ed; border-radius:6px; background:#fff; cursor:pointer; font-size:15px; font-weight:600; margin:0; line-height:1.4; }
-body.dark-mode .viewer-header .viewer-font-controls button { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.viewer-header .viewer-font-controls button { padding:4px 10px; border:1px solid #9aa5b5; border-radius:6px; background:#eef2f7; cursor:pointer; font-size:15px; font-weight:600; margin:0; line-height:1.4; color: #5b6a7a; }
+body.dark-mode .viewer-header .viewer-font-controls button { background:#3a3a3c; border-color:#6a6a6e; color:#f5f5f7; }
 .viewer-header .viewer-font-controls .font-size-label { font-size:13px; min-width:28px; text-align:center; color:#8e8e93; }
 .viewer-header .viewer-close-btn { background:none; border:none; font-size:24px; cursor:pointer; padding:4px 8px; border-radius:6px; margin:0; line-height:1; color:#8e8e93; }
 .viewer-header .viewer-close-btn:hover { background:#f0f0f5; color:#1d1d1f; }
@@ -307,8 +322,8 @@ body.dark-mode .viewer-body .viewer-content .search-nav { background:rgba(44,44,
 body.dark-mode .viewer-body .viewer-content .highlight { background:#b8860b; color:#fff; }
 .viewer-content .search-nav { position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:6px; margin-bottom:8px; background:rgba(255,255,255,0.95); padding:6px 10px; border-radius:8px; border:1px solid #e8e8ed; backdrop-filter:blur(4px); }
 body.dark-mode .viewer-content .search-nav { background:rgba(44,44,46,0.95); border-color:#48484a; }
-.viewer-content .search-nav button { padding:4px 10px; border:1px solid #d1d1d6; border-radius:6px; background:#f8f8fa; cursor:pointer; font-size:12px; margin:0; }
-body.dark-mode .viewer-content .search-nav button { background:#3a3a3c; border-color:#555; color:#f5f5f7; }
+.viewer-content .search-nav button { padding:4px 10px; border:1px solid #9aa5b5; border-radius:6px; background:#eef2f7; cursor:pointer; font-size:12px; margin:0; color: #5b6a7a; }
+body.dark-mode .viewer-content .search-nav button { background:#3a3a3c; border-color:#6a6a6e; color:#f5f5f7; }
 .viewer-content .search-nav .search-count { font-size:12px; color:#8e8e93; min-width:60px; text-align:center; }
 .viewer-footer { padding:12px 20px; border-top:1px solid #e8e8ed; display:flex; justify-content:space-between; font-size:12px; color:#8e8e93; flex-shrink:0; }
 body.dark-mode .viewer-footer { border-top-color:#48484a; }
@@ -348,7 +363,7 @@ body.dark-mode #anchorSearchResults h3 {
     color: #f5f5f7;
 }
 #anchorSearchResults h3 button {
-    background: #8e8e93;
+    background: #9aa5b5;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -357,7 +372,7 @@ body.dark-mode #anchorSearchResults h3 {
     font-size: 12px;
 }
 #anchorSearchResults h3 button:hover {
-    background: #6c757d;
+    background: #8692a2;
 }
 #anchorSearchResults ul {
     list-style: none;
@@ -395,20 +410,22 @@ body.dark-mode #anchorSearchResults li:hover {
 }
 
 /* =====新增锚点样式===== */
-.note-anchor-marker.linked { color:#007aff; opacity:1; font-size:14px; font-weight:600; }
-body.dark-mode .note-anchor-marker.linked { color:#5e9eff; }
-.note-anchor-marker .anchor-jump-info { font-size:11px; font-weight:400; color:#007aff; margin-left:2px; opacity:0.8; }
-body.dark-mode .note-anchor-marker .anchor-jump-info { color:#5e9eff; }
-.note-anchor-link.linked { color:#007aff; border-bottom-color:#007aff; font-size:14px; font-weight:600; }
-body.dark-mode .note-anchor-link.linked { color:#5e9eff; border-bottom-color:#5e9eff; }
-.note-anchor-link .anchor-jump-info { font-size:11px; font-weight:400; color:#007aff; margin-left:2px; opacity:0.8; }
-body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
+.note-anchor-marker.linked { color:#5b8dd9; opacity:1; font-size:14px; font-weight:600; }
+body.dark-mode .note-anchor-marker.linked { color:#5b8dd9; }
+.note-anchor-marker .anchor-jump-info { font-size:11px; font-weight:400; color:#5b8dd9; margin-left:2px; opacity:0.8; }
+body.dark-mode .note-anchor-marker .anchor-jump-info { color:#5b8dd9; }
+.note-anchor-link.linked { color:#5b8dd9; border-bottom-color:#5b8dd9; font-size:14px; font-weight:600; }
+body.dark-mode .note-anchor-link.linked { color:#5b8dd9; border-bottom-color:#5b8dd9; }
+.note-anchor-link .anchor-jump-info { font-size:11px; font-weight:400; color:#5b8dd9; margin-left:2px; opacity:0.8; }
+body.dark-mode .note-anchor-link .anchor-jump-info { color:#5b8dd9; }
+#toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1d1d1f; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; display: none; max-width: 90%; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="header-section">
     <h1>简洁笔记本</h1>
+    <button id="headerNewBtn">+</button>
     <button id="darkModeToggle">🌙</button>
     <div style="position: relative;">
         <button id="menuToggleButton"></button>
@@ -416,8 +433,8 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
             <button id="homeBtn">首页</button>
             <button id="newBtn">新建笔记</button>
             <button id="showAllNotesBtn">全部笔记</button>
-            <button id="showTrashBtn" style="background:#ff3b30;color:white;">回收站</button>
-            <button id="showTagsBtn" style="background:#5e5ce6;color:white;">标签管理</button>
+            <button id="showTrashBtn" style="background:#e8685a;color:white;">回收站</button>
+            <button id="showTagsBtn" style="background:#b388d9;color:white;">标签管理</button>
             <button id="exportDataBtn">导出数据(JSON)</button>
             <button id="importDataBtn">导入数据(JSON)</button>
             <button id="showSettingsBtn">⚙️ 设置</button>
@@ -459,7 +476,7 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
     <button id="fmtAnchorLink" title="插入跳转到锚点的链接">↗ 跳转</button>
     <button id="fmtBullet" title="项目符号">• 列表</button>
     <button id="fmtNumber" title="编号列表">1. 列表</button>
-    <button id="fmtTagBtn" title="标签" style="background:#5e5ce6;color:white;"># 标签</button>
+    <button id="fmtTagBtn" title="标签" style="background:#b388d9;color:white;"># 标签</button>
     <span class="auto-save-indicator" id="autoSaveIndicator">已保存</span>
   </div>
   <div id="story" contenteditable="true"></div>
@@ -486,7 +503,7 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
   <div id="tagPickerList"></div>
   <div class="tag-new-row">
     <input type="text" id="tagPickerNewInput" placeholder="新建标签...">
-    <button id="tagPickerNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">添加</button>
+    <button id="tagPickerNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#5b8dd9;color:#fff;cursor:pointer;font-size:13px;">添加</button>
   </div>
 </div>
 
@@ -504,14 +521,29 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
   <div id="anchorInfoList"></div>
 </div>
 
+<!-- 锚点名称输入弹窗（替代 prompt，适配手机） -->
+<div id="anchorNamePopup" class="tag-picker-popup" style="display:none; max-height:80vh; overflow-y:auto;">
+  <div class="picker-title">📌 已有锚点</div>
+  <div id="anchorNameExistingList" style="max-height:200px; overflow-y:auto; margin-bottom:8px;"></div>
+  <div style="height:1px;background:#e8e8ed;margin:6px 0;"></div>
+  <div class="picker-title" style="font-size:13px;">新建锚点</div>
+  <div style="padding:6px 0;">
+    <input type="text" id="anchorNameInput" class="popup-input" placeholder="输入锚点名称（英文或数字）">
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;">
+    <button id="anchorNameCancelBtn" class="popup-cancel-btn">取消</button>
+    <button id="anchorNameConfirmBtn" class="popup-confirm-btn">确定</button>
+  </div>
+</div>
+
 <!-- 版本历史弹窗 -->
 <div id="versionHistoryPopup" class="tag-picker-popup" style="display:none; max-height: 70vh; overflow-y: auto; min-width: 320px;">
   <div class="picker-title">📋 版本历史（最近30天）</div>
   <div style="font-size:12px; color:#8e8e93; margin-bottom:10px;">点击日期可恢复该版本（会自动备份当前版本）</div>
   <div id="versionHistoryList" style="margin-bottom:8px;"></div>
   <div style="display:flex; gap:6px;">
-    <button id="versionHistoryCloseBtn" style="flex:1; background:#8e8e93; color:white;">关闭</button>
-    <button id="versionHistoryBackupBtn" style="flex:1; background:#007aff; color:white;">📥 导出当前数据</button>
+    <button id="versionHistoryCloseBtn" style="flex:1; background:#9aa5b5; color:white;">关闭</button>
+    <button id="versionHistoryBackupBtn" style="flex:1; background:#5b8dd9; color:white;">📥 导出当前数据</button>
   </div>
 </div>
 
@@ -525,7 +557,7 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
     <h2 style="font-size:18px;font-weight:700;margin-top:0;">回收站</h2>
     <ul id="trashList"></ul>
     <button class="empty-trash-btn" id="emptyTrashBtn">清空回收站</button>
-    <button id="backFromTrashBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+    <button id="backFromTrashBtn" style="background:#9aa5b5;color:white;margin-top:8px;">返回笔记列表</button>
 </div>
 
 <div id="tagManagementContainer">
@@ -533,19 +565,19 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
     <div class="tag-new-row" style="margin-bottom:12px;">
       <input type="text" id="tagMgmtNewInput" placeholder="新建标签...">
       <span class="new-tag-colors" id="tagMgmtNewColors"></span>
-      <button id="tagMgmtNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#007aff;color:#fff;cursor:pointer;font-size:13px;">新建</button>
+      <button id="tagMgmtNewBtn" style="padding:6px 14px;border:none;border-radius:8px;background:#5b8dd9;color:#fff;cursor:pointer;font-size:13px;">新建</button>
     </div>
     <ul id="tagManagementList"></ul>
     <div id="anchorMgmtSection">
       <h3 style="font-size:15px;font-weight:600;margin:0 0 4px;">锚点列表</h3>
       <ul id="anchorMgmtList"></ul>
     </div>
-    <button id="backFromTagsBtn" style="background:#6c757d;color:white;margin-top:8px;">返回笔记列表</button>
+    <button id="backFromTagsBtn" style="background:#9aa5b5;color:white;margin-top:8px;">返回笔记列表</button>
 </div>
 
 <div id="noteViewer">
   <div class="viewer-header">
-    <button class="viewer-menu-btn" id="viewerMenuBtn">☰</button>
+    <button class="viewer-close-btn" id="viewerCloseBtn">✕</button>
     <div class="viewer-menu" id="viewerMenu">
       <button id="viewerEditBtn">✏️ 编辑</button>
       <button id="viewerExportTxtBtn">📄 导出TXT</button>
@@ -558,7 +590,7 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
       <span class="font-size-label" id="viewerFontLabel">16</span>
       <button id="viewerFontInc">A+</button>
     </div>
-    <button class="viewer-close-btn" id="viewerCloseBtn">✕</button>
+    <button class="viewer-menu-btn" id="viewerMenuBtn">☰</button>
   </div>
   <div class="viewer-body">
     <div class="viewer-title" id="viewerTitle"></div>
@@ -575,7 +607,7 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
     <div class="lock-title">🔒 笔记已锁定</div>
     <input type="password" id="lockPasswordInput" placeholder="请输入密码" autocomplete="off">
     <div class="lock-error" id="lockError">密码错误，请重试</div>
-    <button id="lockUnlockBtn" style="background:#007aff;color:white;">解锁</button>
+    <button id="lockUnlockBtn" style="background:#5b8dd9;color:white;">解锁</button>
   </div>
 </div>
 
@@ -585,7 +617,10 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
   <input type="password" id="settingsPassword" placeholder="留空则不设密码">
   <label>确认密码</label>
   <input type="password" id="settingsPasswordConfirm" placeholder="再次输入密码">
-  <button id="settingsSavePasswordBtn" style="background:#ff9500;color:white;margin-bottom:16px;">保存密码</button>
+  <div id="settingsPasswordRow" style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+    <button id="settingsSavePasswordBtn" style="background:#5b8dd9;color:white;">保存密码</button>
+    <button id="settingsDeletePasswordBtn" style="background:#e8685a;color:white;">删除密码</button>
+  </div>
   <hr style="border:none;border-top:1px solid #e8e8ed;margin:16px 0;">
   <label>GitHub Token</label>
   <input type="text" id="settingsGitToken" placeholder="ghp_...">
@@ -593,8 +628,11 @@ body.dark-mode .note-anchor-link .anchor-jump-info { color:#5e9eff; }
   <input type="text" id="settingsGitRepo" value="m1978xz/m1978xz.github.io">
   <label>文件路径</label>
   <input type="text" id="settingsGitPath" value="biji/notebook-data.json">
-  <button id="settingsSaveGitBtn" style="background:#007aff;color:white;margin-top:8px;">保存设置</button>
+  <button id="settingsSaveGitBtn" style="background:#5b8dd9;color:white;margin-top:8px;">保存设置</button>
   <span class="sync-indicator" id="syncIndicator"></span>
+  <hr style="border:none;border-top:1px solid #e8e8ed;margin:16px 0;">
+  <label>自动备份 (保留最近3份)</label>
+  <div id="backupListContainer" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;"></div>
 </div>
 
 <input type="file" id="importFileInput" accept=".json" style="display:none;">
@@ -805,6 +843,10 @@ function addLinkTarget(html) {
 
 function normalizeContentForDisplay(html) {
     var s = html;
+    /* 如果内容不是以 HTML 标签开头，用 <div> 包裹（修复 contentEditable 裸文本导致行合并） */
+    if (s && !/^\s*</.test(s)) {
+        s = '<div>' + s + '</div>';
+    }
     var anchors = [], alinks = [];
     s = s.replace(/<span[^>]*data-anchor-id=["'][^"']*["'][^>]*>.*?<\/span>/gi, function(m) { anchors.push(m); return '%%AM' + (anchors.length - 1) + '%%'; });
     s = s.replace(/<a[^>]*data-note-anchor=["'][^"']*["'][^>]*>.*?<\/a>/gi, function(m) { alinks.push(m); return '%%AL' + (alinks.length - 1) + '%%'; });
@@ -818,8 +860,17 @@ function normalizeContentForDisplay(html) {
         inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, function(lm, lc) { items.push(lc.trim()); return lm; });
         return items.map(function(t) { return '  \u2022 ' + t; }).join('\n') + '\n';
     });
+    /* 剥离内联格式标签，暴露被包裹的 <br>（如 <span style="..."><br></span>） */
+    s = s.replace(/<span[^>]*>/gi, '');
+    s = s.replace(/<\/span>/gi, '');
+    s = s.replace(/<font[^>]*>/gi, '');
+    s = s.replace(/<\/font>/gi, '');
+    /* 包裹 <div> 内的裸文本，使其有独立的 </div> 提供换行（修复 contentEditable 首行无包裹导致空行丢失） */
+    s = s.replace(/(<div[^>]*>)([^<]+?)(?=<div\b)/gi, '$1<div>$2</div>');
     s = s.replace(/<p[^>]*>\s*<br\s*\/?>\s*<\/p>/gi, '\n');
     s = s.replace(/<div[^>]*>\s*<br\s*\/?>\s*<\/div>/gi, '\n');
+    s = s.replace(/<div[^>]*>\s*<\/div>/gi, '\n');
+    s = s.replace(/<p[^>]*>\s*<\/p>/gi, '\n');
     s = s.replace(/<\/p>/gi, '\n');
     s = s.replace(/<\/div>/gi, '\n');
     s = s.replace(/<\/h[1-6]>/gi, '\n');
@@ -984,19 +1035,7 @@ function renderList(filteredNotes, searchTerm) {
         var cardActions = document.createElement('div');
         cardActions.className = 'action-buttons';
         cardActions.style.margin = '0';
-        var exportTxtBtn = document.createElement("button");
-        exportTxtBtn.textContent = "TXT";
-        exportTxtBtn.classList.add("export-btn");
-        exportTxtBtn.style.padding = '3px 10px';
-        exportTxtBtn.onclick = function(event) { event.stopPropagation(); exportNoteToTxt(n.id); };
-        cardActions.appendChild(exportTxtBtn);
-        var exportMdBtn = document.createElement("button");
-        exportMdBtn.textContent = "MD";
-        exportMdBtn.classList.add("export-btn");
-        exportMdBtn.style.padding = '3px 10px';
-        exportMdBtn.style.backgroundColor = "#6f42c1";
-        exportMdBtn.onclick = function(event) { event.stopPropagation(); exportNoteToMd(n.id); };
-        cardActions.appendChild(exportMdBtn);
+        /* ★ 需求2：删除了 TXT 和 MD 导出按钮 ★ */
         var editBtn = document.createElement("button");
         editBtn.textContent = "编辑";
         editBtn.classList.add("edit-btn");
@@ -1156,6 +1195,10 @@ document.addEventListener("click", function(event) {
     if (tPopup.style.display === 'block' && !tPopup.contains(event.target) && event.target.id !== 'fmtTagBtn') {
         tPopup.style.display = 'none';
     }
+    var aPopup = document.querySelector("#anchorNamePopup");
+    if (aPopup.style.display === 'block' && !aPopup.contains(event.target) && event.target.id !== 'fmtAnchor') {
+        aPopup.style.display = 'none';
+    }
 });
 
 document.querySelector("#fmtUndo").onclick = function() { storyDiv.focus(); document.execCommand('undo'); };
@@ -1177,6 +1220,8 @@ document.querySelector("#fmtLink").onclick = function() {
     }
 };
 
+/* ★ 需求1：锚点输入改用自定义弹窗，适配手机；同时列出已有锚点 ★ */
+document.querySelector("#fmtAnchor").onmousedown = function() { saveSelection(); };
 document.querySelector("#fmtAnchor").onclick = function() {
     var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
     var existingNums = [];
@@ -1184,16 +1229,76 @@ document.querySelector("#fmtAnchor").onclick = function() {
     var match;
     while ((match = numRegex.exec(allContent)) !== null) { existingNums.push(parseInt(match[1], 10)); }
     var nextNum = existingNums.length > 0 ? Math.max.apply(null, existingNums) + 1 : 1;
-    var name = prompt('输入锚点名称（英文或数字，用于跳转定位）：', 'm' + nextNum);
+    var defaultName = 'm' + nextNum;
+
+    /* 填充已有锚点列表 */
+    var existingList = document.querySelector("#anchorNameExistingList");
+    existingList.innerHTML = '';
+    var allAnchors = [];
+    notes.concat({ id: '__current__', title: '(当前笔记)', content: storyDiv.innerHTML }).forEach(function(n) {
+        var regex = /data-anchor-id=["']([^"']*)["']/gi;
+        var m;
+        while ((m = regex.exec(n.content)) !== null) {
+            allAnchors.push({ noteTitle: n.title, anchorId: m[1] });
+        }
+    });
+    if (allAnchors.length === 0) {
+        existingList.innerHTML = '<div style="padding:6px 0;color:#8e8e93;font-size:13px;">暂无锚点</div>';
+    } else {
+        allAnchors.forEach(function(a) {
+            var item = document.createElement('div');
+            item.className = 'picker-anchor-item';
+            item.style.fontSize = '13px';
+            item.textContent = '⚓ ' + a.anchorId.replace('anc_', '') + ' — ' + a.noteTitle;
+            item.onclick = function() {
+                /* 点击已有锚点自动填入名称以便覆盖 */
+                document.querySelector("#anchorNameInput").value = a.anchorId.replace('anc_', '');
+            };
+            existingList.appendChild(item);
+        });
+    }
+
+    var popup = document.querySelector("#anchorNamePopup");
+    var input = document.querySelector("#anchorNameInput");
+    input.value = defaultName;
+    var rect = this.getBoundingClientRect();
+    popup.style.left = Math.max(4, rect.left) + 'px';
+    popup.style.top = (rect.bottom + 4) + 'px';
+    popup.style.display = 'block';
+    setTimeout(function() { input.focus(); input.select(); }, 50);
+};
+
+function insertAnchor(name) {
     if (!name || !name.trim()) return;
     var id = 'anc_' + name.trim().replace(/[^a-zA-Z0-9_\-]/g, '_');
     var allContent = notes.map(function(n) { return n.content; }).join(' ') + ' ' + storyDiv.innerHTML;
-    var dupRegex = new RegExp('data-anchor-id=[\']' + id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '[\']', 'i');
+    var dupRegex = new RegExp('data-anchor-id=["\']' + id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '["\']', 'i');
     if (dupRegex.test(allContent)) {
-        alert('锚点 "' + name.trim() + '" 已存在。'); return;
+        alert('锚点 "' + name.trim() + '" 已存在。');
+        return;
+    }
+    /* 恢复光标位置再插入 */
+    if (savedRange) {
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(savedRange);
+        savedRange = null;
     }
     storyDiv.focus();
     document.execCommand('insertHTML', false, '<span data-anchor-id="' + id + '" class="note-anchor-marker">⚓' + name.trim() + '</span>');
+    document.querySelector("#anchorNamePopup").style.display = 'none';
+}
+
+document.querySelector("#anchorNameConfirmBtn").onclick = function() {
+    insertAnchor(document.querySelector("#anchorNameInput").value);
+};
+
+document.querySelector("#anchorNameCancelBtn").onclick = function() {
+    document.querySelector("#anchorNamePopup").style.display = 'none';
+};
+
+document.querySelector("#anchorNameInput").onkeydown = function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); insertAnchor(this.value); }
 };
 
 document.querySelector("#fmtAnchorLink").onclick = function() {
@@ -1207,7 +1312,8 @@ document.querySelector("#fmtAnchorLink").onclick = function() {
     list.innerHTML = '';
     searchInput.value = '';
     var allAnchors = [];
-    notes.forEach(function(n) {
+    /* 包含所有已保存笔记 + 当前编辑器中的锚点（未保存也可见） */
+    notes.concat({ id: '__current__', title: '(当前笔记)', content: storyDiv.innerHTML }).forEach(function(n) {
         var regex = /data-anchor-id=["']([^"']*)["']/gi;
         var m;
         while ((m = regex.exec(n.content)) !== null) {
@@ -1266,7 +1372,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-var TAG_COLORS = ['#e8e8ed','#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#5e5ce6','#af52de','#ff2d55'];
+var TAG_COLORS = ['#e8e8ed','#e8685a','#e8a060','#e8c860','#6bb39b','#5b8dd9','#b388d9','#e088a8','#9aa5b5'];
 var tagSelectedColor = TAG_COLORS[0];
 
 function renderTagPicker() {
@@ -1346,7 +1452,7 @@ function renderTagManagementList() {
         if (!groups[c]) groups[c] = [];
         groups[c].push(t);
     });
-    var colorNames = { '#e8e8ed':'默认','#ff3b30':'红','#ff9500':'橙','#ffcc00':'黄','#34c759':'绿','#007aff':'蓝','#5e5ce6':'靛','#af52de':'紫','#ff2d55':'粉' };
+    var colorNames = { '#e8e8ed':'默认','#e8685a':'珊瑚','#e8a060':'杏色','#e8c860':'浅黄','#6bb39b':'薄荷','#5b8dd9':'晴蓝','#b388d9':'淡紫','#e088a8':'粉红','#9aa5b5':'冷灰' };
     Object.keys(groups).forEach(function(c) {
         var groupHeader = document.createElement('div');
         groupHeader.style.cssText = 'font-size:13px;font-weight:600;color:' + c + ';margin:12px 0 4px 0;padding-top:8px;border-top:1px solid #e8e8ed;';
@@ -1497,6 +1603,7 @@ document.querySelector("#lockUnlockBtn").onclick = function() {
         document.querySelector("#lockError").style.display = 'block';
     }
 };
+
 document.querySelector("#lockPasswordInput").onkeydown = function(e) {
     if (e.key === 'Enter') document.querySelector("#lockUnlockBtn").click();
 };
@@ -1511,6 +1618,18 @@ document.querySelector("#settingsSavePasswordBtn").onclick = function() {
     document.querySelector("#settingsPassword").value = '';
     document.querySelector("#settingsPasswordConfirm").value = '';
     alert(p1 ? '密码已设置。' : '密码已清除。');
+    checkPassword();
+};
+
+/* ★ 需求4：删除密码按钮 ★ */
+document.querySelector("#settingsDeletePasswordBtn").onclick = function() {
+    if (!passwordHash) { alert('当前没有设置密码。'); return; }
+    if (!confirm('确定删除密码保护？删除后任何人都可访问你的笔记。')) return;
+    passwordHash = '';
+    localStorage.setItem('simpleNotesAppData_passwordHash', '');
+    document.querySelector("#settingsPassword").value = '';
+    document.querySelector("#settingsPasswordConfirm").value = '';
+    alert('密码已删除。');
     checkPassword();
 };
 
@@ -1640,6 +1759,45 @@ document.querySelector("#settingsSaveGitBtn").onclick = function() {
     alert('GitHub 设置已保存。');
     loadFromGitHub();
 };
+document.querySelectorAll(".download-backup-btn").forEach(function(btn) {
+    btn.onclick = function() {
+        var slot = this.getAttribute('data-slot');
+        var raw = localStorage.getItem('backup_' + slot);
+        if (!raw) { alert('备份' + slot + ' 不存在。'); return; }
+        var blob = new Blob([raw], { type: 'application/json;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = '笔记本数据_备份' + slot + '.json';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    };
+});
+function renderBackupButtons() {
+    var container = document.getElementById('backupListContainer');
+    if (!container) return;
+    var list = JSON.parse(localStorage.getItem('backup_list') || '[]');
+    if (list.length === 0) {
+        container.innerHTML = '<span style="font-size:12px;color:#9aa5b5;">暂无备份</span>';
+        return;
+    }
+    container.innerHTML = '';
+    list.slice().reverse().forEach(function(key) {
+        var btn = document.createElement('button');
+        btn.style.cssText = 'background:#9aa5b5;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;';
+        var label = key.replace('backup_', '');
+        btn.textContent = label;
+        btn.onclick = function() {
+            var raw = localStorage.getItem(key);
+            if (!raw) { alert('备份不存在'); return; }
+            var blob = new Blob([raw], { type: 'application/json;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = '笔记本数据_' + label + '.json';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        };
+        container.appendChild(btn);
+    });
+}
+renderBackupButtons();
 
 var origSaveData = saveData;
 saveData = function() {
@@ -1654,6 +1812,7 @@ function triggerAutoSave() {
         if (editor.style.display === 'block') {
             var t = titleInput.value.trim();
             var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
+            if (c && !/^\s*</.test(c)) { c = '<div>' + c + '</div>'; }
             var folderId = noteFolderSelect.value;
             var now = Date.now();
             if (t) {
@@ -1689,6 +1848,22 @@ document.querySelector("#darkModeToggle").onclick = function() {
     document.body.classList.toggle('dark-mode', darkMode);
     this.textContent = darkMode ? '☀️' : '🌙';
     localStorage.setItem('simpleNotesAppData_darkMode', darkMode);
+};
+document.querySelector("#headerNewBtn").onclick = function() {
+    editing = null;
+    titleInput.value = "";
+    storyDiv.innerHTML = "";
+    noteFolderSelect.value = 'unfiled';
+    editor.style.display = "block";
+    if (currentOpenNoteContentDiv) { currentOpenNoteContentDiv.style.display = 'none'; currentOpenNoteContentDiv = null; }
+    actionMenu.style.display = 'none';
+    folderListContainer.style.display = 'none';
+    document.querySelector("#trashContainer").style.display = 'none';
+    document.querySelector("#tagManagementContainer").style.display = 'none';
+    document.querySelector("#tagPickerPopup").style.display = 'none';
+    mainSearchBar.style.display = 'none';
+    folderTabs.style.display = 'none';
+    noteList.style.display = 'none';
 };
 
 function updateWordCount(noteId, contentDiv) {
@@ -1923,9 +2098,6 @@ function openNoteViewer(id, searchTerm) {
         });
         tagHtml += '</div>';
     }
-    var folderHtml = '';
-    var f = folders.find(function(fold) { return fold.id === note.folderId; });
-    if (f) folderHtml = '<span style="font-size:12px;color:#8e8e93;">📁 ' + f.name + '</span> &middot; ';
     var contentHtml = renderContentWithLines(note.content, viewerSearchTerm);
     if (viewerSearchTerm) {
         contentHtml = '<div class="search-nav"><button id="searchNavPrev">↑</button><span class="search-count" id="searchNavCount">0/0</span><button id="searchNavNext">↓</button></div>' + contentHtml;
@@ -1942,7 +2114,7 @@ function openNoteViewer(id, searchTerm) {
         if (highlights.length > 0) {
             countEl.textContent = '1/' + highlights.length;
             highlights[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            highlights[0].style.outline = '2px solid #007aff';
+            highlights[0].style.outline = '2px solid #5b8dd9';
         }
         var curIdx = 0;
         document.querySelector("#searchNavNext").onclick = function() {
@@ -1950,7 +2122,7 @@ function openNoteViewer(id, searchTerm) {
             highlights[curIdx].style.outline = '';
             curIdx = (curIdx + 1) % highlights.length;
             highlights[curIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            highlights[curIdx].style.outline = '2px solid #007aff';
+            highlights[curIdx].style.outline = '2px solid #5b8dd9';
             countEl.textContent = (curIdx + 1) + '/' + highlights.length;
         };
         document.querySelector("#searchNavPrev").onclick = function() {
@@ -1958,13 +2130,13 @@ function openNoteViewer(id, searchTerm) {
             highlights[curIdx].style.outline = '';
             curIdx = (curIdx - 1 + highlights.length) % highlights.length;
             highlights[curIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            highlights[curIdx].style.outline = '2px solid #007aff';
+            highlights[curIdx].style.outline = '2px solid #5b8dd9';
             countEl.textContent = (curIdx + 1) + '/' + highlights.length;
         };
     }
     var text = normalizeContentForDisplay(note.content).replace(/<[^>]+>/g, '').replace(/\\n/g, '');
     document.querySelector("#viewerWordCount").textContent = text.length + ' 字 · ' + (text ? text.split('\n').length : 0) + ' 行';
-    document.querySelector("#viewerTimestamp").textContent = (folderHtml || '') + '最后编辑: ' + formatTimestamp(note.lastModified);
+    document.querySelector("#viewerTimestamp").textContent = '最后编辑: ' + formatTimestamp(note.lastModified);
     document.querySelector("#viewerContent").style.fontSize = viewerFontSize + 'px';
     document.querySelector("#viewerFontLabel").textContent = viewerFontSize;
     document.querySelector("#viewerMenu").style.display = 'none';
@@ -2028,7 +2200,7 @@ function renderVersionHistory() {
         labelSpan.style.fontWeight = '500';
         var restoreBtn = document.createElement('button');
         restoreBtn.textContent = '恢复';
-        restoreBtn.style.cssText = 'padding:4px 12px; border:none; border-radius:6px; background:#007aff; color:white; cursor:pointer; font-size:12px;';
+        restoreBtn.style.cssText = 'padding:4px 12px; border:none; border-radius:6px; background:#5b8dd9; color:white; cursor:pointer; font-size:12px;';
         restoreBtn.onclick = function(e) {
             e.stopPropagation();
             restoreSnapshot(dayKey);
@@ -2242,6 +2414,8 @@ cancelBtn.onclick = function() {
 publishBtn.onclick = function() {
     var t = titleInput.value.trim();
     var c = storyDiv.innerHTML === '<br>' ? '' : storyDiv.innerHTML;
+    /* 保存时规范化结构，确保裸文本被 div 包裹，避免行合并 */
+    if (c && !/^\s*</.test(c)) { c = '<div>' + c + '</div>'; }
     var folderId = noteFolderSelect.value;
     var now = Date.now();
     if (!t) { alert("标题不能为空"); return; }
@@ -2447,7 +2621,7 @@ document.querySelector("#exportDataBtn").onclick = function() {
     var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = '笔记本数据_' + new Date().toISOString().slice(0, 10) + '.json';
+    a.href = url; a.download = '笔记本数据_' + new Date().toISOString().slice(0, 19).replace(/[:-]/g, '').replace('T', '_') + '.json';
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     actionMenu.style.display = 'none';
 };
@@ -2596,6 +2770,48 @@ renderFoldersDropdowns();
 showHomePage();
 checkPassword();
 loadFromGitHub();
+/* 关闭页面时强制导出备份 */
+var toastEl = document.createElement('div');
+toastEl.id = 'toast';
+document.body.appendChild(toastEl);
+function showToast(msg, duration) {
+    toastEl.textContent = msg;
+    toastEl.style.display = 'block';
+    if (duration) setTimeout(function() { toastEl.style.display = 'none'; }, duration);
+}
+function autoExportBackup() {
+    if (notes.length === 0) return;
+    var data = { notes: notes, folders: folders, trash: trash, tags: tags };
+    var json = JSON.stringify(data, null, 2);
+    /* 生成时间戳 key，保留最近3份 */
+    var now = new Date();
+    var ts = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0') + String(now.getSeconds()).padStart(2,'0');
+    var key = 'backup_' + ts;
+    localStorage.setItem(key, json);
+    var list = JSON.parse(localStorage.getItem('backup_list') || '[]');
+    list.push(key);
+    if (list.length > 3) {
+        var old = list.shift();
+        localStorage.removeItem(old);
+    }
+    localStorage.setItem('backup_list', JSON.stringify(list));
+    /* 同时下载文件 */
+    var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = '笔记本数据_' + ts + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('📥 已备份 (保留最近3份)', 3000);
+}
+/* 页面隐藏时（关闭/切换标签）自动备份（每分钟最多一次） */
+var lastBackupTime = 0;
+document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden' && notes.length > 0 && Date.now() - lastBackupTime > 60000) {
+        lastBackupTime = Date.now();
+        autoExportBackup();
+    }
+});
 </script>
 </body>
 </html>
+
