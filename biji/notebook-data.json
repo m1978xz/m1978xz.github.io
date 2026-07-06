@@ -22,8 +22,8 @@
       "id": "id_1783153908976_5q12cqknk",
       "folderId": "unfiled",
       "title": "m2",
-      "content": "<span style=\"font-size: 11px;\">测试第一行</span><div><span style=\"font-size: 11px;\">测试第二行</span></div><div><span style=\"font-size: 11px;\"><br></span></div>",
-      "lastModified": 1783308255656,
+      "content": "<span style=\"font-size: 11px;\">测试第一行</span><div><span style=\"font-size: 11px;\">测试第二行</span></div><div><span data-anchor-id=\"anc_m2\" class=\"note-anchor-marker\">⚓m2</span><span style=\"font-size: 11px;\"></span></div>",
+      "lastModified": 1783308261176,
       "tags": []
     },
     {
