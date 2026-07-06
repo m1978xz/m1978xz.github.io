@@ -39,7 +39,8 @@
       "folderId": "unfiled",
       "title": "m1",
       "content": "<div>测试1<div><br></div><div>测试2</div><div><br></div><div><br></div><div>测试2行</div><div><br></div><div><br></div><div><br></div><div>测试3行</div><div><span data-anchor-id=\"anc_m1\" class=\"note-anchor-marker\">⚓m1</span></div></div>",
-      "lastModified": 1783317037389
+      "lastModified": 1783317037389,
+      "tags": []
     }
   ],
   "folders": [
