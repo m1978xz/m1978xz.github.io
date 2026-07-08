@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD 语法规则 - 在线预览</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #0a0a0a; color: #eee; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+
+.container { display: flex; height: 100vh; }
+
+.editor-panel {
+  flex: 1; display: flex; flex-direction: column; border-right: 1px solid #333; background: #111; min-width: 0;
+}
+.editor-panel .header {
+  padding: 10px 16px; background: #1a1a1a; border-bottom: 1px solid #333;
+  font-size: 13px; color: #888; display: flex; align-items: center; gap: 10px;
+}
+.editor-panel .header .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.editor-panel .header .dot.r { background: #ff5f56; }
+.editor-panel .header .dot.y { background: #ffbd2e; }
+.editor-panel .header .dot.g { background: #27c93f; }
+.editor-panel .header span { margin-left: auto; font-size: 12px; color: #666; }
+textarea {
+  flex: 1; width: 100%; resize: none; border: none; outline: none; padding: 20px;
+  background: #0d0d0d; color: #d4d4d4; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 14px; line-height: 1.7; tab-size: 2;
+}
+
+.preview-panel {
+  flex: 1; display: flex; flex-direction: column; background: #0a0a0a; min-width: 0; overflow: hidden;
+}
+.preview-panel .header {
+  padding: 10px 16px; background: #1a1a1a; border-bottom: 1px solid #333;
+  font-size: 13px; color: #888; display: flex; align-items: center;
+}
+.preview-panel .header .badge {
+  margin-left: auto; background: #2d2d2d; padding: 2px 10px; border-radius: 4px; font-size: 11px; color: #999;
+}
+.preview-content {
+  flex: 1; padding: 30px 40px; overflow-y: auto; line-height: 1.8;
+}
+
+/* Markdown 渲染样式 */
+.preview-content h1 { font-size: 26px; border-bottom: 1px solid #333; padding-bottom: 10px; margin: 30px 0 16px; color: #f0f0f0; }
+.preview-content h2 { font-size: 22px; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; margin: 26px 0 14px; color: #e8e8e8; }
+.preview-content h3 { font-size: 18px; margin: 22px 0 12px; color: #e0e0e0; }
+.preview-content p { margin: 10px 0; }
+.preview-content a { color: #60b8ff; text-decoration: none; }
+.preview-content a:hover { text-decoration: underline; }
+.preview-content strong { color: #fff; }
+.preview-content blockquote {
+  border-left: 4px solid #60b8ff; padding: 8px 16px; margin: 12px 0;
+  background: #141414; color: #bbb; border-radius: 0 6px 6px 0;
+}
+.preview-content code {
+  background: #1e1e1e; padding: 2px 7px; border-radius: 4px; font-size: 13px; color: #c9d1d9;
+}
+.preview-content pre {
+  background: #121212; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 14px 0; border: 1px solid #222;
+}
+.preview-content pre code { background: none; padding: 0; }
+.preview-content table {
+  border-collapse: collapse; width: 100%; margin: 14px 0;
+}
+.preview-content th, .preview-content td {
+  border: 1px solid #333; padding: 10px 14px; text-align: left;
+}
+.preview-content th { background: #1a1a1a; color: #ccc; font-weight: 600; }
+.preview-content td { background: #0f0f0f; }
+.preview-content ul, .preview-content ol { padding-left: 24px; margin: 8px 0; }
+.preview-content li { margin: 4px 0; }
+.preview-content hr { border: none; border-top: 1px solid #333; margin: 24px 0; }
+.preview-content img { max-width: 100%; border-radius: 6px; }
+
+/* 滚动条 */
+.preview-content::-webkit-scrollbar { width: 6px; }
+.preview-content::-webkit-scrollbar-track { background: transparent; }
+.preview-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+textarea::-webkit-scrollbar { width: 6px; }
+textarea::-webkit-scrollbar-track { background: transparent; }
+textarea::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+@media (max-width: 768px) {
+  .container { flex-direction: column; }
+  .editor-panel { border-right: none; border-bottom: 1px solid #333; height: 50vh; }
+  .preview-panel { height: 50vh; }
+  .preview-content { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="editor-panel">
+    <div class="header">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span>md语法规则.md — 编辑区</span>
+    </div>
+    <textarea id="editor" spellcheck="false"></textarea>
+  </div>
+  <div class="preview-panel">
+    <div class="header">
+      预览效果
+      <span class="badge">实时渲染</span>
+    </div>
+    <div class="preview-content" id="preview"></div>
+  </div>
+</div>
+<script>
+const mdContent = `<a id="toc"></a>
+- [颜色和字号](#color)
+- [符号输入](#symbol)
+  - [表格](#table)
+- [vscode快捷键](#vscode)
+  - [页面字体大小](#zoom)
+  - [标题折叠和展开](#fold)
+  - [自动生成目录](#toc-gen)
+- [发到网上](#publish)
+
+<a id="color"></a>
+# 颜色和字号
+可以自己填<font color=yellowgreen size=6>颜色</font>名
+1. <font color="yellowgreen">yellowgreen 黄绿</font>
+2. <font color="lightgreen">lightgreen 浅绿</font>
+3. <font color="forestgreen">forestgreen 森林绿</font>
+4. <font color="skyblue">skyblue 天蓝色</font>
+5. <font color="royalblue">royalblue 宝蓝</font>
+6. <font color="coral">coral 珊瑚橙</font>
+7. <font color="tomato">tomato 番茄红</font>
+8. <font color="hotpink">hotpink 艳粉</font>
+9. <font color="gold">gold 金色</font>
+10. <font color="slategray">slategray 石板灰</font>
+
+<a id="symbol"></a>
+# 符号输入
+[↑ 返回目录](#toc)
+1. 有序
+* 无序
+  * 无序
+>引用效果
+
+**粗体** 或 __粗体__
+• 实心圆点  ○ 空心圆点  □ 方框  ✓ 勾选框
+→ 右箭头  ← 左箭头  ↑ 上箭头  ↓ 下箭头  ↔ 双向箭头
+
+<a id="table"></a>
+## 表格
+[↑ 返回目录](#toc)
+| 姓名 | 年龄 | 职业 |
+|------|------|------|
+| 张三 | 25   | 工程师 |
+| 李四 | 30   | 设计师 |
+
+| 左对齐 | 居中对齐 | 右对齐 |
+|:------|:--------:|-------:|
+| 左    | 中       | 右    |
+| 数据  | 数据     | 数据  |
+
+| 项目 | 状态 | 进度 | 负责人 |
+|------|------|------|--------|
+| 前端开发 | 进行中 | 75% | 张三 |
+| 后端开发 | 已完成 | 100% | 李四 |
+| 测试阶段 | 待开始 | 0% | 王五 |
+| 部署上线 | 计划中 | - | 赵六 |
+
+<a id="vscode"></a>
+# vscode快捷键
+[↑ 返回目录](#toc)
+<a id="zoom"></a>
+## 页面字体大小
+ctrl++或者-就能缩放
+<a id="fold"></a>
+## 标题折叠和展开
+在行号右侧，鼠标放上就能显示箭头，点击就行
+<a id="toc-gen"></a>
+## 自动生成目录
+命令：Create Table of Contents 生成文档目录（带锚点跳转）
+保存文件自动刷新目录；光标放在目录上重新执行命令更新
+支持 GitHub/GitLab/VSCode 多种标题 ID 锚点规则配置
+操作流程：
+* 修改 / 新增 / 删除文档标题 → 按 Ctrl+S 保存文件 → 目录自动全部刷新
+* 如果保存不自动更新：Ctrl+, 打开设置，搜索 toc.updateOnSave，勾选「Update TOC on save」
+
+[↑ 返回目录](#toc)
+<a id="publish"></a>
+# 发到网上
+
+先用：https://dillinger.io/?github_connected=true
+把它导出为网页，在\\<head\\>标签里放入：
+
+<details>
+<summary>点击查看代码</summary>
+
+\`\`\`html
+<style>
+body {
+  background-color: #111111;
+  color: #eeeeee;
+  padding: 30px;
+}
+.markdown-body {
+  background: #1a1a1a;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+a {
+  color: #60b8ff;
+}
+font, span[style*="color"] {
+  color: unset !important;
+}
+</style>
+\`\`\`
+</details>
+
+---
+其中的details和summary2行，是折叠的代码
+之后点开秒悟，拖进去让ai确认改成可以发布的项目类型，也可以直接把md发给它，让它改成黑底的，之后点发布`;
+
+const editor = document.getElementById('editor');
+const preview = document.getElementById('preview');
+
+editor.value = mdContent;
+
+function render() {
+  preview.innerHTML = marked.parse(editor.value);
+  preview.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#') { e.preventDefault(); return; }
+      if (href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.getElementById(href.slice(1));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+}
+
+editor.addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
