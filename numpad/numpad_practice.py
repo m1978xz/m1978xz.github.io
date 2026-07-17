@@ -103,10 +103,11 @@ class NumpadPractice:
                  fg=self.colors["wrong"], font=("Consolas", 9)
                  ).pack(side=tk.LEFT)
 
-        self.next_btn = tk.Button(df, text="▶", bg=self.colors["bg"],
-                                  fg=self.colors["muted"], font=("Consolas", 12),
-                                  bd=0, activebackground=self.colors["bg"],
-                                  activeforeground=self.colors["orange"],
+        self.next_btn = tk.Button(df, text="▶ 下一轮", bg="#3b4261",
+                                  fg=self.colors["text"], font=("Microsoft YaHei", 9),
+                                  bd=0, padx=8, pady=2,
+                                  activebackground=self.colors["orange"],
+                                  activeforeground=self.colors["bg"],
                                   cursor="hand2", command=self.skip_round)
         self.next_btn.pack(side=tk.RIGHT)
 
