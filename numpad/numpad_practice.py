@@ -4,7 +4,6 @@ import time
 import winsound
 import json
 import os
-import threading
 
 
 class NumpadPractice:
@@ -104,16 +103,33 @@ class NumpadPractice:
                  fg=self.colors["wrong"], font=("Consolas", 9)
                  ).pack(side=tk.LEFT)
 
+        self.next_btn = tk.Button(df, text="▶", bg=self.colors["bg"],
+                                  fg=self.colors["muted"], font=("Consolas", 12),
+                                  bd=0, activebackground=self.colors["bg"],
+                                  activeforeground=self.colors["orange"],
+                                  cursor="hand2", command=self.skip_round)
+        self.next_btn.pack(side=tk.RIGHT)
+
         self.root.bind("<KeyPress>", self.on_key)
         self.root.focus_set()
         self.update_stats()
 
     def play_correct_sound(self, digit):
         freq = self.CALC_TONES.get(digit, 1000)
-        threading.Thread(target=lambda: winsound.Beep(freq, 300), daemon=True).start()
+        try:
+            winsound.Beep(freq, 300)
+        except Exception:
+            pass
 
     def play_wrong_sound(self):
-        threading.Thread(target=lambda: winsound.Beep(350, 200), daemon=True).start()
+        try:
+            winsound.Beep(350, 200)
+        except Exception:
+            pass
+
+    def skip_round(self):
+        if not self.running:
+            self.new_round()
 
     def new_round(self):
         self.target = "".join(random.choice("0123456789") for _ in range(self.DIGITS))
