@@ -38,7 +38,7 @@ pyinstaller --onefile --windowed --name "小键盘数字盲打练习" numpad_pra
 
 ## 界面预览
 
-<img src="练习器.png" width="66%">
+<img src="练习器.png" width="320">
 
 ```
 ┌──────────────────────────────┐
