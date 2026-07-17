@@ -4,6 +4,7 @@ import time
 import winsound
 import json
 import os
+import threading
 
 
 class NumpadPractice:
@@ -109,10 +110,10 @@ class NumpadPractice:
 
     def play_correct_sound(self, digit):
         freq = self.CALC_TONES.get(digit, 1000)
-        winsound.Beep(freq, 300)
+        threading.Thread(target=lambda: winsound.Beep(freq, 300), daemon=True).start()
 
     def play_wrong_sound(self):
-        winsound.Beep(350, 200)
+        threading.Thread(target=lambda: winsound.Beep(350, 200), daemon=True).start()
 
     def new_round(self):
         self.target = "".join(random.choice("0123456789") for _ in range(self.DIGITS))
